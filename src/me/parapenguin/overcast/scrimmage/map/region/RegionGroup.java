@@ -23,6 +23,13 @@ public class RegionGroup {
 	@Getter RegionGroupType type;
 	@Getter List<Location> locations;
 	
+	private RegionGroup(String name, Element group, RegionGroupType type, List<Location> locations) {
+		this.name = name;
+		this.group = group;
+		this.type = type;
+		this.locations = locations;
+	}
+	
 	public RegionGroup(String name, List<Location> locations) {
 		this.name = name;
 		this.locations = locations;
@@ -155,6 +162,10 @@ public class RegionGroup {
 	
 	public boolean isInverted() {
 		return type == RegionGroupType.NEGATIVE;
+	}
+	
+	public RegionGroup clone() {
+		return new RegionGroup(getName(), getGroup(), getType(), getLocations());
 	}
 	
 }

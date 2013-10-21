@@ -5,11 +5,11 @@ import java.util.List;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
-import me.parapenguin.overcast.scrimmage.map.Map;
+import me.parapenguin.overcast.scrimmage.map.MapLoader;
 
 public class Rotation {
 	
-	static @Getter List<Map> loaded = new ArrayList<Map>();
+	static @Getter List<MapLoader> loaded = new ArrayList<MapLoader>();
 	@Getter List<RotationSlot> rotation = new ArrayList<RotationSlot>();
 	
 	public Rotation() {
@@ -23,14 +23,14 @@ public class Rotation {
 		}
 	}
 	
-	public static boolean addMap(Map map) {
-		return loaded.add(map);
+	public static boolean addMap(MapLoader loader) {
+		return loaded.add(loader);
 	}
 	
-	public static Map getMap(List<Map> maps, String name) {
-		for(Map map : maps)
-			if(map.getName().startsWith(name))
-				return map;
+	public static MapLoader getMap(List<MapLoader> loaded, String name) {
+		for(MapLoader loader : loaded)
+			if(loader.getName().startsWith(name))
+				return loader;
 		
 		return null;
 	}

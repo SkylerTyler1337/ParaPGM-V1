@@ -35,4 +35,8 @@ public class MapTeamSpawn {
 		return null;
 	}
 	
+	public MapTeamSpawn clone() {
+		return new MapTeamSpawn(getPossibles());
+	}
+	
 }

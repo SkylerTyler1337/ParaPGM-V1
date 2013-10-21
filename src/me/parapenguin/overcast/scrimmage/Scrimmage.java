@@ -6,7 +6,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 import me.parapenguin.overcast.scrimmage.rotation.Rotation;
 
@@ -26,7 +25,7 @@ public class Scrimmage extends JavaPlugin {
 				for(File contains : file.listFiles())
 					if(!contains.isDirectory() && contains.getName().endsWith(".xml") && MapLoader.isLoadable(contains)) {
 						MapLoader loader = MapLoader.getLoader(contains);
-						Map map = loader.getMap();
+						Rotation.addMap(loader);
 					}
 	}
 	

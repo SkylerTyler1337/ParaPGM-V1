@@ -37,6 +37,16 @@ public class Filter {
 	@Getter List<Material> allowBlocks; // only really allowing/denying materials...
 	@Getter List<Material> denyBlocks;
 	
+	private Filter(String name, List<FilterType> parents, List<MapTeam> allowTeams,
+			List<MapTeam> denyTeams, List<Material> allowBlocks, List<Material> denyBlocks) {
+		this.name = name;
+		this.parents = parents;
+		this.allowTeams = allowTeams;
+		this.denyTeams = denyTeams;
+		this.allowBlocks = allowBlocks;
+		this.denyBlocks = denyBlocks;
+	}
+	
 	public Filter(Element element) {
 		this.name = element.attributeValue("name");
 		List<FilterType> list = new ArrayList<FilterType>();
@@ -51,6 +61,31 @@ public class Filter {
 		
 		if(FilterType.getBySplitAttribute(name) != null)
 			list.add(FilterType.getBySplitAttribute(name));
+	}
+	
+	/*
+	 * I need a way of updating all the teams to the correct team of the new object
+	 * Supplying all the teams inside the clone should do the trick - HOWEVER, I need a way of matching each one
+	 * 
+	 * Using the ChatColor seems like the best way to do it.
+	 * 
+	 * For the sake of whatever, I'll allow a pure-clone method, which uses the same team objects as before
+	 */
+	
+	public Filter clone(List<MapTeam> replace) {
+		List<MapTeam> allowTeams = new ArrayList<MapTeam>();
+		List<MapTeam> denyTeams = new ArrayList<MapTeam>();
+		
+		for(MapTeam team : getAllowTeams())
+			allowTeams.add(MapTeam.getTeamByChatColor(replace, team.getColor()));
+		for(MapTeam team : getDenyTeams())
+			allowTeams.add(MapTeam.getTeamByChatColor(replace, team.getColor()));
+		
+		return new Filter(name, parents, allowTeams, denyTeams, allowBlocks, denyBlocks);
+	}
+	
+	public Filter clone() {
+		return new Filter(name, parents, allowTeams, denyTeams, allowBlocks, denyBlocks);
 	}
 	
 }

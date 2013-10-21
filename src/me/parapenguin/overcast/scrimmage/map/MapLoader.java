@@ -13,11 +13,13 @@ import org.dom4j.io.SAXReader;
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
+import me.parapenguin.overcast.scrimmage.map.filter.Filter;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.map.region.RegionGroup;
 import me.parapenguin.overcast.scrimmage.map.region.RegionGroupType;
 import me.parapenguin.overcast.scrimmage.map.region.RegionType;
+import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
 
 public class MapLoader {
 	
@@ -26,6 +28,18 @@ public class MapLoader {
 	
 	@Getter Map map;
 	@Getter List<RegionGroup> groups;
+
+	@Getter String name;
+	@Getter String version;
+	@Getter String objective;
+	@Getter List<String> rules;
+	@Getter List<String> authors;
+	@Getter List<Contributor> contributors;
+	@Getter List<MapTeam> teams;
+	@Getter MapTeam observers;
+	
+	@Getter List<RegionGroup> regions;
+	@Getter List<Filter> filters;
 	
 	private MapLoader(File file, Document doc) {
 		/*
@@ -34,13 +48,13 @@ public class MapLoader {
 		
 		Element root = doc.getRootElement();
 		
-		String name = root.elementText("name");
-		String version = root.elementText("version");
-		String objective = root.elementText("objective");
-		List<String> authors = getList("authors", "author");
-		List<String> rules = getList("rules", "rule");
+		this.name = root.elementText("name");
+		this.version = root.elementText("version");
+		this.objective = root.elementText("objective");
+		this.authors = getList("authors", "author");
+		this.rules = getList("rules", "rule");
 		
-		List<Contributor> contributors = new ArrayList<Contributor>();
+		this.contributors = new ArrayList<Contributor>();
 		Element contributorsElement = root.element("contributors");
 		
 		int cur = 0;
@@ -105,6 +119,10 @@ public class MapLoader {
 		List<Element> elements = getElements(regions, names);
 		for(Element element : elements)
 			groups.add(new RegionGroup(element, this));
+	}
+	
+	public Map getMap(RotationSlot slot) {
+		return new Map(slot, name, version, objective, rules, authors, contributors, teams, observers, regions, filters);
 	}
 	
 	public static boolean isLoadable(File file) {

@@ -32,6 +32,16 @@ public class MapTeam {
 	
 	@Getter List<MapTeamSpawn> spawns;
 	
+	public MapTeam(String name, ChatColor color, int cap, List<MapTeamSpawn> spawns) {
+		this.name = name;
+		this.color = color;
+		this.cap = cap;
+		
+		this.spawns = new ArrayList<MapTeamSpawn>();
+		for(MapTeamSpawn spawn : spawns)
+			this.spawns.add(spawn.clone());
+	}
+	
 	public MapTeam(String name, ChatColor color, int cap) {
 		this.name = name;
 		this.color = color;
@@ -105,6 +115,18 @@ public class MapTeam {
 	
 	public boolean isObserver() {
 		return ChatColor.AQUA == getColor();
+	}
+	
+	public MapTeam clone() {
+		return new MapTeam(getName(), getColor(), getCap(), getSpawns());
+	}
+	
+	public static MapTeam getTeamByChatColor(List<MapTeam> teams, ChatColor color) {
+		for(MapTeam team : teams)
+			if(team.getColor() == color)
+				return team;
+		
+		return null;
 	}
 	
 }
