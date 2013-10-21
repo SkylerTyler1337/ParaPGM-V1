@@ -9,11 +9,9 @@ import me.parapenguin.overcast.scrimmage.map.extras.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.extras.Region;
 import me.parapenguin.overcast.scrimmage.map.extras.RegionType;
 import me.parapenguin.overcast.scrimmage.utils.ConversionUtil;
-import me.parapenguin.overcast.scrimmage.utils.RegionUtil;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.dom4j.Element;
 
 public class MapTeam {

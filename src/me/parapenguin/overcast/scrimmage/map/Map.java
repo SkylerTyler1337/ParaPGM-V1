@@ -13,5 +13,6 @@ public class Map {
 	@Getter List<String> authors;
 	@Getter List<Contributor> contributors;
 	@Getter List<MapTeam> teams;
+	@Getter MapTeam observers;
 	
 }

@@ -12,7 +12,12 @@ import org.dom4j.io.SAXReader;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.map.extras.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
+import me.parapenguin.overcast.scrimmage.map.extras.Region;
+import me.parapenguin.overcast.scrimmage.map.extras.RegionGroup;
+import me.parapenguin.overcast.scrimmage.map.extras.RegionGroupType;
+import me.parapenguin.overcast.scrimmage.map.extras.RegionType;
 
 public class MapLoader {
 	
@@ -20,6 +25,7 @@ public class MapLoader {
 	@Getter Document doc;
 	
 	@Getter Map map;
+	@Getter List<RegionGroup> groups;
 	
 	private MapLoader(File file, Document doc) {
 		/*
@@ -67,6 +73,38 @@ public class MapLoader {
 		
 		for(MapTeam team : teams)
 			team.load(root.element("spawns"));
+		MapTeam obs = new MapTeam("Observers", ChatColor.AQUA, -1);
+		obs.load(teamsElement);
+		
+		Element regions = root.element("regions");
+		Region shapes = new Region(regions, RegionType.ALL);
+		
+		List<RegionGroup> groups = new ArrayList<RegionGroup>();
+		for(ConfiguredRegion conf : shapes.getRegions())
+			groups.add(new RegionGroup(conf.getName(), conf.getLocations()));
+		
+		/*
+		List<Element> negatives = getElements(regions, RegionGroupType.NEGATIVE.name().toLowerCase());
+		List<Element> unions = getElements(regions, RegionGroupType.UNION.name().toLowerCase());
+		List<Element> complements = getElements(regions, RegionGroupType.COMPLEMENT.name().toLowerCase());
+		List<Element> intersects = getElements(regions, RegionGroupType.INTERSECT.name().toLowerCase());
+		
+		List<Element> all = new ArrayList<Element>();
+		all.addAll(negatives);
+		all.addAll(unions);
+		all.addAll(complements);
+		all.addAll(intersects);
+		*/
+		
+		List<String> names = new ArrayList<String>();
+		names.add(RegionGroupType.NEGATIVE.name().toLowerCase());
+		names.add(RegionGroupType.UNION.name().toLowerCase());
+		names.add(RegionGroupType.COMPLEMENT.name().toLowerCase());
+		names.add(RegionGroupType.INTERSECT.name().toLowerCase());
+		
+		List<Element> elements = getElements(regions, names);
+		for(Element element : elements)
+			groups.add(new RegionGroup(element, this));
 	}
 	
 	public static boolean isLoadable(File file) {
@@ -96,6 +134,14 @@ public class MapLoader {
 		return new MapLoader(file, doc);
 	}
 	
+	public RegionGroup getRegionGroup(String name) {
+		for(RegionGroup group : getGroups())
+			if(group.getName().equalsIgnoreCase(name))
+				return group;
+		
+		return null;
+	}
+	
 	private List<String> getList(String container, String contains) {
 		Element root = doc.getRootElement();
 		
@@ -112,6 +158,19 @@ public class MapLoader {
 		return contents;
 	}
 	
+	public static List<Element> getElements(Element from, List<String> names) {
+		List<Element> elements = new ArrayList<Element>();
+		
+		int cur = 0;
+		while(from.elements().size() < cur) {
+			if(names.contains(((Element) from.elements().get(cur)).getName()))
+				elements.add(((Element) from.elements().get(cur)));
+			cur++;
+		}
+		
+		return elements;
+	}
+	
 	public static List<Element> getElements(Element from, String name) {
 		List<Element> elements = new ArrayList<Element>();
 		
@@ -119,6 +178,18 @@ public class MapLoader {
 		while(from.elements().size() < cur) {
 			if(((Element) from.elements().get(cur)).getName().equalsIgnoreCase(name))
 				elements.add(((Element) from.elements().get(cur)));
+			cur++;
+		}
+		
+		return elements;
+	}
+	
+	public static List<Element> getElements(Element from) {
+		List<Element> elements = new ArrayList<Element>();
+		
+		int cur = 0;
+		while(from.elements().size() < cur) {
+			elements.add(((Element) from.elements().get(cur)));
 			cur++;
 		}
 		

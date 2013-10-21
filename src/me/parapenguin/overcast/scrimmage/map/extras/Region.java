@@ -20,6 +20,15 @@ public class Region {
 	@Getter List<ConfiguredRegion> regions;
 	@Getter List<Element> elements;
 	
+	public Region(Element element) {
+		List<Element> elements = new ArrayList<Element>();
+		elements.add(element);
+		
+		Region region = new Region(elements, RegionType.getByElementName(element.getName()));
+		this.elements = region.getElements();
+		this.regions = region.getRegions();
+	}
+	
 	public Region(List<Element> elements, @NonNull RegionType type) {
 		MAX_BUILD_HEIGHT = Scrimmage.getInstance().getServer().getWorlds().get(0).getMaxHeight();
 		regions = new ArrayList<ConfiguredRegion>();
@@ -135,6 +144,15 @@ public class Region {
 				regions.add(new ConfiguredRegion(name, getPoint(point)));
 			}
 		}
+	}
+	
+	public List<Location> getLocations() {
+		List<Location> locations = new ArrayList<Location>();
+		
+		for(ConfiguredRegion conf : getRegions())
+			locations.addAll(conf.getLocations());
+		
+		return locations;
 	}
 	
 	public List<Location> getRectangle(Element rectangle) {

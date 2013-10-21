@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.parapenguin.overcast.scrimmage.player.Client;
 import net.minecraft.server.v1_6_R3.Packet63WorldParticles;
 
 import org.bukkit.Location;
