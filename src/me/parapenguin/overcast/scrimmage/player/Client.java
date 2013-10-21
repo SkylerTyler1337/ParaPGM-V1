@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
+import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.map.MapTeam;
 
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachment;
 
 public class Client {
 	
@@ -20,9 +23,23 @@ public class Client {
 	}
 	
 	@Getter Player player;
+	@Getter MapTeam team;
+	
+	@Getter PermissionAttachment perms;
 	
 	public Client(Player player) {
 		this.player = player;
+		this.perms = player.addAttachment(Scrimmage.getInstance());
+	}
+	
+	public void setTeam(MapTeam team) {
+		this.team = team;
+		player.teleport(team.getSpawn());
+		team.loadout(this);
+	}
+	
+	public boolean isObserver() {
+		return team.isObserver();
 	}
 	
 }

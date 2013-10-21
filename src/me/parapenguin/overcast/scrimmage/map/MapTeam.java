@@ -8,10 +8,13 @@ import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.map.region.RegionType;
+import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.utils.ConversionUtil;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.dom4j.Element;
 
 public class MapTeam {
@@ -119,6 +122,36 @@ public class MapTeam {
 	
 	public MapTeam clone() {
 		return new MapTeam(getName(), getColor(), getCap(), getSpawns());
+	}
+	
+	public List<Client> getPlayers() {
+		List<Client> clients = new ArrayList<Client>();
+		
+		for(Client client : Client.getClients())
+			if(client.getTeam() == this)
+				clients.add(client);
+		
+		return clients;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void loadout(Client client) {
+		client.getPlayer().getInventory().clear();
+		client.getPlayer().getInventory().setHelmet(null);
+		client.getPlayer().getInventory().setChestplate(null);
+		client.getPlayer().getInventory().setLeggings(null);
+		client.getPlayer().getInventory().setBoots(null);
+		client.getPlayer().updateInventory();
+		
+		if(isObserver()) {
+			client.getPerms().setPermission("worldedit.navigation.thru.tool", true);
+			client.getPerms().setPermission("worldedit.navigation.jump.tool", true);
+			client.getPlayer().getInventory().setItem(0, new ItemStack(Material.COMPASS));
+		}
+
+		client.getPerms().unsetPermission("worldedit.navigation.thru.tool");
+		client.getPerms().unsetPermission("worldedit.navigation.jump.tool");
+		
 	}
 	
 	public static MapTeam getTeamByChatColor(List<MapTeam> teams, ChatColor color) {

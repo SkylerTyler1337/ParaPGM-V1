@@ -122,7 +122,7 @@ public class MapLoader {
 	}
 	
 	public Map getMap(RotationSlot slot) {
-		return new Map(slot, name, version, objective, rules, authors, contributors, teams, observers, regions, filters);
+		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers, regions, filters);
 	}
 	
 	public static boolean isLoadable(File file) {

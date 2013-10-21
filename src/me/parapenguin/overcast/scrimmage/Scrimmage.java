@@ -2,10 +2,12 @@ package me.parapenguin.overcast.scrimmage;
 
 import java.io.File;
 
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.parapenguin.overcast.scrimmage.event.PlayerEvents;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 import me.parapenguin.overcast.scrimmage.rotation.Rotation;
 
@@ -27,6 +29,10 @@ public class Scrimmage extends JavaPlugin {
 						MapLoader loader = MapLoader.getLoader(contains);
 						Rotation.addMap(loader);
 					}
+		
+		setRotation(new Rotation());
+		
+		registerListener(new PlayerEvents());
 	}
 	
 	public static int random(int min, int max) {
@@ -38,7 +44,11 @@ public class Scrimmage extends JavaPlugin {
 	}
 	
 	public static File getMapRoot() {
-		return new File(getRootFolder().getAbsolutePath() + "/maps/");
+		return new File("/home/servers/scrim/maps/");
+	}
+	
+	public static void registerListener(Listener listener) {
+		getInstance().getServer().getPluginManager().registerEvents(listener, getInstance());
 	}
 	
 }
