@@ -1,21 +1,20 @@
 package me.parapenguin.overcast.scrimmage.map.filter;
 
+import lombok.Getter;
+
 public enum FilterType {
-	
-	ALLOW_ALL(),
-	DENY_ALL(),
 	
 	ALLOW_PLAYERS(),
 	DENY_PLAYERS(),
-	
-	ALLOW_BLOCKS(),
-	DENY_BLOCKS(),
 	
 	ALLOW_PLACE(),
 	DENY_PLACE(),
 	
 	ALLOW_BREAK(),
 	DENY_BREAK(),
+	
+	ALLOW_BLOCKS(new FilterType[]{ALLOW_PLACE, ALLOW_BREAK}),
+	DENY_BLOCKS(new FilterType[]{DENY_PLACE, DENY_BREAK}),
 	
 	ALLOW_WORLD(),
 	DENY_WORLD(),
@@ -27,6 +26,27 @@ public enum FilterType {
 	DENY_ENTITIES(),
 	
 	ALLOW_MOBS(),
-	DENY_MOBS();
+	DENY_MOBS(),
+	
+	ALLOW_ALL(new FilterType[]{ALLOW_PLAYERS, ALLOW_PLACE, ALLOW_BLOCKS, ALLOW_SPAWNS, ALLOW_ENTITIES, ALLOW_MOBS}),
+	DENY_ALL(new FilterType[]{DENY_PLAYERS, DENY_PLACE, DENY_BLOCKS, DENY_SPAWNS, DENY_ENTITIES, DENY_MOBS});
+	
+	@Getter FilterType[] children;
+	
+	FilterType() {
+		this(new FilterType[0]);
+	}
+	
+	FilterType(FilterType[] types) {
+		children = types;
+	}
+	
+	public static FilterType getBySplitAttribute(String attr) {
+		for(FilterType type : values())
+			if(type.name().replaceAll("_", "-").equalsIgnoreCase(attr))
+				return type;
+		
+		return null;
+	}
 	
 }
