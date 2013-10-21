@@ -1,4 +1,4 @@
-package me.parapenguin.overcast.scrimmage.map.extras;
+package me.parapenguin.overcast.scrimmage.map.region;
 
 import java.util.List;
 

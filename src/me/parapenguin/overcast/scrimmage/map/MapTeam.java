@@ -5,9 +5,9 @@ import java.util.List;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
-import me.parapenguin.overcast.scrimmage.map.extras.ConfiguredRegion;
-import me.parapenguin.overcast.scrimmage.map.extras.Region;
-import me.parapenguin.overcast.scrimmage.map.extras.RegionType;
+import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
+import me.parapenguin.overcast.scrimmage.map.region.Region;
+import me.parapenguin.overcast.scrimmage.map.region.RegionType;
 import me.parapenguin.overcast.scrimmage.utils.ConversionUtil;
 
 import org.bukkit.ChatColor;

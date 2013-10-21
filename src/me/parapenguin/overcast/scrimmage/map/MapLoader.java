@@ -12,12 +12,12 @@ import org.dom4j.io.SAXReader;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
-import me.parapenguin.overcast.scrimmage.map.extras.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
-import me.parapenguin.overcast.scrimmage.map.extras.Region;
-import me.parapenguin.overcast.scrimmage.map.extras.RegionGroup;
-import me.parapenguin.overcast.scrimmage.map.extras.RegionGroupType;
-import me.parapenguin.overcast.scrimmage.map.extras.RegionType;
+import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
+import me.parapenguin.overcast.scrimmage.map.region.Region;
+import me.parapenguin.overcast.scrimmage.map.region.RegionGroup;
+import me.parapenguin.overcast.scrimmage.map.region.RegionGroupType;
+import me.parapenguin.overcast.scrimmage.map.region.RegionType;
 
 public class MapLoader {
 	

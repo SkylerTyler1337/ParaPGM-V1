@@ -5,7 +5,7 @@ import java.util.List;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
-import me.parapenguin.overcast.scrimmage.map.extras.ConfiguredRegion;
+import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 
 import org.bukkit.Location;
 
