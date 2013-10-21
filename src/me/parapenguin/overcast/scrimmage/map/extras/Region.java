@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NonNull;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
-import me.parapenguin.overcast.scrimmage.map.MapTeamSpawn;
 import me.parapenguin.overcast.scrimmage.utils.RegionUtil;
 
 import org.bukkit.Location;
@@ -17,189 +17,122 @@ public class Region {
 	
 	private static int MAX_BUILD_HEIGHT = 0;
 	
-	@Getter List<Location> locations;
+	@Getter List<ConfiguredRegion> regions;
+	@Getter List<Element> elements;
 	
-	public Region(Element element, RegionType type) {
+	public Region(List<Element> elements, @NonNull RegionType type) {
 		MAX_BUILD_HEIGHT = Scrimmage.getInstance().getServer().getWorlds().get(0).getMaxHeight();
-		locations = new ArrayList<Location>();
+		regions = new ArrayList<ConfiguredRegion>();
+		this.elements = new ArrayList<Element>();
 		
-		if(type == RegionType.RECTANGLE) {
-			List<Element> rectangles = MapLoader.getElements(element, "rectangle");
-			for(Element rectangle : rectangles)
-				locations.addAll(getRectangle(rectangle));
+		for(Element element : elements) {
+			if(type == RegionType.RECTANGLE && element.getName().equalsIgnoreCase("rectangle")) {
+				this.elements.add(element);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getRectangle(element)));
+			}
+			
+			if(type == RegionType.CUBOID && element.getName().equalsIgnoreCase("cuboid")) {
+				this.elements.add(element);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getCuboid(element)));
+			}
+			
+			if(type == RegionType.CIRCLE && element.getName().equalsIgnoreCase("circle")) {
+				this.elements.add(element);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getCircle(element)));
+			}
+			
+			if(type == RegionType.CYLINDER && element.getName().equalsIgnoreCase("cylinder")) {
+				this.elements.add(element);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getCylinder(element)));
+			}
+			
+			if(type == RegionType.SPHERE && element.getName().equalsIgnoreCase("sphere")) {
+				this.elements.add(element);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getSphere(element)));
+			}
+			
+			if(type == RegionType.BLOCK && element.getName().equalsIgnoreCase("point")) {
+				this.elements.add(element);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getPoint(element)));
+			}
 		}
+	}
+	
+	/*
+	 * The element variable is actually the root element - pretty obvious from the code...
+	 */
+	public Region(Element element, @NonNull RegionType type) {
+		MAX_BUILD_HEIGHT = Scrimmage.getInstance().getServer().getWorlds().get(0).getMaxHeight();
+		regions = new ArrayList<ConfiguredRegion>();
 		
-		if(type == RegionType.CUBOID) {
-			List<Element> cuboids = MapLoader.getElements(element, "cuboid");
-			for(Element cuboid : cuboids)
-				locations.addAll(getCuboid(cuboid));
-		}
-		
+		List<Element> rectangles = MapLoader.getElements(element, "rectangle");
+		List<Element> cuboids = MapLoader.getElements(element, "cuboid");
 		List<Element> circles = MapLoader.getElements(element, "circle");
-		for(Element circle : circles) {
-			/*
-			 * Setup Circle Regions
-			 * Example: <circle name="something" center="X1,Z1" radius="R"/>
-			 * Notes: From 0 to Max Build Height
-			 */
-			
-			boolean failed = false;
-			String center = circle.attributeValue("center");
-			String radius = circle.attributeValue("radius");
-			
-			double cR = 0;
-			double cX = 0;
-			double cY = 0;
-			double cZ = 0;
-			
-			String[] cSplit = center.split(",");
-			String cXS = cSplit[0];
-			String cYS = cSplit[1];
-			String cZS = cSplit[2];
-			
-			try {
-				cR = Double.parseDouble(radius);
-				cX = Double.parseDouble(cXS);
-				cY = Double.parseDouble(cYS);
-				cZ = Double.parseDouble(cZS);
-			} catch(NumberFormatException nfe) {
-				nfe.printStackTrace();
-				failed = true;
-			}
-			
-			if(!failed) {
-				Location centerL = new Location(null, cX, cY, cZ);
-				
-				List<Location> possibles = RegionUtil.circle(centerL, cR, MAX_BUILD_HEIGHT, false, false);
-				MapTeamSpawn mts = new MapTeamSpawn(possibles);
-				spawns.add(mts);
-			}
-		}
-		
-		/*
-		 * Setup Cylinder Regions
-		 * Example: <cylinder name="something" base="X1,Y1,Z1" radius="R" height="H"/>
-		 * Notes: From 0 to the defined height
-		 */
-		
 		List<Element> cylinders = MapLoader.getElements(element, "cylinder");
-		for(Element cylinder : cylinders) {
-			boolean failed = false;
-			String center = cylinder.attributeValue("center");
-			String radius = cylinder.attributeValue("radius");
-			String height = cylinder.attributeValue("height");
-			
-			double cR = 0;
-			double cH = 0;
-			double cX = 0;
-			double cY = 0;
-			double cZ = 0;
-			
-			String[] cSplit = center.split(",");
-			String cXS = cSplit[0];
-			String cYS = cSplit[1];
-			String cZS = cSplit[2];
-			
-			try {
-				cR = Double.parseDouble(radius);
-				cH = Double.parseDouble(height);
-				cX = Double.parseDouble(cXS);
-				cY = Double.parseDouble(cYS);
-				cZ = Double.parseDouble(cZS);
-			} catch(NumberFormatException nfe) {
-				nfe.printStackTrace();
-				failed = true;
-			}
-			
-			if(!failed) {
-				Location centerL = new Location(null, cX, cY, cZ);
-				
-				List<Location> possibles = RegionUtil.circle(centerL, cR, cH, false, false);
-				MapTeamSpawn mts = new MapTeamSpawn(possibles);
-				spawns.add(mts);
-			}
-		}
-		
-		/*
-		 * Setup Sphere Regions
-		 * Example: <sphere name="something" origin="X1,Y1,Z1" radius="R"/>
-		 * Notes: I can't remember how my RegionUtil works. That sucks, I guess... hahah
-		 */
-		
 		List<Element> spheres = MapLoader.getElements(element, "sphere");
-		for(Element sphere : spheres) {
-			boolean failed = false;
-			String center = sphere.attributeValue("center");
-			String radius = sphere.attributeValue("radius");
-			
-			double cR = 0;
-			double cH = 0;
-			double cX = 0;
-			double cY = 0;
-			double cZ = 0;
-			
-			String[] cSplit = center.split(",");
-			String cXS = cSplit[0];
-			String cYS = cSplit[1];
-			String cZS = cSplit[2];
-			
-			try {
-				cR = Double.parseDouble(radius);
-				cH = cR;
-				cX = Double.parseDouble(cXS);
-				cY = Double.parseDouble(cYS);
-				cZ = Double.parseDouble(cZS);
-			} catch(NumberFormatException nfe) {
-				nfe.printStackTrace();
-				failed = true;
-			}
-			
-			if(!failed) {
-				Location centerL = new Location(null, cX, cY, cZ);
-				
-				List<Location> possibles = RegionUtil.circle(centerL, cR, cH, false, false);
-				MapTeamSpawn mts = new MapTeamSpawn(possibles);
-				spawns.add(mts);
-			}
-		}
-		
-		/*
-		 * Setup Point/Block Regions
-		 * Example: <block name="something">X,Y,Z</block> or <point>X,Y,Z</point>
-		 * Notes: N/A
-		 */
-		
 		List<Element> points = MapLoader.getElements(element, "point");
-		points.addAll(MapLoader.getElements(element, "block"));
-		for(Element point : points) {
-			boolean failed = false;
-			String center = point.getText();
-			
-			double cX = 0;
-			double cY = 0;
-			double cZ = 0;
-			
-			String[] cSplit = center.split(",");
-			String cXS = cSplit[0];
-			String cYS = cSplit[1];
-			String cZS = cSplit[2];
-			
-			try {
-				cX = Double.parseDouble(cXS);
-				cY = Double.parseDouble(cYS);
-				cZ = Double.parseDouble(cZS);
-			} catch(NumberFormatException nfe) {
-				nfe.printStackTrace();
-				failed = true;
+		
+		elements = new ArrayList<Element>();
+		
+		if(type == RegionType.RECTANGLE || type == RegionType.ALL)
+			for(Element rectangle : rectangles) {
+				elements.add(rectangle);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getRectangle(rectangle)));
 			}
-			
-			if(!failed) {
-				Location location = new Location(null, cX, cY, cZ);
-				
-				List<Location> possibles = new ArrayList<Location>();
-				possibles.add(location);
-				MapTeamSpawn mts = new MapTeamSpawn(possibles);
-				spawns.add(mts);
+		
+		if(type == RegionType.CUBOID || type == RegionType.ALL)
+			for(Element cuboid : cuboids) {
+				elements.add(cuboid);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getCuboid(cuboid)));
+			}
+		
+		if(type == RegionType.CIRCLE || type == RegionType.ALL)
+			for(Element circle : circles) {
+				elements.add(circle);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getCircle(circle)));
+			}
+		
+		if(type == RegionType.CYLINDER || type == RegionType.ALL)
+			for(Element cylinder : cylinders) {
+				elements.add(cylinder);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getCylinder(cylinder)));
+			}
+		
+		if(type == RegionType.SPHERE || type == RegionType.ALL)
+			for(Element sphere : spheres) {
+				elements.add(sphere);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getSphere(sphere)));
+			}
+		
+		if(type == RegionType.BLOCK || type == RegionType.ALL) {
+			points.addAll(MapLoader.getElements(element, "block"));
+			for(Element point : points) {
+				elements.add(point);
+				String name = null;
+				if(element.attributeValue("name") != null) name = element.attributeValue("name");
+				regions.add(new ConfiguredRegion(name, getPoint(point)));
 			}
 		}
 	}
@@ -313,6 +246,177 @@ public class Region {
 			for(Block block : possibleBlocks)
 				possibles.add(block.getLocation());
 			
+			locations.addAll(possibles);
+		}
+		
+		return locations;
+	}
+	
+	public List<Location> getCircle(Element circle) {
+		/*
+		 * Setup Circle Regions
+		 * Example: <circle name="something" center="X1,Z1" radius="R"/>
+		 * Notes: From 0 to Max Build Height
+		 */
+		
+		List<Location> locations = new ArrayList<Location>();
+		boolean failed = false;
+		String center = circle.attributeValue("center");
+		String radius = circle.attributeValue("radius");
+		
+		double cR = 0;
+		double cX = 0;
+		double cY = 0;
+		double cZ = 0;
+		
+		String[] cSplit = center.split(",");
+		String cXS = cSplit[0];
+		String cYS = cSplit[1];
+		String cZS = cSplit[2];
+		
+		try {
+			cR = Double.parseDouble(radius);
+			cX = Double.parseDouble(cXS);
+			cY = Double.parseDouble(cYS);
+			cZ = Double.parseDouble(cZS);
+		} catch(NumberFormatException nfe) {
+			nfe.printStackTrace();
+			failed = true;
+		}
+		
+		if(!failed) {
+			Location centerL = new Location(null, cX, cY, cZ);
+			
+			List<Location> possibles = RegionUtil.circle(centerL, cR, MAX_BUILD_HEIGHT, false, false);
+			locations.addAll(possibles);
+		}
+		
+		return locations;
+	}
+	
+	public List<Location> getCylinder(Element cylinder) {
+		/*
+		 * Setup Cylinder Regions
+		 * Example: <cylinder name="something" base="X1,Y1,Z1" radius="R" height="H"/>
+		 * Notes: From 0 to the defined height
+		 */
+		
+		List<Location> locations = new ArrayList<Location>();
+		boolean failed = false;
+		String center = cylinder.attributeValue("center");
+		String radius = cylinder.attributeValue("radius");
+		String height = cylinder.attributeValue("height");
+		
+		double cR = 0;
+		double cH = 0;
+		double cX = 0;
+		double cY = 0;
+		double cZ = 0;
+		
+		String[] cSplit = center.split(",");
+		String cXS = cSplit[0];
+		String cYS = cSplit[1];
+		String cZS = cSplit[2];
+		
+		try {
+			cR = Double.parseDouble(radius);
+			cH = Double.parseDouble(height);
+			cX = Double.parseDouble(cXS);
+			cY = Double.parseDouble(cYS);
+			cZ = Double.parseDouble(cZS);
+		} catch(NumberFormatException nfe) {
+			nfe.printStackTrace();
+			failed = true;
+		}
+		
+		if(!failed) {
+			Location centerL = new Location(null, cX, cY, cZ);
+			
+			List<Location> possibles = RegionUtil.circle(centerL, cR, cH, false, false);
+			locations.addAll(possibles);
+		}
+		
+		return locations;
+	}
+	
+	public List<Location> getSphere(Element sphere) {
+		/*
+		 * Setup Sphere Regions
+		 * Example: <sphere name="something" origin="X1,Y1,Z1" radius="R"/>
+		 * Notes: I can't remember how my RegionUtil works. That sucks, I guess... hahah
+		 */
+		
+		List<Location> locations = new ArrayList<Location>();
+		boolean failed = false;
+		String center = sphere.attributeValue("center");
+		String radius = sphere.attributeValue("radius");
+		
+		double cR = 0;
+		double cH = 0;
+		double cX = 0;
+		double cY = 0;
+		double cZ = 0;
+		
+		String[] cSplit = center.split(",");
+		String cXS = cSplit[0];
+		String cYS = cSplit[1];
+		String cZS = cSplit[2];
+		
+		try {
+			cR = Double.parseDouble(radius);
+			cH = cR;
+			cX = Double.parseDouble(cXS);
+			cY = Double.parseDouble(cYS);
+			cZ = Double.parseDouble(cZS);
+		} catch(NumberFormatException nfe) {
+			nfe.printStackTrace();
+			failed = true;
+		}
+		
+		if(!failed) {
+			Location centerL = new Location(null, cX, cY, cZ);
+			
+			List<Location> possibles = RegionUtil.circle(centerL, cR, cH, false, false);
+			locations.addAll(possibles);
+		}
+		
+		return locations;
+	}
+	
+	public List<Location> getPoint(Element point) {
+		/*
+		 * Setup Point/Block Regions
+		 * Example: <block name="something">X,Y,Z</block> or <point>X,Y,Z</point>
+		 * Notes: N/A
+		 */
+		
+		List<Location> locations = new ArrayList<Location>();
+		boolean failed = false;
+		String center = point.getText();
+		
+		double cX = 0;
+		double cY = 0;
+		double cZ = 0;
+		
+		String[] cSplit = center.split(",");
+		String cXS = cSplit[0];
+		String cYS = cSplit[1];
+		String cZS = cSplit[2];
+		
+		try {
+			cX = Double.parseDouble(cXS);
+			cY = Double.parseDouble(cYS);
+			cZ = Double.parseDouble(cZS);
+		} catch(NumberFormatException nfe) {
+			nfe.printStackTrace();
+			failed = true;
+		}
+		
+		if(!failed) {
+			Location location = new Location(null, cX, cY, cZ);
+			
+			List<Location> possibles = new ArrayList<Location>();
+			possibles.add(location);
 			locations.addAll(possibles);
 		}
 		

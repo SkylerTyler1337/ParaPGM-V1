@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.map.extras.ConfiguredRegion;
 
 import org.bukkit.Location;
 
@@ -17,6 +18,10 @@ public class MapTeamSpawn {
 	
 	public MapTeamSpawn(List<Location> possibles) {
 		this.possibles = possibles;
+	}
+	
+	public MapTeamSpawn(ConfiguredRegion region) {
+		this.possibles = region.getLocations();
 	}
 	
 	public Location getSpawn() {
