@@ -159,10 +159,24 @@ public class Region {
 		return locations;
 	}
 	
-	public Double parseInfiniteDouble(String parse) throws NumberFormatException {
+	public Double parseInfiniteDouble(LocationPoint point, String parse) throws NumberFormatException {
+		double start = 0;
+		int difference = 1000;
+		if(point == LocationPoint.X)
+			start = map.getObservers().getSpawn().getX();
+		else if(point == LocationPoint.Y) {
+			start = map.getObservers().getSpawn().getY();
+			if(parse.equalsIgnoreCase("oo")) difference = (int) (255 - start);
+			else if(parse.equalsIgnoreCase("-oo")) difference = (int) (start);
+			
+			if(parse.equalsIgnoreCase("oo") && difference > ((int) (255 + start))) difference = 255 - ((int) start);
+		}
+		else if(point == LocationPoint.Z)
+			start = map.getObservers().getSpawn().getZ();
+		
 		double value = 0;
-		if(parse.equalsIgnoreCase("oo")) value = Double.MAX_VALUE;
-		else if(parse.equalsIgnoreCase("-oo")) value = Double.MIN_VALUE;
+		if(parse.equalsIgnoreCase("oo")) value = start + difference;
+		else if(parse.equalsIgnoreCase("-oo")) value = start - difference;
 		else value = Double.parseDouble(parse);
 		return value;
 	}
@@ -199,11 +213,11 @@ public class Region {
 		String maxZS = maxSplit[1];
 		
 		try {
-			minX = parseInfiniteDouble(minXS);
-			minZ = parseInfiniteDouble(minZS);
+			minX = parseInfiniteDouble(LocationPoint.X, minXS);
+			minZ = parseInfiniteDouble(LocationPoint.Z, minZS);
 			
-			maxX = parseInfiniteDouble(maxXS);
-			maxZ = parseInfiniteDouble(maxZS);
+			maxX = parseInfiniteDouble(LocationPoint.X, maxXS);
+			maxZ = parseInfiniteDouble(LocationPoint.Z, maxZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
@@ -255,13 +269,13 @@ public class Region {
 		String maxZS = maxSplit[2];
 		
 		try {
-			minX = parseInfiniteDouble(minXS);
-			minY = parseInfiniteDouble(minYS);
-			minZ = parseInfiniteDouble(minZS);
+			minX = parseInfiniteDouble(LocationPoint.X, minXS);
+			minY = parseInfiniteDouble(LocationPoint.Y, minYS);
+			minZ = parseInfiniteDouble(LocationPoint.Z, minZS);
 			
-			maxX = parseInfiniteDouble(maxXS);
-			maxY = parseInfiniteDouble(maxYS);
-			maxZ = parseInfiniteDouble(maxZS);
+			maxX = parseInfiniteDouble(LocationPoint.X, maxXS);
+			maxY = parseInfiniteDouble(LocationPoint.Y, maxYS);
+			maxZ = parseInfiniteDouble(LocationPoint.Z, maxZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
@@ -305,10 +319,10 @@ public class Region {
 		String cZS = cSplit[2];
 		
 		try {
-			cR = parseInfiniteDouble(radius);
-			cX = parseInfiniteDouble(cXS);
-			cY = parseInfiniteDouble(cYS);
-			cZ = parseInfiniteDouble(cZS);
+			cR = parseInfiniteDouble(LocationPoint.X, radius);
+			cX = parseInfiniteDouble(LocationPoint.X, cXS);
+			cY = parseInfiniteDouble(LocationPoint.Y, cYS);
+			cZ = parseInfiniteDouble(LocationPoint.Z, cZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
@@ -349,11 +363,11 @@ public class Region {
 		String cZS = cSplit[2];
 		
 		try {
-			cR = parseInfiniteDouble(radius);
-			cH = parseInfiniteDouble(height);
-			cX = parseInfiniteDouble(cXS);
-			cY = parseInfiniteDouble(cYS);
-			cZ = parseInfiniteDouble(cZS);
+			cR = parseInfiniteDouble(LocationPoint.X, radius);
+			cH = parseInfiniteDouble(LocationPoint.X, height);
+			cX = parseInfiniteDouble(LocationPoint.X, cXS);
+			cY = parseInfiniteDouble(LocationPoint.Y, cYS);
+			cZ = parseInfiniteDouble(LocationPoint.Z, cZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
@@ -393,11 +407,11 @@ public class Region {
 		String cZS = cSplit[2];
 		
 		try {
-			cR = parseInfiniteDouble(radius);
+			cR = parseInfiniteDouble(LocationPoint.X, radius);
 			cH = cR;
-			cX = parseInfiniteDouble(cXS);
-			cY = parseInfiniteDouble(cYS);
-			cZ = parseInfiniteDouble(cZS);
+			cX = parseInfiniteDouble(LocationPoint.X, cXS);
+			cY = parseInfiniteDouble(LocationPoint.Y, cYS);
+			cZ = parseInfiniteDouble(LocationPoint.Z, cZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
@@ -434,9 +448,9 @@ public class Region {
 		String cZS = cSplit[2];
 		
 		try {
-			cX = parseInfiniteDouble(cXS);
-			cY = parseInfiniteDouble(cYS);
-			cZ = parseInfiniteDouble(cZS);
+			cX = parseInfiniteDouble(LocationPoint.X, cXS);
+			cY = parseInfiniteDouble(LocationPoint.Y, cYS);
+			cZ = parseInfiniteDouble(LocationPoint.Z, cZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
