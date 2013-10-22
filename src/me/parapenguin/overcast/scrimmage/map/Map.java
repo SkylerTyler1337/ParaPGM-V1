@@ -4,16 +4,22 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.util.FileUtil;
+import org.dom4j.Element;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.filter.Filter;
+import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
+import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.map.region.RegionGroup;
+import me.parapenguin.overcast.scrimmage.map.region.RegionGroupType;
+import me.parapenguin.overcast.scrimmage.map.region.RegionType;
 import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
 
 public class Map {
@@ -27,12 +33,13 @@ public class Map {
 	
 	@Getter MapLoader loader;
 	@Getter RotationSlot slot;
+	@Getter World world;
 	
 	@Getter String name;
 	@Getter String version;
 	@Getter String objective;
 	@Getter List<String> rules;
-	@Getter List<String> authors;
+	@Getter List<Contributor> authors;
 	@Getter List<Contributor> contributors;
 	@Getter List<MapTeam> teams;
 	@Getter MapTeam observers;
@@ -40,8 +47,8 @@ public class Map {
 	@Getter List<RegionGroup> regions;
 	@Getter List<Filter> filters;
 	
-	public Map(MapLoader loader, RotationSlot slot, String name, String version, String objective, List<String> rules, List<String> authors,
-			List<Contributor> contributors, List<MapTeam> teams, MapTeam observers, List<RegionGroup> regions, List<Filter> filters) {
+	public Map(MapLoader loader, RotationSlot slot, String name, String version, String objective, List<String> rules, List<Contributor> authors,
+			List<Contributor> contributors, List<MapTeam> teams, MapTeam observers) {
 		this.loader = loader;
 		this.slot = slot;
 		this.name = name;
@@ -50,49 +57,6 @@ public class Map {
 		this.rules = rules;
 		this.authors = authors;
 		this.contributors = contributors;
-		
-		/*
-		 * 
-		 * Load things where the world has/will change(d)
-		 * 
-		 */
-		
-		List<MapTeam> mapTeams = new ArrayList<MapTeam>();
-		for(MapTeam team : teams)
-			mapTeams.add(team.clone());
-		
-		MapTeam mapObservers = observers.clone();
-		
-		List<RegionGroup> mapRegions = new ArrayList<RegionGroup>();
-		if(regions != null)
-			for(RegionGroup region : regions)
-				mapRegions.add(region.clone());
-		
-		List<Filter> mapFilters = new ArrayList<Filter>();
-		if(filters != null)
-			for(Filter filter : filters)
-				mapFilters.add(filter.clone(teams));
-		
-		/*
-		 * Why isn't this happening?
-		 */
-		this.teams = mapTeams;
-		Scrimmage.getInstance().getLogger().info("Found " + mapTeams.size() + " teams...");
-		for(MapTeam team : this.teams) {
-			String tName = team.getName();
-			List<Location> spawns = new ArrayList<Location>();
-			
-			for(MapTeamSpawn mts : team.getSpawns()) {
-				Scrimmage.getInstance().getLogger().info("Found a spawn for '" + tName + "' containing " + mts.getPossibles().size() + " spawns.");
-				spawns.addAll(mts.getPossibles());
-			}
-
-			Scrimmage.getInstance().getLogger().info("Found '" + tName + "' with " + spawns.size() + " possible spawns.");
-		}
-		
-		this.observers = mapObservers;
-		this.regions = mapRegions;
-		this.filters = mapFilters;
 	}
 	
 	public void update() {
@@ -106,7 +70,10 @@ public class Map {
 		update(Scrimmage.getInstance().getServer().getWorld(name) == null);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void update(boolean load) {
+		long start = System.currentTimeMillis();
+		Scrimmage.getInstance().getLogger().info("Started loading '" + name + "'!");
 		if(Scrimmage.getRotation() == null)
 			Scrimmage.getInstance().getLogger().info("Rotation is null... WTF?!");
 		
@@ -129,18 +96,98 @@ public class Map {
 			world = wc.createWorld();
 		}
 		
-		for(MapTeam team : getTeams())
-			for(MapTeamSpawn spawn : team.getSpawns())
-				for(Location location : spawn.getPossibles())
-					location.setWorld(world);
+		Scrimmage.getInstance().getLogger().info("Loaded the World for '" + name + "' taking " + (System.currentTimeMillis() - start) + "ms!");
+		long step = System.currentTimeMillis();
+		Scrimmage.getInstance().getLogger().info("Total load time for '" + name + "' is currently " + (System.currentTimeMillis() - start) + "ms!");
 		
-		for(MapTeamSpawn spawn : observers.getSpawns())
-			for(Location location : spawn.getPossibles())
-				location.setWorld(world);
+		this.world = world;
 		
-		for(RegionGroup group : regions)
-			for(Location location : group.getLocations())
-				location.setWorld(world);
+		if(world != null) {
+			Element root = loader.getDoc().getRootElement();
+			
+			teams = new ArrayList<MapTeam>();
+			Element teamsElement = root.element("teams");
+			List<Element> teamsList = teamsElement.elements("team");
+			for(Element element : teamsList) {
+				String teamName = element.getText();
+				String teamCap = element.attributeValue("max");
+				String teamColor = element.attributeValue("color");
+				MapTeam team = new MapTeam(this, teamName, teamColor, teamCap);
+				if(team.getColor() == null || team.getColor() == ChatColor.AQUA)
+					Scrimmage.getInstance().getLogger().info("Failed to load team '" + teamName + "' due to having an invalid color supplied!");
+				else teams.add(team);
+			}
+
+			Scrimmage.getInstance().getLogger().info("Loaded the Teams for '" + this.name + "' taking "
+					+ (System.currentTimeMillis() - step) + "ms!");
+			step = System.currentTimeMillis();
+			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
+					+ (System.currentTimeMillis() - start) + "ms!");
+			
+			for(MapTeam team : teams)
+				team.load(root.element("spawns"));
+			observers = new MapTeam(this, "Observers", ChatColor.AQUA, -1);
+			observers.load(root.element("spawns"));
+
+			Scrimmage.getInstance().getLogger().info("Loaded the Spawns for '" + this.name + "' taking "
+					+ (System.currentTimeMillis() - step) + "ms!");
+			step = System.currentTimeMillis();
+			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
+					+ (System.currentTimeMillis() - start) + "ms!");
+
+			regions = new ArrayList<RegionGroup>();
+			
+			Element regions = root.element("regions");
+			if(regions != null) {
+				Region shapes = new Region(this, regions, RegionType.ALL);
+				for(ConfiguredRegion conf : shapes.getRegions())
+					this.regions.add(new RegionGroup(conf.getName(), conf.getLocations()));
+				
+				List<String> names = new ArrayList<String>();
+				names.add(RegionGroupType.NEGATIVE.name().toLowerCase());
+				names.add(RegionGroupType.UNION.name().toLowerCase());
+				names.add(RegionGroupType.COMPLEMENT.name().toLowerCase());
+				names.add(RegionGroupType.INTERSECT.name().toLowerCase());
+				names.add(RegionGroupType.APPLY.name().toLowerCase());
+				
+				List<Element> elements = MapLoader.getElements(regions, names);
+				for(Element element : elements)
+					this.regions.add(new RegionGroup(element, this));
+			}
+
+			Scrimmage.getInstance().getLogger().info("Loaded the Regions for '" + this.name + "' taking "
+					+ (System.currentTimeMillis() - step) + "ms!");
+			step = System.currentTimeMillis();
+			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
+					+ (System.currentTimeMillis() - start) + "ms!");
+			
+			/*
+			List<Element> negatives = getElements(regions, RegionGroupType.NEGATIVE.name().toLowerCase());
+			List<Element> unions = getElements(regions, RegionGroupType.UNION.name().toLowerCase());
+			List<Element> complements = getElements(regions, RegionGroupType.COMPLEMENT.name().toLowerCase());
+			List<Element> intersects = getElements(regions, RegionGroupType.INTERSECT.name().toLowerCase());
+			
+			List<Element> all = new ArrayList<Element>();
+			all.addAll(negatives);
+			all.addAll(unions);
+			all.addAll(complements);
+			all.addAll(intersects);
+			*/
+			
+			/*
+			 * Going to skip filters for now, I want to see the plugin working ;-;
+			 */
+		}
+		long finish = System.currentTimeMillis();
+		Scrimmage.getInstance().getLogger().info("Loaded '" + name + "' taking " + (finish - start) + "ms!");
+	}
+	
+	public RegionGroup getRegionGroup(String name) {
+		for(RegionGroup group : getRegions())
+			if(group.getName().equalsIgnoreCase(name))
+				return group;
+		
+		return null;
 	}
 	
 	public List<Filter> getFilters(Location loc) {

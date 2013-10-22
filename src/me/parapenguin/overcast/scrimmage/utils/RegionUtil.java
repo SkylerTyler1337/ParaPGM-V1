@@ -24,6 +24,8 @@ public class RegionUtil {
 	}
 
 	public static List<Location> circle(boolean block, Location loc, double r, double h, Boolean hollow, Boolean sphere) {
+		if(r == 0) r = 1;
+		if(h == 0) h = 1;
 		List<Location> circleblocks = new ArrayList<Location>();
 		double cx = loc.getBlockX();
 		double cy = loc.getBlockY();
@@ -51,6 +53,7 @@ public class RegionUtil {
 	}
 	
 	public static List<Block> square(Block block, int radius, boolean hollow) {
+		if(radius == 0) radius = 1;
 		Location centre = block.getLocation();
 		
 		List<Location> locs = square(true, centre, radius, hollow);
@@ -67,6 +70,7 @@ public class RegionUtil {
 	}
 	
 	public static List<Location> square(boolean block, Location centre, int radius, boolean hollow) {
+		if(radius == 0) radius = 1;
 		List<Location> locs = new ArrayList<Location>();
 		
 		Location corner1 = new Location(centre.getWorld(), centre.getX() + radius, centre.getY(), centre.getY() + radius);

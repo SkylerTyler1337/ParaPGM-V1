@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -12,14 +11,8 @@ import org.dom4j.io.SAXReader;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
-import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
-import me.parapenguin.overcast.scrimmage.map.filter.Filter;
-import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
-import me.parapenguin.overcast.scrimmage.map.region.RegionGroup;
-import me.parapenguin.overcast.scrimmage.map.region.RegionGroupType;
-import me.parapenguin.overcast.scrimmage.map.region.RegionType;
 import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
 
 public class MapLoader {
@@ -33,13 +26,10 @@ public class MapLoader {
 	@Getter String version;
 	@Getter String objective;
 	@Getter List<String> rules;
-	@Getter List<String> authors;
+	@Getter List<Contributor> authors;
 	@Getter List<Contributor> contributors;
 	@Getter List<MapTeam> teams;
 	@Getter MapTeam observers;
-	
-	@Getter List<RegionGroup> groups;
-	@Getter List<Filter> filters;
 	
 	@Getter int maxBuildHeight;
 	
@@ -60,94 +50,27 @@ public class MapLoader {
 		this.name = root.elementText("name");
 		this.version = root.elementText("version");
 		this.objective = root.elementText("objective");
-		this.authors = getList("authors", "author");
 		this.rules = getList("rules", "rule");
+
+		this.authors = new ArrayList<Contributor>();
+		Element authorsElement = root.element("authors");
+		List<Element> authorsList = authorsElement.elements("author");
+		for(Element element : authorsList) {
+			String username = element.getText();
+			String contribution = element.attributeValue("contribution");
+			authors.add(new Contributor(username, contribution));
+		}
 		
 		this.contributors = new ArrayList<Contributor>();
 		Element contributorsElement = root.element("contributors");
-		
-		int cur = 0;
 		if(contributorsElement != null) {
-			while(contributorsElement.elements().size() < cur) {
-				if(((Element) contributorsElement.elements().get(cur)).getName().equalsIgnoreCase("contributor")) {
-					String contributorName = ((Element) contributorsElement.elements().get(cur)).getText();
-					String contribution = ((Element) contributorsElement.elements().get(cur)).attributeValue("contribution");
-					contributors.add(new Contributor(contributorName, contribution));
-				}
-				cur++;
+			List<Element> contributorsList = contributorsElement.elements("contributor");
+			for(Element element : contributorsList) {
+				String username = element.getText();
+				String contribution = element.attributeValue("contribution");
+				contributors.add(new Contributor(username, contribution));
 			}
 		}
-		
-		teams = new ArrayList<MapTeam>();
-		Element teamsElement = root.element("teams");
-		List<Element> teamsList = teamsElement.elements("team");
-		for(Element element : teamsList) {
-			String teamName = element.getText();
-			String teamCap = element.attributeValue("max");
-			String teamColor = element.attributeValue("color");
-			MapTeam team = new MapTeam(teamName, teamColor, teamCap);
-			if(team.getColor() == null || team.getColor() == ChatColor.AQUA)
-				Scrimmage.getInstance().getLogger().info("Failed to load team '" + teamName + "' due to having an invalid color supplied!");
-			else teams.add(team);
-		}
-		
-		cur = 0;
-		while(teamsElement.elements().size() < cur) {
-			if(((Element) teamsElement.elements().get(cur)).getName().equalsIgnoreCase("team")) {
-				String teamName = ((Element) contributorsElement.elements().get(cur)).getText();
-				String teamCap = ((Element) contributorsElement.elements().get(cur)).attributeValue("max");
-				String teamColor = ((Element) contributorsElement.elements().get(cur)).attributeValue("color");
-				MapTeam team = new MapTeam(teamName, teamColor, teamCap);
-				if(team.getColor() == null || team.getColor() == ChatColor.AQUA)
-					Scrimmage.getInstance().getLogger().info("Failed to load team '" + teamName + "' due to having an invalid color supplied!");
-				else teams.add(team);
-			} else {
-				ServerLog.info("Element inside <teams> isn't a team...");
-			}
-			cur++;
-		}
-		
-		for(MapTeam team : teams)
-			team.load(root.element("spawns"));
-		observers = new MapTeam("Observers", ChatColor.AQUA, -1);
-		observers.load(teamsElement);
-
-		groups = new ArrayList<RegionGroup>();
-		
-		Element regions = root.element("regions");
-		if(regions != null) {
-			Region shapes = new Region(regions, RegionType.ALL);
-			for(ConfiguredRegion conf : shapes.getRegions())
-				groups.add(new RegionGroup(conf.getName(), conf.getLocations()));
-			
-			List<String> names = new ArrayList<String>();
-			names.add(RegionGroupType.NEGATIVE.name().toLowerCase());
-			names.add(RegionGroupType.UNION.name().toLowerCase());
-			names.add(RegionGroupType.COMPLEMENT.name().toLowerCase());
-			names.add(RegionGroupType.INTERSECT.name().toLowerCase());
-			names.add(RegionGroupType.APPLY.name().toLowerCase());
-			
-			List<Element> elements = getElements(regions, names);
-			for(Element element : elements)
-				groups.add(new RegionGroup(element, this));
-		}
-		
-		/*
-		List<Element> negatives = getElements(regions, RegionGroupType.NEGATIVE.name().toLowerCase());
-		List<Element> unions = getElements(regions, RegionGroupType.UNION.name().toLowerCase());
-		List<Element> complements = getElements(regions, RegionGroupType.COMPLEMENT.name().toLowerCase());
-		List<Element> intersects = getElements(regions, RegionGroupType.INTERSECT.name().toLowerCase());
-		
-		List<Element> all = new ArrayList<Element>();
-		all.addAll(negatives);
-		all.addAll(unions);
-		all.addAll(complements);
-		all.addAll(intersects);
-		*/
-		
-		/*
-		 * Going to skip filters for now, I want to see the plugin working ;-;
-		 */
 		
 		this.maxBuildHeight = Region.MAX_BUILD_HEIGHT;
 		if(root.element("maxbuildheight") != null && root.element("maxbuildheight").getText() != null) {
@@ -165,7 +88,7 @@ public class MapLoader {
 	}
 	
 	public Map getMap(RotationSlot slot) {
-		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers, groups, filters);
+		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers);
 	}
 	
 	public static boolean isLoadable(File file) {
@@ -197,14 +120,6 @@ public class MapLoader {
 		if(doc == null)
 			Scrimmage.getInstance().getLogger().info("Document is null?");
 		return new MapLoader(file, doc);
-	}
-	
-	public RegionGroup getRegionGroup(String name) {
-		for(RegionGroup group : getGroups())
-			if(group.getName().equalsIgnoreCase(name))
-				return group;
-		
-		return null;
 	}
 	
 	private List<String> getList(String container, String contains) {

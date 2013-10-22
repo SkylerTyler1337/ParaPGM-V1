@@ -29,13 +29,16 @@ public class MapTeam {
 		return null;
 	}
 	
+	@Getter Map map;
+	
 	@Getter String name;
 	@Getter ChatColor color;
 	@Getter int cap;
 	
 	@Getter List<MapTeamSpawn> spawns;
 	
-	public MapTeam(String name, ChatColor color, int cap, List<MapTeamSpawn> spawns) {
+	public MapTeam(Map map, String name, ChatColor color, int cap, List<MapTeamSpawn> spawns) {
+		this.map = map;
 		this.name = name;
 		this.color = color;
 		this.cap = cap;
@@ -45,22 +48,23 @@ public class MapTeam {
 			this.spawns.add(spawn.clone());
 	}
 	
-	public MapTeam(String name, ChatColor color, int cap) {
+	public MapTeam(Map map, String name, ChatColor color, int cap) {
+		this.map = map;
 		this.name = name;
 		this.color = color;
 		this.cap = cap;
 	}
 	
-	public MapTeam(String name, String color, String cap) {
-		this(name, getChatColorFromString(color), ConversionUtil.convertStringToInteger(cap, DEFAULT_TEAM_CAP));
+	public MapTeam(Map map, String name, String color, String cap) {
+		this(map, name, getChatColorFromString(color), ConversionUtil.convertStringToInteger(cap, DEFAULT_TEAM_CAP));
 	}
 	
-	public MapTeam(String name, ChatColor color, String cap) {
-		this(name, color, ConversionUtil.convertStringToInteger(cap, DEFAULT_TEAM_CAP));
+	public MapTeam(Map map, String name, ChatColor color, String cap) {
+		this(map, name, color, ConversionUtil.convertStringToInteger(cap, DEFAULT_TEAM_CAP));
 	}
 	
-	public MapTeam(String name, String color, int cap) {
-		this(name, getChatColorFromString(color), cap);
+	public MapTeam(Map map, String name, String color, int cap) {
+		this(map, name, getChatColorFromString(color), cap);
 	}
 	
 	public void load(Element search) {
@@ -77,24 +81,22 @@ public class MapTeam {
 			if(isObserver() || element.attributeValue("team").equalsIgnoreCase(getColorName()))
 				teamElements.add(element);
 		
-		if(!isObserver()) {
+		if(!isObserver())
 			for(Element element : MapLoader.getElements(search, "spawns"))
-				if(element.attributeValue("team").equalsIgnoreCase(getColorName())) {
+				if(element.attributeValue("team") != null && element.attributeValue("team").equalsIgnoreCase(getColorName())) {
 					search = element;
 					
 					spawnElements = MapLoader.getElements(search, tag);
 					for(Element element2 : spawnElements)
 						teamElements.add(element2);
 				}
-					
-		}
 		
 		/*
 		 * Now I have to make these spawns into their actual spawn value regions/points... * fun *
 		 * Dat class shift...
 		 */
 
-		Region regions = new Region(teamElements, RegionType.ALL);
+		Region regions = new Region(map, teamElements, RegionType.ALL);
 		
 		List<ConfiguredRegion> configured = regions.getRegions();
 		for(ConfiguredRegion region : configured)
@@ -123,7 +125,7 @@ public class MapTeam {
 	}
 	
 	public MapTeam clone() {
-		return new MapTeam(getName(), getColor(), getCap(), getSpawns());
+		return new MapTeam(getMap(), getName(), getColor(), getCap(), getSpawns());
 	}
 	
 	public List<Client> getPlayers() {

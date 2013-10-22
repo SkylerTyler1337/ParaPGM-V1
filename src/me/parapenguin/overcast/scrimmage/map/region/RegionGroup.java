@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
+import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 
 import org.bukkit.Location;
@@ -36,18 +37,17 @@ public class RegionGroup {
 		this.type = RegionGroupType.UNION;
 	}
 	
-	public RegionGroup(Element group, MapLoader loader) {
+	public RegionGroup(Element group, Map map) {
 		type = RegionGroupType.getByElementName(group.getName());
 		this.group = group;
-		if(type == null) {
-			locations = new ArrayList<Location>();
+		if(type == null)
 			name = null;
-		}
-		
+
+		locations = new ArrayList<Location>();
 		List<Element> elements = MapLoader.getElements(group);
 		
 		Element baseElement = elements.get(0);
-		Region baseRegion = new Region(baseElement);
+		Region baseRegion = new Region(map, baseElement);
 		
 		if(type == RegionGroupType.NEGATIVE) {
 			/*
@@ -56,58 +56,60 @@ public class RegionGroup {
 			
 			locations.addAll(baseRegion.getLocations());
 		} else {
-			List<Element> others = elements.subList(1, elements.size() - 1);
-			if(type == RegionGroupType.UNION) {
-				locations.addAll(baseRegion.getLocations());
-				
-				for(Element element : others) {
-					List<Location> locations = new ArrayList<Location>();
-					if(element.getName().equalsIgnoreCase("region")) {
-						RegionGroup mapGroup = loader.getRegionGroup(element.attributeValue("name"));
-						if(mapGroup != null)
-							locations = mapGroup.getLocations();
+			if(elements.size() > 1) {
+				List<Element> others = elements.subList(1, elements.size() - 1);
+				if(type == RegionGroupType.UNION) {
+					locations.addAll(baseRegion.getLocations());
+					
+					for(Element element : others) {
+						List<Location> locations = new ArrayList<Location>();
+						if(element.getName().equalsIgnoreCase("region")) {
+							RegionGroup mapGroup = map.getRegionGroup(element.attributeValue("name"));
+							if(mapGroup != null)
+								locations = mapGroup.getLocations();
+						}
+						
+						for(Location location : locations)
+							if(!contains(location, false))
+								locations.add(location);
+					}
+				} else if(type == RegionGroupType.COMPLEMENT) {
+					locations.addAll(baseRegion.getLocations());
+					
+					for(Element element : others) {
+						List<Location> locations = new ArrayList<Location>();
+						if(element.getName().equalsIgnoreCase("region")) {
+							RegionGroup mapGroup = map.getRegionGroup(element.attributeValue("name"));
+							if(mapGroup != null)
+								locations = mapGroup.getLocations();
+						}
+						
+						for(Location location : locations) {
+							int index = containsAt(location, false);
+							if(index != -1)
+								locations.remove(index);
+						}
+					}
+				} else if(type == RegionGroupType.COMPLEMENT) {
+					locations.addAll(baseRegion.getLocations());
+					List<Location> overlap = new ArrayList<Location>();
+					
+					for(Element element : others) {
+						List<Location> locations = new ArrayList<Location>();
+						if(element.getName().equalsIgnoreCase("region")) {
+							RegionGroup mapGroup = map.getRegionGroup(element.attributeValue("name"));
+							if(mapGroup != null)
+								locations = mapGroup.getLocations();
+						}
+						
+						for(Location location : locations) {
+							if(contains(location, false))
+								overlap.add(location);
+						}
 					}
 					
-					for(Location location : locations)
-						if(!contains(location, false))
-							locations.add(location);
+					locations = overlap;
 				}
-			} else if(type == RegionGroupType.COMPLEMENT) {
-				locations.addAll(baseRegion.getLocations());
-				
-				for(Element element : others) {
-					List<Location> locations = new ArrayList<Location>();
-					if(element.getName().equalsIgnoreCase("region")) {
-						RegionGroup mapGroup = loader.getRegionGroup(element.attributeValue("name"));
-						if(mapGroup != null)
-							locations = mapGroup.getLocations();
-					}
-					
-					for(Location location : locations) {
-						int index = containsAt(location, false);
-						if(index != -1)
-							locations.remove(index);
-					}
-				}
-			} else if(type == RegionGroupType.COMPLEMENT) {
-				locations.addAll(baseRegion.getLocations());
-				List<Location> overlap = new ArrayList<Location>();
-				
-				for(Element element : others) {
-					List<Location> locations = new ArrayList<Location>();
-					if(element.getName().equalsIgnoreCase("region")) {
-						RegionGroup mapGroup = loader.getRegionGroup(element.attributeValue("name"));
-						if(mapGroup != null)
-							locations = mapGroup.getLocations();
-					}
-					
-					for(Location location : locations) {
-						if(contains(location, false))
-							overlap.add(location);
-					}
-				}
-				
-				locations = overlap;
 			}
 		}
 		

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 import me.parapenguin.overcast.scrimmage.utils.RegionUtil;
 
@@ -18,19 +19,21 @@ public class Region {
 	
 	@Getter @Setter public static int MAX_BUILD_HEIGHT = 0;
 	
+	@Getter Map map;
 	@Getter List<ConfiguredRegion> regions;
 	@Getter List<Element> elements;
 	
-	public Region(Element element) {
+	public Region(Map map, Element element) {
 		List<Element> elements = new ArrayList<Element>();
 		elements.add(element);
 		
-		Region region = new Region(elements, RegionType.getByElementName(element.getName()));
+		Region region = new Region(map, elements, RegionType.getByElementName(element.getName()));
 		this.elements = region.getElements();
 		this.regions = region.getRegions();
 	}
 	
-	public Region(List<Element> elements, @NonNull RegionType type) {
+	public Region(Map map, List<Element> elements, @NonNull RegionType type) {
+		this.map = map;
 		regions = new ArrayList<ConfiguredRegion>();
 		this.elements = new ArrayList<Element>();
 		
@@ -82,9 +85,10 @@ public class Region {
 	/*
 	 * The element variable is actually the root element - pretty obvious from the code...
 	 */
-	public Region(Element element, @NonNull RegionType type) {
+	public Region(Map map, Element element, @NonNull RegionType type) {
 		MAX_BUILD_HEIGHT = Scrimmage.getInstance().getServer().getWorlds().get(0).getMaxHeight();
 		regions = new ArrayList<ConfiguredRegion>();
+		this.map = map;
 		
 		List<Element> rectangles = MapLoader.getElements(element, "rectangle");
 		List<Element> cuboids = MapLoader.getElements(element, "cuboid");
@@ -155,6 +159,14 @@ public class Region {
 		return locations;
 	}
 	
+	public Double parseInfiniteDouble(String parse) throws NumberFormatException {
+		double value = 0;
+		if(parse.equalsIgnoreCase("oo")) value = Double.MAX_VALUE;
+		else if(parse.equalsIgnoreCase("-oo")) value = Double.MIN_VALUE;
+		else value = Double.parseDouble(parse);
+		return value;
+	}
+	
 	public List<Location> getRectangle(Element rectangle) {
 		/*
 		 * Setup Rectangle Regions
@@ -187,19 +199,19 @@ public class Region {
 		String maxZS = maxSplit[1];
 		
 		try {
-			minX = Double.parseDouble(minXS);
-			minZ = Double.parseDouble(minZS);
+			minX = parseInfiniteDouble(minXS);
+			minZ = parseInfiniteDouble(minZS);
 			
-			maxX = Double.parseDouble(maxXS);
-			maxZ = Double.parseDouble(maxZS);
+			maxX = parseInfiniteDouble(maxXS);
+			maxZ = parseInfiniteDouble(maxZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
 		}
 		
 		if(!failed) {
-			Location minL = new Location(null, minX, minY, minZ);
-			Location maxL = new Location(null, maxX, maxY, maxZ);
+			Location minL = new Location(map.getWorld(), minX, minY, minZ);
+			Location maxL = new Location(map.getWorld(), maxX, maxY, maxZ);
 			List<Block> possibleBlocks = RegionUtil.contains(minL, maxL);
 			
 			List<Location> possibles = new ArrayList<Location>();
@@ -243,21 +255,21 @@ public class Region {
 		String maxZS = maxSplit[2];
 		
 		try {
-			minX = Double.parseDouble(minXS);
-			minY = Double.parseDouble(minYS);
-			minZ = Double.parseDouble(minZS);
+			minX = parseInfiniteDouble(minXS);
+			minY = parseInfiniteDouble(minYS);
+			minZ = parseInfiniteDouble(minZS);
 			
-			maxX = Double.parseDouble(maxXS);
-			maxY = Double.parseDouble(maxYS);
-			maxZ = Double.parseDouble(maxZS);
+			maxX = parseInfiniteDouble(maxXS);
+			maxY = parseInfiniteDouble(maxYS);
+			maxZ = parseInfiniteDouble(maxZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
 		}
 		
 		if(!failed) {
-			Location minL = new Location(null, minX, minY, minZ);
-			Location maxL = new Location(null, maxX, maxY, maxZ);
+			Location minL = new Location(map.getWorld(), minX, minY, minZ);
+			Location maxL = new Location(map.getWorld(), maxX, maxY, maxZ);
 			List<Block> possibleBlocks = RegionUtil.contains(minL, maxL);
 			
 			List<Location> possibles = new ArrayList<Location>();
@@ -293,17 +305,17 @@ public class Region {
 		String cZS = cSplit[2];
 		
 		try {
-			cR = Double.parseDouble(radius);
-			cX = Double.parseDouble(cXS);
-			cY = Double.parseDouble(cYS);
-			cZ = Double.parseDouble(cZS);
+			cR = parseInfiniteDouble(radius);
+			cX = parseInfiniteDouble(cXS);
+			cY = parseInfiniteDouble(cYS);
+			cZ = parseInfiniteDouble(cZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
 		}
 		
 		if(!failed) {
-			Location centerL = new Location(null, cX, cY, cZ);
+			Location centerL = new Location(map.getWorld(), cX, cY, cZ);
 			
 			List<Location> possibles = RegionUtil.circle(centerL, cR, MAX_BUILD_HEIGHT, false, false);
 			locations.addAll(possibles);
@@ -337,18 +349,18 @@ public class Region {
 		String cZS = cSplit[2];
 		
 		try {
-			cR = Double.parseDouble(radius);
-			cH = Double.parseDouble(height);
-			cX = Double.parseDouble(cXS);
-			cY = Double.parseDouble(cYS);
-			cZ = Double.parseDouble(cZS);
+			cR = parseInfiniteDouble(radius);
+			cH = parseInfiniteDouble(height);
+			cX = parseInfiniteDouble(cXS);
+			cY = parseInfiniteDouble(cYS);
+			cZ = parseInfiniteDouble(cZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
 		}
 		
 		if(!failed) {
-			Location centerL = new Location(null, cX, cY, cZ);
+			Location centerL = new Location(map.getWorld(), cX, cY, cZ);
 			
 			List<Location> possibles = RegionUtil.circle(centerL, cR, cH, false, false);
 			locations.addAll(possibles);
@@ -381,18 +393,18 @@ public class Region {
 		String cZS = cSplit[2];
 		
 		try {
-			cR = Double.parseDouble(radius);
+			cR = parseInfiniteDouble(radius);
 			cH = cR;
-			cX = Double.parseDouble(cXS);
-			cY = Double.parseDouble(cYS);
-			cZ = Double.parseDouble(cZS);
+			cX = parseInfiniteDouble(cXS);
+			cY = parseInfiniteDouble(cYS);
+			cZ = parseInfiniteDouble(cZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
 		}
 		
 		if(!failed) {
-			Location centerL = new Location(null, cX, cY, cZ);
+			Location centerL = new Location(map.getWorld(), cX, cY, cZ);
 			
 			List<Location> possibles = RegionUtil.circle(centerL, cR, cH, false, false);
 			locations.addAll(possibles);
@@ -422,16 +434,16 @@ public class Region {
 		String cZS = cSplit[2];
 		
 		try {
-			cX = Double.parseDouble(cXS);
-			cY = Double.parseDouble(cYS);
-			cZ = Double.parseDouble(cZS);
+			cX = parseInfiniteDouble(cXS);
+			cY = parseInfiniteDouble(cYS);
+			cZ = parseInfiniteDouble(cZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
 			failed = true;
 		}
 		
 		if(!failed) {
-			Location location = new Location(null, cX, cY, cZ);
+			Location location = new Location(map.getWorld(), cX, cY, cZ);
 			
 			List<Location> possibles = new ArrayList<Location>();
 			possibles.add(location);
