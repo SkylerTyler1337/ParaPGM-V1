@@ -13,8 +13,9 @@ public class RotationSlot {
 		this.loader = loader;
 	}
 	
-	public void load() {
-		
+	public Map load() {
+		map = loader.getMap(this);
+		return map;
 	}
 	
 }

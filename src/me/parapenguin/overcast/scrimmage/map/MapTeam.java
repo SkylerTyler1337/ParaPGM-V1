@@ -99,6 +99,8 @@ public class MapTeam {
 		List<ConfiguredRegion> configured = regions.getRegions();
 		for(ConfiguredRegion region : configured)
 			spawns.add(new MapTeamSpawn(region));
+		
+		this.spawns = spawns;
 	}
 	
 	public Location getSpawn() {

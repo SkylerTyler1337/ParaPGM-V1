@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 import me.parapenguin.overcast.scrimmage.utils.RegionUtil;
@@ -15,7 +16,7 @@ import org.dom4j.Element;
 
 public class Region {
 	
-	private static int MAX_BUILD_HEIGHT = 0;
+	@Getter @Setter public static int MAX_BUILD_HEIGHT = 0;
 	
 	@Getter List<ConfiguredRegion> regions;
 	@Getter List<Element> elements;
@@ -30,7 +31,6 @@ public class Region {
 	}
 	
 	public Region(List<Element> elements, @NonNull RegionType type) {
-		MAX_BUILD_HEIGHT = Scrimmage.getInstance().getServer().getWorlds().get(0).getMaxHeight();
 		regions = new ArrayList<ConfiguredRegion>();
 		this.elements = new ArrayList<Element>();
 		

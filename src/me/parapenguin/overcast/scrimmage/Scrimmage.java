@@ -1,23 +1,67 @@
 package me.parapenguin.overcast.scrimmage;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import lombok.Getter;
 import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.event.PlayerEvents;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
+import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.rotation.Rotation;
+import me.parapenguin.overcast.scrimmage.utils.JarUtils;
 
 public class Scrimmage extends JavaPlugin {
 	
 	static @Getter Scrimmage instance;
 	static @Getter @Setter Rotation rotation;
+	@Getter List<File> libs = new ArrayList<File>();
+	@Getter List<String> files = new ArrayList<String>();
+	
+	static @Getter String team;
+	static @Getter @Setter boolean open;
 	
 	public void onEnable() {
+		setOpen(false);
 		instance = this;
+		Region.MAX_BUILD_HEIGHT = 256;
+		
+		File libFolder = new File("/home/servers/scrim/libs/");
+		files.add("dom4j.jar");
+		
+		for (String stringFile : files) {
+
+			if (libFolder.exists() && libFolder.isDirectory()) {
+				libs.add(new File(libFolder.getAbsolutePath() + "/" + stringFile));
+			} else if (!libFolder.exists()) {
+				libFolder.mkdir();
+				libs.add(new File(libFolder.getAbsolutePath() + "/" + stringFile));
+			} else {
+				getLogger().warning("/" + libFolder.getParentFile().getName() + "/" + libFolder.getName() + " already exists and isn't a directory.");
+				Bukkit.getServer().getPluginManager().disablePlugin(this);
+			}
+		}
+		
+		loadJars();
+		reloadConfig();
+		
+		
+	}
+	
+	public void startup() {
+		team = getConfig().getString("team");
+		if(team == null)
+			team = "public";
 		
 		// Load the maps from the local map repository (no github/download connections this time Harry...)
 		File[] files = getMapRoot().listFiles();
@@ -31,8 +75,45 @@ public class Scrimmage extends JavaPlugin {
 					}
 		
 		setRotation(new Rotation());
-		
 		registerListener(new PlayerEvents());
+		getRotation().start();
+	}
+	
+	public void loadJars() {
+		/*
+		 * That awkward moment when you forget to upload the jar file... hahah!
+		 */
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				for (File lib : libs) {
+					try {
+						addClassPath(JarUtils.getJarUrl(lib));
+						getLogger().info("'" + lib.getName() + "' has been loaded!");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				startup();
+			}
+			
+		}.runTask(instance);
+	}
+	
+	public void addClassPath(final URL url) throws IOException {
+		final URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+		final Class<URLClassLoader> sysclass = URLClassLoader.class;
+		try {
+			final Method method = sysclass.getDeclaredMethod("addURL", new Class[] { URL.class });
+			method.setAccessible(true);
+			method.invoke(sysloader, new Object[] { url });
+		} catch (final Throwable t) {
+			t.printStackTrace();
+			throw new IOException("Error adding " + url + " to system classloader");
+		}
 	}
 	
 	public static int random(int min, int max) {
@@ -49,6 +130,14 @@ public class Scrimmage extends JavaPlugin {
 	
 	public static void registerListener(Listener listener) {
 		getInstance().getServer().getPluginManager().registerEvents(listener, getInstance());
+	}
+	
+	public static boolean isPublic() {
+		return getTeam().equalsIgnoreCase("public");
+	}
+	
+	public static int getID() {
+		return getInstance().getServer().getPort() - 25560;
 	}
 	
 }

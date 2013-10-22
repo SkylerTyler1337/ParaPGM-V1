@@ -12,6 +12,7 @@ import org.dom4j.io.SAXReader;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.filter.Filter;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
@@ -23,11 +24,10 @@ import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
 
 public class MapLoader {
 	
-	@Getter File file;
+	@Getter File folder;
 	@Getter Document doc;
 	
 	@Getter Map map;
-	@Getter List<RegionGroup> groups;
 
 	@Getter String name;
 	@Getter String version;
@@ -38,14 +38,23 @@ public class MapLoader {
 	@Getter List<MapTeam> teams;
 	@Getter MapTeam observers;
 	
-	@Getter List<RegionGroup> regions;
+	@Getter List<RegionGroup> groups;
 	@Getter List<Filter> filters;
 	
+	@Getter int maxBuildHeight;
+	
+	@SuppressWarnings("unchecked")
 	private MapLoader(File file, Document doc) {
+		long start = System.currentTimeMillis();
+		
 		/*
 		 * Load the map and it's attributes now ready for loading into the rotation
+		 * 
+		 * I'm so retarded...
 		 */
 		
+		this.doc = doc;
+		this.folder = file.getParentFile();
 		Element root = doc.getRootElement();
 		
 		this.name = root.elementText("name");
@@ -58,17 +67,29 @@ public class MapLoader {
 		Element contributorsElement = root.element("contributors");
 		
 		int cur = 0;
-		while(contributorsElement.elements().size() < cur) {
-			if(((Element) contributorsElement.elements().get(cur)).getName().equalsIgnoreCase("contributor")) {
-				String contributorName = ((Element) contributorsElement.elements().get(cur)).getText();
-				String contribution = ((Element) contributorsElement.elements().get(cur)).attributeValue("contribution");
-				contributors.add(new Contributor(contributorName, contribution));
+		if(contributorsElement != null) {
+			while(contributorsElement.elements().size() < cur) {
+				if(((Element) contributorsElement.elements().get(cur)).getName().equalsIgnoreCase("contributor")) {
+					String contributorName = ((Element) contributorsElement.elements().get(cur)).getText();
+					String contribution = ((Element) contributorsElement.elements().get(cur)).attributeValue("contribution");
+					contributors.add(new Contributor(contributorName, contribution));
+				}
+				cur++;
 			}
-			cur++;
 		}
 		
-		List<MapTeam> teams = new ArrayList<MapTeam>();
+		teams = new ArrayList<MapTeam>();
 		Element teamsElement = root.element("teams");
+		List<Element> teamsList = teamsElement.elements("team");
+		for(Element element : teamsList) {
+			String teamName = element.getText();
+			String teamCap = element.attributeValue("max");
+			String teamColor = element.attributeValue("color");
+			MapTeam team = new MapTeam(teamName, teamColor, teamCap);
+			if(team.getColor() == null || team.getColor() == ChatColor.AQUA)
+				Scrimmage.getInstance().getLogger().info("Failed to load team '" + teamName + "' due to having an invalid color supplied!");
+			else teams.add(team);
+		}
 		
 		cur = 0;
 		while(teamsElement.elements().size() < cur) {
@@ -79,23 +100,37 @@ public class MapLoader {
 				MapTeam team = new MapTeam(teamName, teamColor, teamCap);
 				if(team.getColor() == null || team.getColor() == ChatColor.AQUA)
 					Scrimmage.getInstance().getLogger().info("Failed to load team '" + teamName + "' due to having an invalid color supplied!");
-				else
-					teams.add(team);
+				else teams.add(team);
+			} else {
+				ServerLog.info("Element inside <teams> isn't a team...");
 			}
 			cur++;
 		}
 		
 		for(MapTeam team : teams)
 			team.load(root.element("spawns"));
-		MapTeam obs = new MapTeam("Observers", ChatColor.AQUA, -1);
-		obs.load(teamsElement);
+		observers = new MapTeam("Observers", ChatColor.AQUA, -1);
+		observers.load(teamsElement);
+
+		groups = new ArrayList<RegionGroup>();
 		
 		Element regions = root.element("regions");
-		Region shapes = new Region(regions, RegionType.ALL);
-		
-		List<RegionGroup> groups = new ArrayList<RegionGroup>();
-		for(ConfiguredRegion conf : shapes.getRegions())
-			groups.add(new RegionGroup(conf.getName(), conf.getLocations()));
+		if(regions != null) {
+			Region shapes = new Region(regions, RegionType.ALL);
+			for(ConfiguredRegion conf : shapes.getRegions())
+				groups.add(new RegionGroup(conf.getName(), conf.getLocations()));
+			
+			List<String> names = new ArrayList<String>();
+			names.add(RegionGroupType.NEGATIVE.name().toLowerCase());
+			names.add(RegionGroupType.UNION.name().toLowerCase());
+			names.add(RegionGroupType.COMPLEMENT.name().toLowerCase());
+			names.add(RegionGroupType.INTERSECT.name().toLowerCase());
+			names.add(RegionGroupType.APPLY.name().toLowerCase());
+			
+			List<Element> elements = getElements(regions, names);
+			for(Element element : elements)
+				groups.add(new RegionGroup(element, this));
+		}
 		
 		/*
 		List<Element> negatives = getElements(regions, RegionGroupType.NEGATIVE.name().toLowerCase());
@@ -110,19 +145,27 @@ public class MapLoader {
 		all.addAll(intersects);
 		*/
 		
-		List<String> names = new ArrayList<String>();
-		names.add(RegionGroupType.NEGATIVE.name().toLowerCase());
-		names.add(RegionGroupType.UNION.name().toLowerCase());
-		names.add(RegionGroupType.COMPLEMENT.name().toLowerCase());
-		names.add(RegionGroupType.INTERSECT.name().toLowerCase());
+		/*
+		 * Going to skip filters for now, I want to see the plugin working ;-;
+		 */
 		
-		List<Element> elements = getElements(regions, names);
-		for(Element element : elements)
-			groups.add(new RegionGroup(element, this));
+		this.maxBuildHeight = Region.MAX_BUILD_HEIGHT;
+		if(root.element("maxbuildheight") != null && root.element("maxbuildheight").getText() != null) {
+			try {
+				this.maxBuildHeight = Integer.parseInt(root.element("maxbuildheight").getText());
+			} catch(NumberFormatException e) {
+				Scrimmage.getInstance().getLogger().info("Failed to load max build height for '" + name + "'...");
+			}
+		}
+		
+		// this.filters = filters;
+		
+		long finish = System.currentTimeMillis();
+		Scrimmage.getInstance().getLogger().info("Loaded '" + name + "' taking " + (finish - start) + "ms!");
 	}
 	
 	public Map getMap(RotationSlot slot) {
-		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers, regions, filters);
+		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers, groups, filters);
 	}
 	
 	public static boolean isLoadable(File file) {
@@ -137,18 +180,22 @@ public class MapLoader {
 	}
 	
 	public static MapLoader getLoader(File file) {
-		if(!isLoadable(file))
+		if(!isLoadable(file)) {
+			Scrimmage.getInstance().getLogger().info("File !isLoadable() when trying to getLoader() - return null;");
 			return null;
+		}
 		
 		SAXReader reader = new SAXReader();
 		Document doc;
 		try {
 			doc = reader.read(file);
 		} catch (DocumentException e) {
-			/* This should never happen */
+			Scrimmage.getInstance().getLogger().info("File fired DocumentException when trying to getLoader() - return null;");
 			return null;
 		}
 		
+		if(doc == null)
+			Scrimmage.getInstance().getLogger().info("Document is null?");
 		return new MapLoader(file, doc);
 	}
 	
@@ -161,16 +208,21 @@ public class MapLoader {
 	}
 	
 	private List<String> getList(String container, String contains) {
+		if(doc == null)
+			Scrimmage.getInstance().getLogger().info("Document is null?");
+		
 		Element root = doc.getRootElement();
 		
 		List<String> contents = new ArrayList<String>();
 		Element containerElement = root.element(container);
 		
 		int cur = 0;
-		while(containerElement.elements().size() < cur) {
-			if(((Element) containerElement.elements().get(cur)).getName().equalsIgnoreCase(contains))
-				contents.add(((Element) containerElement.elements().get(cur)).getText());
-			cur++;
+		if(containerElement != null) {
+			while(containerElement.elements().size() < cur) {
+				if(((Element) containerElement.elements().get(cur)).getName().equalsIgnoreCase(contains))
+					contents.add(((Element) containerElement.elements().get(cur)).getText());
+				cur++;
+			}
 		}
 		
 		return contents;
@@ -179,12 +231,10 @@ public class MapLoader {
 	public static List<Element> getElements(Element from, List<String> names) {
 		List<Element> elements = new ArrayList<Element>();
 		
-		int cur = 0;
-		while(from.elements().size() < cur) {
-			if(names.contains(((Element) from.elements().get(cur)).getName()))
-				elements.add(((Element) from.elements().get(cur)));
-			cur++;
-		}
+		for(String name : names)
+			for(Element element : getElements(from))
+				if(element.getName().equalsIgnoreCase(name))
+					elements.add(element);
 		
 		return elements;
 	}
@@ -192,12 +242,9 @@ public class MapLoader {
 	public static List<Element> getElements(Element from, String name) {
 		List<Element> elements = new ArrayList<Element>();
 		
-		int cur = 0;
-		while(from.elements().size() < cur) {
-			if(((Element) from.elements().get(cur)).getName().equalsIgnoreCase(name))
-				elements.add(((Element) from.elements().get(cur)));
-			cur++;
-		}
+		for(Element element : getElements(from))
+			if(element.getName().equalsIgnoreCase(name))
+				elements.add(element);
 		
 		return elements;
 	}
@@ -205,11 +252,9 @@ public class MapLoader {
 	public static List<Element> getElements(Element from) {
 		List<Element> elements = new ArrayList<Element>();
 		
-		int cur = 0;
-		while(from.elements().size() < cur) {
-			elements.add(((Element) from.elements().get(cur)));
-			cur++;
-		}
+		for(Object obj : from.elements())
+			if(obj instanceof Element)
+				elements.add((Element) obj);
 		
 		return elements;
 	}

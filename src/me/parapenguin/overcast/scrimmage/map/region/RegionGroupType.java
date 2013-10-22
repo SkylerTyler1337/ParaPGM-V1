@@ -5,7 +5,8 @@ public enum RegionGroupType {
 	NEGATIVE(),
 	UNION(),
 	COMPLEMENT(),
-	INTERSECT();
+	INTERSECT(),
+	APPLY();
 	
 	public static RegionGroupType getByElementName(String name) {
 		for(RegionGroupType type : values())

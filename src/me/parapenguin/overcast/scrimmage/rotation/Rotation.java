@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 
 public class Rotation {
@@ -15,12 +16,47 @@ public class Rotation {
 	@Getter RotationSlot slot;
 	
 	public Rotation() {
-		int id = 1;
-		while(Scrimmage.getInstance().getConfig().getString("rotation." + id) != null) {
-			String map = Scrimmage.getInstance().getConfig().getString("rotation." + id + ".name");
-			rotation.add(new RotationSlot(getMap(loaded, map)));
-			id++;
+		List<MapLoader> maps = new ArrayList<MapLoader>();
+		List<RotationSlot> slots = new ArrayList<RotationSlot>();
+
+		String rotation = Scrimmage.getInstance().getConfig().getString("rotation");
+		if(rotation == null)
+			maps.addAll(loaded);
+		else {
+			String[] split = rotation.split(",");
+			for(String map : split)
+				maps.add(getMap(loaded, map));
 		}
+		
+		for(MapLoader loader : maps)
+			slots.add(new RotationSlot(loader));
+		
+		this.rotation = slots;
+		
+		Scrimmage.getInstance().getLogger().info("Rotation: " + getRotationString());
+	}
+	
+	public void start() {
+		RotationSlot slot = rotation.get(0);
+		this.slot = slot; // derp, wrong way around.
+		if(slot == null)
+			Scrimmage.getInstance().getLogger().info("Slot #0 is null");
+		
+		slot.load();
+		Map map = slot.getMap();
+		map.update(true);
+		
+		Scrimmage.setOpen(true);
+	}
+	
+	public String getRotationString() {
+		String rotationString = "";
+		for(RotationSlot slot : rotation) {
+			rotationString += slot.getLoader().getName();
+			if(rotation.get(rotation.size() - 1) != slot)
+				rotationString += ",";
+		}
+		return rotationString;
 	}
 	
 	public void setNext(RotationSlot slot) {

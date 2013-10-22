@@ -1,5 +1,7 @@
 package me.parapenguin.overcast.scrimmage.map.filter;
 
+import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.player.Client;
 
 import org.bukkit.entity.Player;
@@ -14,8 +16,15 @@ public class FilterEvents implements Listener {
 		Player player = event.getPlayer();
 		Client client = Client.getClient(player);
 		
-		if(client.isObserver() && !player.hasPermission("scrimmage.observer.place"))
+		if(client.isObserver() && !player.hasPermission("scrimmage.observer.place")) {
 			event.setCancelled(true);
+			return;
+		}
+		
+		if(!client.isObserver()) {
+			Map map = Scrimmage.getRotation().getSlot().getMap();
+			
+		}
 	}
 	
 }

@@ -1,4 +1,4 @@
-package me.parapenguin.overcast.scrimmage.rotation;
+package me.parapenguin.overcast.scrimmage.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
