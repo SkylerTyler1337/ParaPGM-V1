@@ -1,6 +1,8 @@
 package me.parapenguin.overcast.scrimmage.map;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.util.FileUtil;
+import org.bukkit.generator.ChunkGenerator;
 import org.dom4j.Element;
 
 import lombok.Getter;
@@ -21,6 +23,7 @@ import me.parapenguin.overcast.scrimmage.map.region.RegionGroup;
 import me.parapenguin.overcast.scrimmage.map.region.RegionGroupType;
 import me.parapenguin.overcast.scrimmage.map.region.RegionType;
 import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
+import me.parapenguin.overcast.scrimmage.utils.FileUtil;
 
 public class Map {
 	
@@ -82,18 +85,25 @@ public class Map {
 		World world = Scrimmage.getInstance().getServer().getWorld(name);
 		
 		if(load) {
-			File region = new File(Scrimmage.getMapRoot(), "/" + loader.getFolder().getName() + "/region/");
-			File levelDat = new File(Scrimmage.getMapRoot(), "/" + loader.getFolder().getName() + "/level.dat");
-
-			File destRoot = new File(Scrimmage.getRootFolder(), "/" + name + "/");
-			File destRegion = new File(Scrimmage.getRootFolder(), "/" + name + "/region/");
-			File destLevelDat = new File(Scrimmage.getRootFolder(), "/" + name + "/level.dat");
+			File src = loader.getFolder();
+			File dest = new File(name);
 			
-			destRoot.mkdirs();
-			FileUtil.copy(region, destRegion);
-			FileUtil.copy(levelDat, destLevelDat);
+			dest.mkdirs();
+			try {
+				FileUtil.copyFolder(src, dest);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			WorldCreator wc = new WorldCreator(name);
+			wc.generator(new ChunkGenerator() {
+				
+				public byte[] generate(World world, Random random, int x, int z) {
+					return new byte[65536];
+				}
+				
+			});
 			world = wc.createWorld();
 		}
 		

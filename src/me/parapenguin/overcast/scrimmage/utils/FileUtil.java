@@ -10,20 +10,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileUtil {
-    public static List<File> getFiles(File folder) {
-    	if (!folder.exists())
-    		folder.mkdirs();
-        List<File> list = new ArrayList<File>();
-        for (File fileEntry : folder.listFiles()) {
-            if (fileEntry.isDirectory()) {
-                getFiles(fileEntry);
-            }
-            else {
-                list.add(fileEntry);
-            }
-        }
-        return list;
-    }
+	public static List<File> getFiles(File folder) {
+		if (!folder.exists())
+			folder.mkdirs();
+		List<File> list = new ArrayList<File>();
+		for (File fileEntry : folder.listFiles()) {
+			if (fileEntry.isDirectory()) {
+				getFiles(fileEntry);
+			}
+			else {
+				list.add(fileEntry);
+			}
+		}
+		return list;
+	}
 	
 	public static void delete(File dir) {
 		if (dir.isDirectory()) {
@@ -63,8 +63,7 @@ public class FileUtil {
 				}
 			}
 			String list[] = src.list();
-			for (int i = 0; i < list.length; i++)
-			{
+			for (int i = 0; i < list.length; i++) {
 				File dest1 = new File(dest, list[i]);
 				File src1 = new File(src, list[i]);
 				copy(src1 , dest1);
@@ -88,6 +87,35 @@ public class FileUtil {
 			} finally {
 				if (fin != null) { fin.close(); }
 				if (fout != null) { fout.close(); }
+			}
+		}
+	}
+	
+	@SuppressWarnings("resource")
+	public static void copyFolder(File src, File dest) throws IOException {
+		if (src.isDirectory()) {
+			if (!dest.exists()) {
+				dest.mkdir();
+			}
+			String files[] = src.list();
+			for (String file : files) {
+				File srcFile = new File(src, file);
+				File destFile = new File(dest, file);
+				copyFolder(srcFile, destFile);
+			}
+		} else {
+			OutputStream out;
+			try {
+				InputStream in = new FileInputStream(src);
+				out = new FileOutputStream(dest);
+				byte[] buffer = new byte[1024];
+				int length;
+				while ((length = in.read(buffer)) > 0) {
+						out.write(buffer, 0, length);
+				}
+				out.close();
+			} catch(Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}

@@ -311,18 +311,15 @@ public class Region {
 		
 		double cR = 0;
 		double cX = 0;
-		double cY = 0;
 		double cZ = 0;
 		
 		String[] cSplit = center.split(",");
 		String cXS = cSplit[0];
-		String cYS = cSplit[1];
-		String cZS = cSplit[2];
+		String cZS = cSplit[1];
 		
 		try {
 			cR = parseInfiniteDouble(LocationPoint.X, radius);
 			cX = parseInfiniteDouble(LocationPoint.X, cXS);
-			cY = parseInfiniteDouble(LocationPoint.Y, cYS);
 			cZ = parseInfiniteDouble(LocationPoint.Z, cZS);
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
@@ -330,7 +327,7 @@ public class Region {
 		}
 		
 		if(!failed) {
-			Location centerL = new Location(map.getWorld(), cX, cY, cZ);
+			Location centerL = new Location(map.getWorld(), cX, 0, cZ);
 			
 			List<Location> possibles = RegionUtil.circle(centerL, cR, MAX_BUILD_HEIGHT, false, false);
 			locations.addAll(possibles);
