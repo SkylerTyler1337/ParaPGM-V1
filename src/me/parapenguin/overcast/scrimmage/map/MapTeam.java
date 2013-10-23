@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.map.region.RegionType;
@@ -51,6 +52,7 @@ public class MapTeam {
 	public MapTeam(Map map, String name, ChatColor color, int cap) {
 		this.map = map;
 		this.name = name;
+		if(color == ChatColor.AQUA) name = "Observers";
 		this.color = color;
 		this.cap = cap;
 	}
@@ -78,12 +80,14 @@ public class MapTeam {
 		List<Element> teamElements = new ArrayList<Element>();
 		
 		for(Element element : spawnElements)
-			if(isObserver() || element.attributeValue("team").equalsIgnoreCase(getColorName()))
+			if(isObserver() || (element.attributeValue("team") != null
+				&& getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase())))
 				teamElements.add(element);
 		
 		if(!isObserver())
 			for(Element element : MapLoader.getElements(search, "spawns"))
-				if(element.attributeValue("team") != null && element.attributeValue("team").equalsIgnoreCase(getColorName())) {
+				if(element.attributeValue("team") != null
+					&& getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase())) {
 					search = element;
 					
 					spawnElements = MapLoader.getElements(search, tag);
@@ -95,14 +99,25 @@ public class MapTeam {
 		 * Now I have to make these spawns into their actual spawn value regions/points... * fun *
 		 * Dat class shift...
 		 */
-
-		Region regions = new Region(map, teamElements, RegionType.ALL);
+		
+		List<Element> loadableElements = new ArrayList<Element>();
+		for(Element element : teamElements)
+			loadableElements.addAll(MapLoader.getElements(element));
+		
+		Region regions = new Region(map, loadableElements, RegionType.ALL);
 		
 		List<ConfiguredRegion> configured = regions.getRegions();
 		for(ConfiguredRegion region : configured)
 			spawns.add(new MapTeamSpawn(region));
 		
 		this.spawns = spawns;
+		
+		int spawnCount = spawns.size();
+		int locationCount = 0;
+		for(MapTeamSpawn spawn : this.spawns)
+			locationCount += spawn.getPossibles().size();
+		
+		ServerLog.info("Loaded " + spawnCount + " spawn(s), containing " + locationCount + " location(s) for '" + name + "'!");
 	}
 	
 	public Location getSpawn() {

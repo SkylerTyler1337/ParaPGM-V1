@@ -38,42 +38,42 @@ public class Region {
 		this.elements = new ArrayList<Element>();
 		
 		for(Element element : elements) {
-			if(type == RegionType.RECTANGLE && element.getName().equalsIgnoreCase("rectangle")) {
+			if((type == RegionType.RECTANGLE || type == RegionType.ALL) && element.getName().equalsIgnoreCase("rectangle")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
 				regions.add(new ConfiguredRegion(name, getRectangle(element)));
 			}
 			
-			if(type == RegionType.CUBOID && element.getName().equalsIgnoreCase("cuboid")) {
+			if((type == RegionType.CUBOID || type == RegionType.ALL) && element.getName().equalsIgnoreCase("cuboid")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
 				regions.add(new ConfiguredRegion(name, getCuboid(element)));
 			}
 			
-			if(type == RegionType.CIRCLE && element.getName().equalsIgnoreCase("circle")) {
+			if((type == RegionType.CIRCLE || type == RegionType.ALL) && element.getName().equalsIgnoreCase("circle")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
 				regions.add(new ConfiguredRegion(name, getCircle(element)));
 			}
 			
-			if(type == RegionType.CYLINDER && element.getName().equalsIgnoreCase("cylinder")) {
+			if((type == RegionType.CYLINDER || type == RegionType.ALL) && element.getName().equalsIgnoreCase("cylinder")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
 				regions.add(new ConfiguredRegion(name, getCylinder(element)));
 			}
 			
-			if(type == RegionType.SPHERE && element.getName().equalsIgnoreCase("sphere")) {
+			if((type == RegionType.SPHERE || type == RegionType.ALL) && element.getName().equalsIgnoreCase("sphere")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
 				regions.add(new ConfiguredRegion(name, getSphere(element)));
 			}
 			
-			if(type == RegionType.BLOCK && element.getName().equalsIgnoreCase("point")) {
+			if((type == RegionType.BLOCK || type == RegionType.ALL) && element.getName().equalsIgnoreCase("point")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
@@ -161,23 +161,24 @@ public class Region {
 	
 	public Double parseInfiniteDouble(LocationPoint point, String parse) throws NumberFormatException {
 		double start = 0;
-		int difference = 1000;
-		if(point == LocationPoint.X)
-			start = map.getObservers().getSpawn().getX();
-		else if(point == LocationPoint.Y) {
-			start = map.getObservers().getSpawn().getY();
-			if(parse.equalsIgnoreCase("oo")) difference = (int) (255 - start);
-			else if(parse.equalsIgnoreCase("-oo")) difference = (int) (start);
-			
-			if(parse.equalsIgnoreCase("oo") && difference > ((int) (255 + start))) difference = 255 - ((int) start);
-		}
-		else if(point == LocationPoint.Z)
-			start = map.getObservers().getSpawn().getZ();
-		
 		double value = 0;
-		if(parse.equalsIgnoreCase("oo")) value = start + difference;
-		else if(parse.equalsIgnoreCase("-oo")) value = start - difference;
-		else value = Double.parseDouble(parse);
+		if(parse.equalsIgnoreCase("oo") || parse.equalsIgnoreCase("-oo")) {
+			int difference = 1000;
+			if(point == LocationPoint.X)
+				start = map.getObservers().getSpawn().getX();
+			else if(point == LocationPoint.Y) {
+				start = map.getObservers().getSpawn().getY();
+				if(parse.equalsIgnoreCase("oo")) difference = (int) (255 - start);
+				else if(parse.equalsIgnoreCase("-oo")) difference = (int) (start);
+				
+				if(parse.equalsIgnoreCase("oo") && difference > ((int) (255 + start))) difference = 255 - ((int) start);
+			}
+			else if(point == LocationPoint.Z)
+				start = map.getObservers().getSpawn().getZ();
+			
+			if(parse.equalsIgnoreCase("oo")) value = start + difference;
+			else if(parse.equalsIgnoreCase("-oo")) value = start - difference;
+		} else value = Double.parseDouble(parse);
 		return value;
 	}
 	
@@ -347,7 +348,7 @@ public class Region {
 		
 		List<Location> locations = new ArrayList<Location>();
 		boolean failed = false;
-		String center = cylinder.attributeValue("center");
+		String center = cylinder.attributeValue("base");
 		String radius = cylinder.attributeValue("radius");
 		String height = cylinder.attributeValue("height");
 		
@@ -392,7 +393,7 @@ public class Region {
 		
 		List<Location> locations = new ArrayList<Location>();
 		boolean failed = false;
-		String center = sphere.attributeValue("center");
+		String center = sphere.attributeValue("origin");
 		String radius = sphere.attributeValue("radius");
 		
 		double cR = 0;

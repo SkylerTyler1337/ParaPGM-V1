@@ -25,7 +25,8 @@ import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
 public class Map {
 	
 	/*
-	 * When the Map object is loaded all locations in any lists must have the world updated - this means that there needs to be 1 map object per play
+	 * When the Map object is loaded all locations in any lists must have the world updated
+	 * this means that there needs to be 1 map object per play
 	 * An "update" method will be added where the RotationSlot must be specified, so that the world can be set to the correct name, etc, etc.
 	 * 
 	 * Or I could just supply the RotationSlot in the map object? I guess that could work ^.^
@@ -47,8 +48,8 @@ public class Map {
 	@Getter List<RegionGroup> regions;
 	@Getter List<Filter> filters;
 	
-	public Map(MapLoader loader, RotationSlot slot, String name, String version, String objective, List<String> rules, List<Contributor> authors,
-			List<Contributor> contributors, List<MapTeam> teams, MapTeam observers) {
+	public Map(MapLoader loader, RotationSlot slot, String name, String version, String objective, List<String> rules,
+			List<Contributor> authors, List<Contributor> contributors, List<MapTeam> teams, MapTeam observers) {
 		this.loader = loader;
 		this.slot = slot;
 		this.name = name;
@@ -96,9 +97,11 @@ public class Map {
 			world = wc.createWorld();
 		}
 		
-		Scrimmage.getInstance().getLogger().info("Loaded the World for '" + name + "' taking " + (System.currentTimeMillis() - start) + "ms!");
+		Scrimmage.getInstance().getLogger().info("Loaded the World for '" + this.name + "' taking "
+				+ (System.currentTimeMillis() - start) + "ms!");
 		long step = System.currentTimeMillis();
-		Scrimmage.getInstance().getLogger().info("Total load time for '" + name + "' is currently " + (System.currentTimeMillis() - start) + "ms!");
+		Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
+				+ (System.currentTimeMillis() - start) + "ms!");
 		
 		this.world = world;
 		
@@ -114,7 +117,8 @@ public class Map {
 				String teamColor = element.attributeValue("color");
 				MapTeam team = new MapTeam(this, teamName, teamColor, teamCap);
 				if(team.getColor() == null || team.getColor() == ChatColor.AQUA)
-					Scrimmage.getInstance().getLogger().info("Failed to load team '" + teamName + "' due to having an invalid color supplied!");
+					Scrimmage.getInstance().getLogger().info("Failed to load team '"
+							+ teamName + "' due to having an invalid color supplied!");
 				else teams.add(team);
 			}
 
@@ -179,7 +183,7 @@ public class Map {
 			 */
 		}
 		long finish = System.currentTimeMillis();
-		Scrimmage.getInstance().getLogger().info("Loaded '" + name + "' taking " + (finish - start) + "ms!");
+		Scrimmage.getInstance().getLogger().info("Loaded '" + this.name + "' taking " + (finish - start) + "ms!");
 	}
 	
 	public RegionGroup getRegionGroup(String name) {
