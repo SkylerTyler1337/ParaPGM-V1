@@ -159,6 +159,17 @@ public class Region {
 		return locations;
 	}
 	
+	public static Float parseFloat(String parse) {
+		if(parse == null)
+			return 0F;
+		
+		try {
+			return Float.parseFloat(parse);
+		} catch(NumberFormatException e) {
+			return 0F;
+		}
+	}
+	
 	public Double parseInfiniteDouble(LocationPoint point, String parse) throws NumberFormatException {
 		double start = 0;
 		double value = 0;
@@ -197,6 +208,9 @@ public class Region {
 		String min = rectangle.attributeValue("min");
 		String max = rectangle.attributeValue("max");
 		
+		String yaw = rectangle.getParent().attributeValue("yaw");
+		String pitch = rectangle.getParent().attributeValue("pitch");
+		
 		double minX = 0;
 		double minY = 0;
 		double minZ = 0;
@@ -225,8 +239,8 @@ public class Region {
 		}
 		
 		if(!failed) {
-			Location minL = new Location(map.getWorld(), minX, minY, minZ);
-			Location maxL = new Location(map.getWorld(), maxX, maxY, maxZ);
+			Location minL = new Location(map.getWorld(), minX, minY, minZ, parseFloat(yaw), parseFloat(pitch));
+			Location maxL = new Location(map.getWorld(), maxX, maxY, maxZ, parseFloat(yaw), parseFloat(pitch));
 			List<Block> possibleBlocks = RegionUtil.contains(minL, maxL);
 			
 			List<Location> possibles = new ArrayList<Location>();
@@ -250,6 +264,9 @@ public class Region {
 		boolean failed = false;
 		String min = cuboid.attributeValue("min");
 		String max = cuboid.attributeValue("max");
+		
+		String yaw = cuboid.getParent().attributeValue("yaw");
+		String pitch = cuboid.getParent().attributeValue("pitch");
 		
 		double minX = 0;
 		double minY = 0;
@@ -283,8 +300,8 @@ public class Region {
 		}
 		
 		if(!failed) {
-			Location minL = new Location(map.getWorld(), minX, minY, minZ);
-			Location maxL = new Location(map.getWorld(), maxX, maxY, maxZ);
+			Location minL = new Location(map.getWorld(), minX, minY, minZ, parseFloat(yaw), parseFloat(pitch));
+			Location maxL = new Location(map.getWorld(), maxX, maxY, maxZ, parseFloat(yaw), parseFloat(pitch));
 			List<Block> possibleBlocks = RegionUtil.contains(minL, maxL);
 			
 			List<Location> possibles = new ArrayList<Location>();
@@ -309,6 +326,9 @@ public class Region {
 		String center = circle.attributeValue("center");
 		String radius = circle.attributeValue("radius");
 		
+		String yaw = circle.getParent().attributeValue("yaw");
+		String pitch = circle.getParent().attributeValue("pitch");
+		
 		double cR = 0;
 		double cX = 0;
 		double cZ = 0;
@@ -327,7 +347,7 @@ public class Region {
 		}
 		
 		if(!failed) {
-			Location centerL = new Location(map.getWorld(), cX, 0, cZ);
+			Location centerL = new Location(map.getWorld(), cX, 0, cZ, parseFloat(yaw), parseFloat(pitch));
 			
 			List<Location> possibles = RegionUtil.circle(centerL, cR, MAX_BUILD_HEIGHT, false, false);
 			locations.addAll(possibles);
@@ -348,6 +368,9 @@ public class Region {
 		String center = cylinder.attributeValue("base");
 		String radius = cylinder.attributeValue("radius");
 		String height = cylinder.attributeValue("height");
+		
+		String yaw = cylinder.getParent().attributeValue("yaw");
+		String pitch = cylinder.getParent().attributeValue("pitch");
 		
 		double cR = 0;
 		double cH = 0;
@@ -372,7 +395,7 @@ public class Region {
 		}
 		
 		if(!failed) {
-			Location centerL = new Location(map.getWorld(), cX, cY, cZ);
+			Location centerL = new Location(map.getWorld(), cX, cY, cZ, parseFloat(yaw), parseFloat(pitch));
 			
 			List<Location> possibles = RegionUtil.circle(centerL, cR, cH, false, false);
 			locations.addAll(possibles);
@@ -392,6 +415,9 @@ public class Region {
 		boolean failed = false;
 		String center = sphere.attributeValue("origin");
 		String radius = sphere.attributeValue("radius");
+		
+		String yaw = sphere.getParent().attributeValue("yaw");
+		String pitch = sphere.getParent().attributeValue("pitch");
 		
 		double cR = 0;
 		double cH = 0;
@@ -416,7 +442,7 @@ public class Region {
 		}
 		
 		if(!failed) {
-			Location centerL = new Location(map.getWorld(), cX, cY, cZ);
+			Location centerL = new Location(map.getWorld(), cX, cY, cZ, parseFloat(yaw), parseFloat(pitch));
 			
 			List<Location> possibles = RegionUtil.circle(centerL, cR, cH, false, false);
 			locations.addAll(possibles);
@@ -435,6 +461,9 @@ public class Region {
 		List<Location> locations = new ArrayList<Location>();
 		boolean failed = false;
 		String center = point.getText();
+		
+		String yaw = point.getParent().attributeValue("yaw");
+		String pitch = point.getParent().attributeValue("pitch");
 		
 		double cX = 0;
 		double cY = 0;
@@ -455,7 +484,7 @@ public class Region {
 		}
 		
 		if(!failed) {
-			Location location = new Location(map.getWorld(), cX, cY, cZ);
+			Location location = new Location(map.getWorld(), cX, cY, cZ, parseFloat(yaw), parseFloat(pitch));
 			
 			List<Location> possibles = new ArrayList<Location>();
 			possibles.add(location);

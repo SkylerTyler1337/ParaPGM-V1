@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,7 +18,11 @@ import lombok.Getter;
 import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.event.PlayerEvents;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
+import me.parapenguin.overcast.scrimmage.map.MapTeam;
+import me.parapenguin.overcast.scrimmage.map.filter.FilterEvents;
+import me.parapenguin.overcast.scrimmage.map.objective.ObjectiveEvents;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
+import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.rotation.Rotation;
 import me.parapenguin.overcast.scrimmage.utils.JarUtils;
 
@@ -51,17 +56,17 @@ public class Scrimmage extends JavaPlugin {
 				Bukkit.getServer().getPluginManager().disablePlugin(this);
 			}
 		}
-		
-		loadJars();
+
 		reloadConfig();
-		
-		
+		loadJars();
 	}
 	
 	public void startup() {
 		team = getConfig().getString("team");
 		if(team == null)
 			team = "public";
+		Scrimmage.getInstance().getConfig().set("team", team);
+		Scrimmage.getInstance().saveConfig();
 		
 		// Load the maps from the local map repository (no github/download connections this time Harry...)
 		File[] files = getMapRoot().listFiles();
@@ -76,6 +81,8 @@ public class Scrimmage extends JavaPlugin {
 		
 		setRotation(new Rotation());
 		registerListener(new PlayerEvents());
+		registerListener(new FilterEvents());
+		registerListener(new ObjectiveEvents());
 		getRotation().start();
 	}
 	
@@ -128,8 +135,24 @@ public class Scrimmage extends JavaPlugin {
 		return new File("/home/servers/scrim/maps/");
 	}
 	
+	public static void broadcast(String message) {
+		getInstance().getServer().broadcastMessage(message);
+	}
+	
+	public static void broadcast(String message, MapTeam team) {
+		if(team == null)
+			getInstance().getServer().broadcastMessage(message);
+		else
+			for(Client client : team.getPlayers())
+				client.getPlayer().sendMessage(message);
+	}
+	
 	public static void registerListener(Listener listener) {
 		getInstance().getServer().getPluginManager().registerEvents(listener, getInstance());
+	}
+	
+	public static void callEvent(Event event) {
+		getInstance().getServer().getPluginManager().callEvent(event);
 	}
 	
 	public static boolean isPublic() {

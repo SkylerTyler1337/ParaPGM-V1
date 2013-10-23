@@ -8,13 +8,18 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import org.dom4j.Element;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.filter.Filter;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
@@ -51,6 +56,9 @@ public class Map {
 	@Getter List<RegionGroup> regions;
 	@Getter List<Filter> filters;
 	
+	@Getter Scoreboard board;
+	@Getter Objective boardObjective;
+	
 	public Map(MapLoader loader, RotationSlot slot, String name, String version, String objective, List<String> rules,
 			List<Contributor> authors, List<Contributor> contributors, List<MapTeam> teams, MapTeam observers) {
 		this.loader = loader;
@@ -61,6 +69,47 @@ public class Map {
 		this.rules = rules;
 		this.authors = authors;
 		this.contributors = contributors;
+		
+		this.board = Scrimmage.getInstance().getServer().getScoreboardManager().getNewScoreboard();
+		reloadSidebar(false);
+	}
+	
+	public void reloadSidebar(boolean objectives) {
+		if(boardObjective != null)
+			this.boardObjective.unregister();
+		
+		this.boardObjective = board.registerNewObjective("Objectives", "dummy");
+		this.boardObjective.setDisplayName(ChatColor.GOLD + "Objectives");
+		this.boardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+		
+		if(objectives) {
+			int i = 0;
+			for(MapTeam team : teams) {
+				if(team.getObjectives() == null || team.getObjectives().size() == 0)
+					i = team.loadTeamObjectives(true, i);
+				else i = team.loadTeamObjectives(false, i);
+				if(teams.get(teams.size() - 1) != team) {
+					ServerLog.info("Loading Spaceset @" + i);
+					OfflinePlayer player = Scrimmage.getInstance().getServer().getOfflinePlayer(getSpaces(i));
+					getBoardObjective().getScore(player).setScore(i);
+					i++;
+					ServerLog.info("Loaded Spaceset @" + (i - 1));
+				}
+			}
+		}
+	}
+	
+	public static String getSpaces(int used) {
+		String s = "";
+		
+		int i = 0;
+		while(i <= used) {
+			ServerLog.info("Added 1 space");
+			s += " ";
+			i++;
+		}
+		
+		return s;
 	}
 	
 	public void update() {
@@ -92,7 +141,6 @@ public class Map {
 			try {
 				FileUtil.copyFolder(src, dest);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -139,11 +187,31 @@ public class Map {
 					+ (System.currentTimeMillis() - start) + "ms!");
 			
 			for(MapTeam team : teams)
-				team.load(root.element("spawns"));
+				team.load(root.element("spawns"), -1);
+			
 			observers = new MapTeam(this, "Observers", ChatColor.AQUA, -1);
 			observers.load(root.element("spawns"));
 
 			Scrimmage.getInstance().getLogger().info("Loaded the Spawns for '" + this.name + "' taking "
+					+ (System.currentTimeMillis() - step) + "ms!");
+			step = System.currentTimeMillis();
+			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
+					+ (System.currentTimeMillis() - start) + "ms!");
+			
+			for(MapTeam team : teams)
+				team.loadTeam();
+			
+			observers.loadTeam();
+
+			Scrimmage.getInstance().getLogger().info("Loaded the Scoreboard Teams for '" + this.name + "' taking "
+					+ (System.currentTimeMillis() - step) + "ms!");
+			step = System.currentTimeMillis();
+			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
+					+ (System.currentTimeMillis() - start) + "ms!");
+			
+			reloadSidebar(true);
+
+			Scrimmage.getInstance().getLogger().info("Loaded the Objectives for '" + this.name + "' taking "
 					+ (System.currentTimeMillis() - step) + "ms!");
 			step = System.currentTimeMillis();
 			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "

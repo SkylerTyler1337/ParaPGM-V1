@@ -1,6 +1,6 @@
 name: OCN-Scrim
 main: me.parapenguin.overcast.scrimmage.Scrimmage
-version: 0.1.6
+version: 0.2.6
 author: [ParaPenguin]
 website: http://teamloading.com/
 load: STARTUP

@@ -31,7 +31,7 @@ public class RegionUtil {
 		double cy = loc.getBlockY();
 		double cz = loc.getBlockZ();
 		
-		if(block) {
+		if(!block) {
 			cx = cx + 0.5D;
 			cy = cy + 0.5D;
 			cz = cz + 0.5D;
@@ -42,7 +42,7 @@ public class RegionUtil {
 				for (double y = (sphere ? cy - r : cy); y < (sphere ? cy + r : cy + h); y++) {
 					double dist = (cx - x) * (cx - x) + (cz - z) * (cz - z) + (sphere ? (cy - y) * (cy - y) : 0);
 					if (dist < r * r && !(hollow && dist < (r - 1) * (r - 1))) {
-						Location l = new Location(loc.getWorld(), x, y, z);
+						Location l = new Location(loc.getWorld(), x, y, z, loc.getYaw(), loc.getPitch());
 						circleblocks.add(l);
 					}
 				}
@@ -95,7 +95,7 @@ public class RegionUtil {
 		if(!hollow) {
 			while(x <= xMax) {
 				while(z <= zMax) {
-					locs.add(new Location(centre.getWorld(), x, y, z));
+					locs.add(new Location(centre.getWorld(), x, y, z, centre.getYaw(), centre.getPitch()));
 					z = z + 1;
 				}
 				x = x + 1;
@@ -103,22 +103,22 @@ public class RegionUtil {
 			}
 		} else {
 			while(x <= xMax) {
-				locs.add(new Location(centre.getWorld(), x, y, z));
+				locs.add(new Location(centre.getWorld(), x, y, z, centre.getYaw(), centre.getPitch()));
 				x = x + 1;
 			}
 			
 			while(z <= zMax) {
-				locs.add(new Location(centre.getWorld(), x, y, z));
+				locs.add(new Location(centre.getWorld(), x, y, z, centre.getYaw(), centre.getPitch()));
 				z = z + 1;
 			}
 			
 			while(x <= xMin) {
-				locs.add(new Location(centre.getWorld(), x, y, z));
+				locs.add(new Location(centre.getWorld(), x, y, z, centre.getYaw(), centre.getPitch()));
 				x = x - 1;
 			}
 			
 			while(z <= zMin) {
-				locs.add(new Location(centre.getWorld(), x, y, z));
+				locs.add(new Location(centre.getWorld(), x, y, z, corner1.getYaw(), corner1.getPitch()));
 				z = z - 1;
 			}
 		}
@@ -126,7 +126,7 @@ public class RegionUtil {
 		return locs;
 	}
 	
-	public static Boolean isInside(Location loc, Location corner1, Location corner2) {
+	public static boolean isInside(Location loc, Location corner1, Location corner2) {
 		double xMin, xMax, yMin, yMax, zMin, zMax = 0;
 		
 		double x = loc.getX();
@@ -162,7 +162,7 @@ public class RegionUtil {
 			while (py <= yMax) {
 				int pz = zMin;
 				while (pz <= zMax) {
-					blocks.add(world.getBlockAt(new Location(world, px, py, pz)));
+					blocks.add(world.getBlockAt(new Location(world, px, py, pz, corner1.getYaw(), corner1.getPitch())));
 					pz++;
 				}
 				py++;

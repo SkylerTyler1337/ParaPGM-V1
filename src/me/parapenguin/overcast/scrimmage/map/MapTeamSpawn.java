@@ -15,6 +15,7 @@ public class MapTeamSpawn {
 	public static float DEFAULT_PITCH_VALUE = 0;
 	
 	@Getter List<Location> possibles = new ArrayList<Location>();
+	@Getter String kit;
 	
 	public MapTeamSpawn(List<Location> possibles) {
 		this.possibles = possibles;

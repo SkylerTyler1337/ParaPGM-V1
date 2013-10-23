@@ -6,16 +6,23 @@ import java.util.List;
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.ServerLog;
+import me.parapenguin.overcast.scrimmage.map.objective.TeamObjective;
+import me.parapenguin.overcast.scrimmage.map.objective.WoolObjective;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.map.region.RegionType;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.utils.ConversionUtil;
 
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Team;
 import org.dom4j.Element;
 
 public class MapTeam {
@@ -31,16 +38,20 @@ public class MapTeam {
 	}
 	
 	@Getter Map map;
+	@Getter Team team;
 	
 	@Getter String name;
 	@Getter ChatColor color;
 	@Getter int cap;
 	
+	@Getter String displayName;
 	@Getter List<MapTeamSpawn> spawns;
+	@Getter List<TeamObjective> objectives;
 	
-	public MapTeam(Map map, String name, ChatColor color, int cap, List<MapTeamSpawn> spawns) {
+	private MapTeam(Map map, String name, ChatColor color, int cap, List<MapTeamSpawn> spawns) {
 		this.map = map;
 		this.name = name;
+		setDisplayName();
 		this.color = color;
 		this.cap = cap;
 		
@@ -52,6 +63,7 @@ public class MapTeam {
 	public MapTeam(Map map, String name, ChatColor color, int cap) {
 		this.map = map;
 		this.name = name;
+		setDisplayName();
 		if(color == ChatColor.AQUA) name = "Observers";
 		this.color = color;
 		this.cap = cap;
@@ -69,7 +81,106 @@ public class MapTeam {
 		this(map, name, getChatColorFromString(color), cap);
 	}
 	
+	public void setDisplayName() {
+		setDisplayName(name, false);
+	}
+	
+	public void setDisplayName(String name, boolean update) {
+		this.displayName = name;
+		if(update) getMap().reloadSidebar(false);
+	}
+	
+	public void loadTeam() {
+		this.team = getMap().getBoard().registerNewTeam(getName());
+		this.team.setPrefix(getColor() + "");
+		this.team.setDisplayName(getColor() + getName());
+		this.team.setCanSeeFriendlyInvisibles(true);
+	}
+	
+	public int loadTeamObjectives(int start) {
+		return loadTeamObjectives(true, start);
+	}
+	
+	public int loadTeamObjectives(boolean objectives, int start) {
+		if(this.objectives == null)
+			this.objectives = new ArrayList<TeamObjective>();
+		
+		if(objectives) {
+			this.objectives = new ArrayList<TeamObjective>();
+			Element root = getMap().getLoader().getDoc().getRootElement();
+			
+			// LOAD CTW OBJECTIVES HERE...
+			for(Element element : MapLoader.getElements(root, "wools")) {
+				List<Element> wools = new ArrayList<Element>();
+				if(element.attributeValue("team") != null && isThisTeam(element.attributeValue("team"))) {
+					wools.addAll(MapLoader.getElements(element, "wool"));
+					ServerLog.info("Found " + MapLoader.getElements(element, "wool").size() + " wools!");
+				} else
+					for(Element element2 : MapLoader.getElements(element, "wools"))
+						if(element.attributeValue("team") != null && isThisTeam(element.attributeValue("team")))
+							wools.add(element2);
+				
+				for(Element wool : wools) {
+					ServerLog.info("Found wool '" + wool.attributeValue("color") + "'!");
+					Element block = wool.element("block");
+					Location place = null;
+					try {
+						String[] xyz = block.getText().split(",");
+						double x = Double.parseDouble(xyz[0]);
+						double y = Double.parseDouble(xyz[1]);
+						double z = Double.parseDouble(xyz[2]);
+						
+						place = new Location(getSpawn().getWorld(), x, y, z);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+					
+					DyeColor dye = WoolObjective.getDye(wool.attributeValue("color"));
+					String display = WordUtils.capitalizeFully(wool.attributeValue("color") + " WOOL");
+					if(dye != null && place != null)
+						this.objectives.add(new WoolObjective(getMap(), display, place, dye));
+				}
+			}
+			
+			// LOAD DTM OBJECTIVES HERE...
+			
+		}
+
+		List<String> names = new ArrayList<String>();
+		for(TeamObjective objective : this.objectives) {
+			String name = " " + objective.getColor() + objective.getName() + objective.getSpaces();
+			if(name.length() > 16) {
+				int extra = name.length() - 16;
+				String trimmed = objective.getName().substring(0, objective.getName().length() - 1 - extra);
+				name = " " + objective.getColor() + trimmed + objective.getSpaces();
+			}
+			
+			names.add(name);
+		}
+		
+		String name = getColor() + getDisplayName();
+		if(name.length() > 16) {
+			int extra = name.length() - 16;
+			name = name.substring(0, name.length() - 1 - extra);
+		}
+		
+		names.add(name);
+		
+		int score = start;
+		for(String offlineName : names) {
+			OfflinePlayer player = Scrimmage.getInstance().getServer().getOfflinePlayer(offlineName);
+			getMap().getBoardObjective().getScore(player).setScore(score);
+			score++;
+		}
+		
+		return names.size(); // start at score 1. Have for example, 4 objecitves 1 team. 5. return 5 + 1, for the next team.
+	}
+	
 	public void load(Element search) {
+		load(search, 0);
+	}
+	
+	public void load(Element search, int i) {
 		String tag = "spawn";
 		if(isObserver())
 			tag = "default";
@@ -83,7 +194,7 @@ public class MapTeam {
 			if(isObserver() || (element.attributeValue("team") != null
 				&& getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase())))
 				teamElements.add(element);
-		
+
 		if(!isObserver())
 			for(Element element : MapLoader.getElements(search, "spawns"))
 				if(element.attributeValue("team") != null
@@ -118,6 +229,8 @@ public class MapTeam {
 			locationCount += spawn.getPossibles().size();
 		
 		ServerLog.info("Loaded " + spawnCount + " spawn(s), containing " + locationCount + " location(s) for '" + name + "'!");
+		
+		if(!isObserver() && i != -1) loadTeamObjectives(true, i);
 	}
 	
 	public Location getSpawn() {
@@ -165,12 +278,23 @@ public class MapTeam {
 		if(isObserver()) {
 			client.getPerms().setPermission("worldedit.navigation.thru.tool", true);
 			client.getPerms().setPermission("worldedit.navigation.jump.tool", true);
+			client.getPlayer().setGameMode(GameMode.CREATIVE);
+			client.getPlayer().setCollidesWithEntities(false);
 			client.getPlayer().getInventory().setItem(0, new ItemStack(Material.COMPASS));
+		} else {
+			client.getPerms().unsetPermission("worldedit.navigation.thru.tool");
+			client.getPerms().unsetPermission("worldedit.navigation.jump.tool");
+			client.getPlayer().setGameMode(GameMode.SURVIVAL);
+			client.getPlayer().setCollidesWithEntities(true);
+			// Load the kit here.
 		}
-
-		client.getPerms().unsetPermission("worldedit.navigation.thru.tool");
-		client.getPerms().unsetPermission("worldedit.navigation.jump.tool");
 		
+		if(this.team == null) ServerLog.info("Scoreboard Team for '" + name + "' is null");
+		this.team.addPlayer(client.getPlayer());
+	}
+	
+	public boolean isThisTeam(String check) {
+		return getColorName().toLowerCase().contains(check.toLowerCase());
 	}
 	
 	public static MapTeam getTeamByChatColor(List<MapTeam> teams, ChatColor color) {

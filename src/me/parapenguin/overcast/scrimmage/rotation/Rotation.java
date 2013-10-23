@@ -34,6 +34,8 @@ public class Rotation {
 		this.rotation = slots;
 		
 		Scrimmage.getInstance().getLogger().info("Rotation: " + getRotationString());
+		Scrimmage.getInstance().getConfig().set("rotation", getRotationString());
+		Scrimmage.getInstance().saveConfig();
 	}
 	
 	public void start() {
