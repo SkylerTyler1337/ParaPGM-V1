@@ -1,5 +1,8 @@
 package me.parapenguin.overcast.scrimmage.map.kit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dom4j.Element;
 
 import lombok.Getter;
@@ -14,7 +17,9 @@ public class KitLoader {
 	}
 	
 	public ItemKit load() {
-		ItemKit kit = null;
+		String name = this.element.attributeValue("name");
+		List<ItemSlot> slots = new ArrayList<ItemSlot>();
+		List<ItemKit> parents = new ArrayList<ItemKit>();
 		
 		for(Element element : MapLoader.getElements(this.element, "item")) {
 			/*
@@ -25,7 +30,7 @@ public class KitLoader {
 			
 		}
 		
-		return kit;
+		return new ItemKit(name, null, null);
 	}
 	
 }

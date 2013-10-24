@@ -23,9 +23,8 @@ public class ItemKit {
 			parent.load(client);
 		}
 		
-		for(ItemSlot slot : items) {
-			client.getPlayer().getInventory().setItem(slot.getSlot(), slot.getItem());
-		}
+		for(ItemSlot slot : items)
+			slot.give(client);
 	}
 	
 }
