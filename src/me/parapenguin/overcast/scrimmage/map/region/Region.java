@@ -42,42 +42,42 @@ public class Region {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getRectangle(element)));
+				regions.add(new ConfiguredRegion(name, getRectangle(element), element));
 			}
 			
 			if((type == RegionType.CUBOID || type == RegionType.ALL) && element.getName().equalsIgnoreCase("cuboid")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getCuboid(element)));
+				regions.add(new ConfiguredRegion(name, getCuboid(element), element));
 			}
 			
 			if((type == RegionType.CIRCLE || type == RegionType.ALL) && element.getName().equalsIgnoreCase("circle")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getCircle(element)));
+				regions.add(new ConfiguredRegion(name, getCircle(element), element));
 			}
 			
 			if((type == RegionType.CYLINDER || type == RegionType.ALL) && element.getName().equalsIgnoreCase("cylinder")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getCylinder(element)));
+				regions.add(new ConfiguredRegion(name, getCylinder(element), element));
 			}
 			
 			if((type == RegionType.SPHERE || type == RegionType.ALL) && element.getName().equalsIgnoreCase("sphere")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getSphere(element)));
+				regions.add(new ConfiguredRegion(name, getSphere(element), element));
 			}
 			
 			if((type == RegionType.BLOCK || type == RegionType.ALL) && element.getName().equalsIgnoreCase("point")) {
 				this.elements.add(element);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getPoint(element)));
+				regions.add(new ConfiguredRegion(name, getPoint(element), element));
 			}
 		}
 	}
@@ -104,7 +104,7 @@ public class Region {
 				elements.add(rectangle);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getRectangle(rectangle)));
+				regions.add(new ConfiguredRegion(name, getRectangle(rectangle), rectangle));
 			}
 		
 		if(type == RegionType.CUBOID || type == RegionType.ALL)
@@ -112,7 +112,7 @@ public class Region {
 				elements.add(cuboid);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getCuboid(cuboid)));
+				regions.add(new ConfiguredRegion(name, getCuboid(cuboid), cuboid));
 			}
 		
 		if(type == RegionType.CIRCLE || type == RegionType.ALL)
@@ -120,7 +120,7 @@ public class Region {
 				elements.add(circle);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getCircle(circle)));
+				regions.add(new ConfiguredRegion(name, getCircle(circle), circle));
 			}
 		
 		if(type == RegionType.CYLINDER || type == RegionType.ALL)
@@ -128,7 +128,7 @@ public class Region {
 				elements.add(cylinder);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getCylinder(cylinder)));
+				regions.add(new ConfiguredRegion(name, getCylinder(cylinder), cylinder));
 			}
 		
 		if(type == RegionType.SPHERE || type == RegionType.ALL)
@@ -136,7 +136,7 @@ public class Region {
 				elements.add(sphere);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getSphere(sphere)));
+				regions.add(new ConfiguredRegion(name, getSphere(sphere), sphere));
 			}
 		
 		if(type == RegionType.BLOCK || type == RegionType.ALL) {
@@ -145,7 +145,7 @@ public class Region {
 				elements.add(point);
 				String name = null;
 				if(element.attributeValue("name") != null) name = element.attributeValue("name");
-				regions.add(new ConfiguredRegion(name, getPoint(point)));
+				regions.add(new ConfiguredRegion(name, getPoint(point), point));
 			}
 		}
 	}

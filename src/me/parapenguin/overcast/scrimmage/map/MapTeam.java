@@ -219,7 +219,7 @@ public class MapTeam {
 		
 		List<ConfiguredRegion> configured = regions.getRegions();
 		for(ConfiguredRegion region : configured)
-			spawns.add(new MapTeamSpawn(region));
+			spawns.add(new MapTeamSpawn(getMap(), region, region.getElement().getParent().attributeValue("kit")));
 		
 		this.spawns = spawns;
 		
@@ -277,19 +277,21 @@ public class MapTeam {
 		
 		if(isObserver()) {
 			client.getPerms().setPermission("worldedit.navigation.thru.tool", true);
-			client.getPerms().setPermission("worldedit.navigation.jump.tool", true);
+			client.getPerms().setPermission("worldedit.navigation.jumpto.tool", true);
 			client.getPlayer().setGameMode(GameMode.CREATIVE);
 			client.getPlayer().setCollidesWithEntities(false);
 			client.getPlayer().getInventory().setItem(0, new ItemStack(Material.COMPASS));
 		} else {
 			client.getPerms().unsetPermission("worldedit.navigation.thru.tool");
-			client.getPerms().unsetPermission("worldedit.navigation.jump.tool");
+			client.getPerms().unsetPermission("worldedit.navigation.jumpto.tool");
 			client.getPlayer().setGameMode(GameMode.SURVIVAL);
 			client.getPlayer().setCollidesWithEntities(true);
+			
 			// Load the kit here.
 		}
 		
 		if(this.team == null) ServerLog.info("Scoreboard Team for '" + name + "' is null");
+		client.getPlayer().teleport(getSpawn());
 		this.team.addPlayer(client.getPlayer());
 	}
 	

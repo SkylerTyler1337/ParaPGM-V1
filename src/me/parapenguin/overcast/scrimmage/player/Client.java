@@ -34,7 +34,6 @@ public class Client {
 	
 	public void setTeam(MapTeam team) {
 		this.team = team;
-		player.teleport(team.getSpawn());
 		player.setScoreboard(team.getMap().getBoard());
 		team.loadout(this);
 	}

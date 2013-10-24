@@ -17,6 +17,11 @@ public class KitLoader {
 		ItemKit kit = null;
 		
 		for(Element element : MapLoader.getElements(this.element, "item")) {
+			/*
+			 * Load the Items with their Item Slawt and sheeeeeeeeet!
+			 * Example: <item slot="0">iron sword</item>
+			 */
+			
 			
 		}
 		

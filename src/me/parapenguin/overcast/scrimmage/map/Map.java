@@ -22,6 +22,8 @@ import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.filter.Filter;
+import me.parapenguin.overcast.scrimmage.map.kit.ItemKit;
+import me.parapenguin.overcast.scrimmage.map.kit.KitLoader;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.map.region.RegionGroup;
@@ -50,6 +52,7 @@ public class Map {
 	@Getter List<String> rules;
 	@Getter List<Contributor> authors;
 	@Getter List<Contributor> contributors;
+	@Getter List<ItemKit> kits;
 	@Getter List<MapTeam> teams;
 	@Getter MapTeam observers;
 	
@@ -197,6 +200,20 @@ public class Map {
 			}
 
 			Scrimmage.getInstance().getLogger().info("Loaded the Teams for '" + this.name + "' taking "
+					+ (System.currentTimeMillis() - step) + "ms!");
+			step = System.currentTimeMillis();
+			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
+					+ (System.currentTimeMillis() - start) + "ms!");
+			
+			List<KitLoader> kitLoaders = new ArrayList<KitLoader>();
+			for(Element kitsElement : MapLoader.getElements(root, "kits"))
+				for(Element kitElement : MapLoader.getElements(kitsElement, "kit"))
+					kitLoaders.add(new KitLoader(kitElement));
+			
+			for(KitLoader loader : kitLoaders)
+				kits.add(loader.load());
+
+			Scrimmage.getInstance().getLogger().info("Loaded the Kits for '" + this.name + "' taking "
 					+ (System.currentTimeMillis() - step) + "ms!");
 			step = System.currentTimeMillis();
 			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
