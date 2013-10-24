@@ -14,9 +14,13 @@ public class KitLoader {
 	}
 	
 	public ItemKit load() {
+		ItemKit kit = null;
+		
 		for(Element element : MapLoader.getElements(this.element, "item")) {
 			
 		}
+		
+		return kit;
 	}
 	
 }

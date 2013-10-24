@@ -74,6 +74,22 @@ public class Map {
 		reloadSidebar(false);
 	}
 	
+	public MapTeam getLowest() {
+		List<MapTeam> teams = new ArrayList<MapTeam>();
+		teams.add(getTeams().get(0));
+		int lowest = teams.get(0).getPlayers().size();
+		
+		for(MapTeam team : getTeams())
+			if(lowest > team.getPlayers().size()) {
+				teams = new ArrayList<MapTeam>();
+				teams.add(team);
+				lowest = team.getPlayers().size();
+			} else if(lowest == team.getPlayers().size())
+				teams.add(team);
+		
+		return teams.get(Scrimmage.random(0, teams.size() - 1));
+	}
+	
 	public void reloadSidebar(boolean objectives) {
 		if(boardObjective != null)
 			this.boardObjective.unregister();
