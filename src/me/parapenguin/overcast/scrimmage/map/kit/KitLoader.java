@@ -6,6 +6,7 @@ import java.util.List;
 import org.dom4j.Element;
 
 import lombok.Getter;
+import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 
 public class KitLoader {
@@ -27,10 +28,14 @@ public class KitLoader {
 			 * Example: <item slot="0">iron sword</item>
 			 */
 			
-			
+			try {
+				int slot = element.attributeValue("slot");
+			} catch(Exception e) {
+				ServerLog.info("Failed to load an item because it threw an exception");
+			}
 		}
 		
-		return new ItemKit(name, null, null);
+		return new ItemKit(name, slots, parents);
 	}
 	
 }
