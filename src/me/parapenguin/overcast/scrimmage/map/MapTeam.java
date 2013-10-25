@@ -130,7 +130,7 @@ public class MapTeam {
 						double y = Double.parseDouble(xyz[1]);
 						double z = Double.parseDouble(xyz[2]);
 						
-						place = new Location(getSpawn().getWorld(), x, y, z);
+						place = new Location(getSpawn().getSpawn().getWorld(), x, y, z);
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
@@ -233,9 +233,9 @@ public class MapTeam {
 		if(!isObserver() && i != -1) loadTeamObjectives(true, i);
 	}
 	
-	public Location getSpawn() {
+	public MapTeamSpawn getSpawn() {
 		try {
-			return spawns.get(Scrimmage.random(0, spawns.size() - 1)).getSpawn();
+			return spawns.get(Scrimmage.random(0, spawns.size() - 1));
 		} catch(IndexOutOfBoundsException ioobe) {
 			// What a lovely Exception label... hahah
 			ioobe.printStackTrace();
@@ -267,13 +267,16 @@ public class MapTeam {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void loadout(Client client) {
+	public MapTeamSpawn loadout(Client client, boolean teleport) {
 		client.getPlayer().getInventory().clear();
 		client.getPlayer().getInventory().setHelmet(null);
 		client.getPlayer().getInventory().setChestplate(null);
 		client.getPlayer().getInventory().setLeggings(null);
 		client.getPlayer().getInventory().setBoots(null);
 		client.getPlayer().updateInventory();
+		
+		MapTeamSpawn spawn = getSpawn();
+		if(teleport) client.getPlayer().teleport(spawn.getSpawn());
 		
 		if(isObserver()) {
 			client.getPerms().setPermission("worldedit.navigation.thru.tool", true);
@@ -288,11 +291,13 @@ public class MapTeam {
 			client.getPlayer().setCollidesWithEntities(true);
 			
 			// Load the kit here.
+			spawn.getKit().load(client);
 		}
 		
 		if(this.team == null) ServerLog.info("Scoreboard Team for '" + name + "' is null");
-		client.getPlayer().teleport(getSpawn());
 		this.team.addPlayer(client.getPlayer());
+		
+		return spawn;
 	}
 	
 	public boolean isThisTeam(String check) {

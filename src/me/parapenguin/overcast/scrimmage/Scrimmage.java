@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,6 +24,7 @@ import me.parapenguin.overcast.scrimmage.map.filter.FilterEvents;
 import me.parapenguin.overcast.scrimmage.map.objective.ObjectiveEvents;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.player.Client;
+import me.parapenguin.overcast.scrimmage.player.commands.JoinCommand;
 import me.parapenguin.overcast.scrimmage.rotation.Rotation;
 import me.parapenguin.overcast.scrimmage.utils.JarUtils;
 
@@ -84,6 +86,8 @@ public class Scrimmage extends JavaPlugin {
 		registerListener(new FilterEvents());
 		registerListener(new ObjectiveEvents());
 		getRotation().start();
+		
+		registerCommand("join", new JoinCommand());
 	}
 	
 	public void loadJars() {
@@ -145,6 +149,10 @@ public class Scrimmage extends JavaPlugin {
 		else
 			for(Client client : team.getPlayers())
 				client.getPlayer().sendMessage(message);
+	}
+	
+	public static void registerCommand(String label, CommandExecutor cmdEx) {
+		getInstance().getCommand(label).setExecutor(cmdEx);
 	}
 	
 	public static void registerListener(Listener listener) {

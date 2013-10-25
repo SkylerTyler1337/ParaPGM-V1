@@ -77,6 +77,14 @@ public class Map {
 		reloadSidebar(false);
 	}
 	
+	public List<MapTeam> getAllTeams() {
+		List<MapTeam> teams = new ArrayList<MapTeam>();
+		teams.addAll(getTeams());
+		teams.add(getObservers());
+		
+		return teams;
+	}
+	
 	public MapTeam getLowest() {
 		List<MapTeam> teams = new ArrayList<MapTeam>();
 		teams.add(getTeams().get(0));
@@ -91,6 +99,14 @@ public class Map {
 				teams.add(team);
 		
 		return teams.get(Scrimmage.random(0, teams.size() - 1));
+	}
+	
+	public MapTeam getTeam(String title) {
+		for(MapTeam team : getAllTeams())
+			if(team.getName().toLowerCase().contains(title.toLowerCase()) || team.getColorName().toLowerCase().contains(title.toLowerCase()))
+				return team;
+		
+		return null;
 	}
 	
 	public void reloadSidebar(boolean objectives) {

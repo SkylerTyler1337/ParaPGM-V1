@@ -176,16 +176,16 @@ public class Region {
 		if(parse.equalsIgnoreCase("oo") || parse.equalsIgnoreCase("-oo")) {
 			int difference = 1000;
 			if(point == LocationPoint.X)
-				start = map.getObservers().getSpawn().getX();
+				start = map.getObservers().getSpawn().getSpawn().getX();
 			else if(point == LocationPoint.Y) {
-				start = map.getObservers().getSpawn().getY();
+				start = map.getObservers().getSpawn().getSpawn().getY();
 				if(parse.equalsIgnoreCase("oo")) difference = (int) (255 - start);
 				else if(parse.equalsIgnoreCase("-oo")) difference = (int) (start);
 				
 				if(parse.equalsIgnoreCase("oo") && difference > ((int) (255 + start))) difference = 255 - ((int) start);
 			}
 			else if(point == LocationPoint.Z)
-				start = map.getObservers().getSpawn().getZ();
+				start = map.getObservers().getSpawn().getSpawn().getZ();
 			
 			if(parse.equalsIgnoreCase("oo")) value = start + difference;
 			else if(parse.equalsIgnoreCase("-oo")) value = start - difference;

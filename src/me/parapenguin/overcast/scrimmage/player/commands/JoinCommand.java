@@ -1,7 +1,9 @@
 package me.parapenguin.overcast.scrimmage.player.commands;
 
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
+import me.parapenguin.overcast.scrimmage.player.Client;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -18,10 +20,23 @@ public class JoinCommand implements CommandExecutor {
 			return false;
 		}
 		
-		MapTeam team = Scrimmage.getRotation().getSlot().getMap().getObservers();
+		Map map = Scrimmage.getRotation().getSlot().getMap();
+		
+		MapTeam team = map.getObservers();
 		if(args.length == 0) {
-			
+			team = map.getLowest();
+		} else if(args.length == 1) {
+			team = map.getTeam(args[0]);
+			if(team == null)
+				sender.sendMessage(ChatColor.RED + "Could not find a team by that string!");
+		} else {
+			sender.sendMessage(ChatColor.RED + "Invalid Arguments supplied!");
+			sender.sendMessage(ChatColor.RED + "/join [team]");
+			return false;
 		}
+		
+		sender.sendMessage(ChatColor.GRAY + "You have joined the " + team.getColor() + team.getName() + ChatColor.GRAY + ".");
+		team.loadout(Client.getClient((Player) sender), true);
 		
 		return false;
 	}

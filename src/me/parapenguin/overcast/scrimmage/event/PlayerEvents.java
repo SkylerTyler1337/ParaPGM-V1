@@ -3,6 +3,7 @@ package me.parapenguin.overcast.scrimmage.event;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
+import me.parapenguin.overcast.scrimmage.map.MapTeamSpawn;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.player.PlayerChatEvent;
 
@@ -80,7 +81,8 @@ public class PlayerEvents implements Listener {
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		Client client = Client.getClient(event.getPlayer());
-		event.setRespawnLocation(client.getTeam().getSpawn());
+		MapTeamSpawn spawn = client.getTeam().loadout(client, false);
+		event.setRespawnLocation(spawn.getSpawn());
 	}
 	
 	@EventHandler

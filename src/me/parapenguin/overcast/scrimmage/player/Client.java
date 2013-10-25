@@ -35,7 +35,7 @@ public class Client {
 	public void setTeam(MapTeam team) {
 		this.team = team;
 		player.setScoreboard(team.getMap().getBoard());
-		team.loadout(this);
+		team.loadout(this, true);
 	}
 	
 	public boolean isObserver() {
