@@ -1,5 +1,7 @@
 package me.parapenguin.overcast.scrimmage.utils;
 
+import org.bukkit.Material;
+
 public class ConversionUtil {
 	
 	public static int convertStringToInteger(String value) {
@@ -12,6 +14,10 @@ public class ConversionUtil {
 		} catch(NumberFormatException e) {
 			return fallback;
 		}
+	}
+	
+	public static Material convertStringToMaterial(String convert) {
+		
 	}
 	
 }

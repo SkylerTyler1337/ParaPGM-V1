@@ -27,7 +27,7 @@ public class KitLoader {
 			 * Example: <item slot="0">iron sword</item>
 			 */
 			
-			
+			Material material = ConversionUtil.convertStringToMaterial(element.getText());
 		}
 		
 		return new ItemKit(name, null, null);
