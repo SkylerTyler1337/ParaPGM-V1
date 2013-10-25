@@ -17,7 +17,11 @@ public class ConversionUtil {
 	}
 	
 	public static Material convertStringToMaterial(String convert) {
-		for(Material option : )
+		for(Material option : Material.values())
+			if(option.name().replaceAll("_", " ").equalsIgnoreCase(convert))
+				return option;
+		
+		return Material.AIR;
 	}
 	
 }

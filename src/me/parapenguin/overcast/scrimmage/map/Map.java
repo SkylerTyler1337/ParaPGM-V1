@@ -131,6 +131,14 @@ public class Map {
 		return s;
 	}
 	
+	public ItemKit getKit(String name) {
+		for(ItemKit kit : getKits())
+			if(kit.getName().equalsIgnoreCase(name))
+				return kit;
+		
+		return null;
+	}
+	
 	public void update() {
 		String name = "playing" + Scrimmage.random(1, 10) + "rot" + Scrimmage.getRotation().getLocation(slot);
 		/*
@@ -205,13 +213,9 @@ public class Map {
 			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
 					+ (System.currentTimeMillis() - start) + "ms!");
 			
-			List<KitLoader> kitLoaders = new ArrayList<KitLoader>();
 			for(Element kitsElement : MapLoader.getElements(root, "kits"))
 				for(Element kitElement : MapLoader.getElements(kitsElement, "kit"))
-					kitLoaders.add(new KitLoader(kitElement));
-			
-			for(KitLoader loader : kitLoaders)
-				kits.add(loader.load());
+					kits.add(new KitLoader(this, kitElement).load());
 
 			Scrimmage.getInstance().getLogger().info("Loaded the Kits for '" + this.name + "' taking "
 					+ (System.currentTimeMillis() - step) + "ms!");
