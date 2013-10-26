@@ -3,6 +3,7 @@ package me.parapenguin.overcast.scrimmage.map.objective;
 import org.bukkit.ChatColor;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
 
@@ -11,11 +12,13 @@ public class TeamObjective {
 	@Getter Map map;
 	
 	@Getter String name;
-	@Getter boolean complete;
+	@Getter MapTeam team;
+	@Getter @Setter boolean complete;
 	@Getter int used;
 	
-	public TeamObjective(Map map, String name) {
+	public TeamObjective(Map map, MapTeam owner, String name) {
 		this.name = name;
+		this.team = owner;
 		this.complete = false;
 		
 		this.used = 0;

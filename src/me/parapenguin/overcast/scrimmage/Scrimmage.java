@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import lombok.Getter;
 import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.event.PlayerEvents;
+import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
 import me.parapenguin.overcast.scrimmage.map.filter.FilterEvents;
@@ -26,6 +27,9 @@ import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.player.commands.JoinCommand;
 import me.parapenguin.overcast.scrimmage.rotation.Rotation;
+import me.parapenguin.overcast.scrimmage.tracker.GravityKillTracker;
+import me.parapenguin.overcast.scrimmage.tracker.PlayerBlockChecker;
+import me.parapenguin.overcast.scrimmage.tracker.TickTimer;
 import me.parapenguin.overcast.scrimmage.utils.JarUtils;
 
 public class Scrimmage extends JavaPlugin {
@@ -34,9 +38,14 @@ public class Scrimmage extends JavaPlugin {
 	static @Getter @Setter Rotation rotation;
 	@Getter List<File> libs = new ArrayList<File>();
 	@Getter List<String> files = new ArrayList<String>();
+
+	private TickTimer tickTimer;
+	@Getter public GravityKillTracker gkt;
 	
 	static @Getter String team;
 	static @Getter @Setter boolean open;
+	
+	@Getter public static double MINIMUM_MOVEMENT = 0.125;
 	
 	public void onEnable() {
 		setOpen(false);
@@ -88,6 +97,16 @@ public class Scrimmage extends JavaPlugin {
 		getRotation().start();
 		
 		registerCommand("join", new JoinCommand());
+		enableTracker();
+	}
+
+	public void enableTracker() {
+		tickTimer = new TickTimer(this);
+		tickTimer.start();
+
+		gkt = new GravityKillTracker(tickTimer, new PlayerBlockChecker());
+		getServer().getPluginManager().registerEvents(gkt, this);
+		getServer().getPluginManager().registerEvents(tickTimer, this);
 	}
 	
 	public void loadJars() {
@@ -169,6 +188,10 @@ public class Scrimmage extends JavaPlugin {
 	
 	public static int getID() {
 		return getInstance().getServer().getPort() - 25560;
+	}
+	
+	public static Map getMap() {
+		return Scrimmage.getRotation().getSlot().getMap();
 	}
 	
 }

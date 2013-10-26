@@ -21,6 +21,7 @@ public class JoinCommand implements CommandExecutor {
 		}
 		
 		Map map = Scrimmage.getRotation().getSlot().getMap();
+		Client client = Client.getClient((Player) sender);
 		
 		MapTeam team = map.getObservers();
 		if(args.length == 0) {
@@ -34,9 +35,12 @@ public class JoinCommand implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "/join [team]");
 			return false;
 		}
+
+		client.setTeam(team);
+		team.loadout(client, true);
+		sender.sendMessage(ChatColor.GRAY + "You have joined the " + team.getColor() + team.getDisplayName() + ChatColor.GRAY + ".");
 		
-		sender.sendMessage(ChatColor.GRAY + "You have joined the " + team.getColor() + team.getName() + ChatColor.GRAY + ".");
-		team.loadout(Client.getClient((Player) sender), true);
+		sender.sendMessage(client.getTeam().getColor() + client.getTeam().getColor().name() + " + " + client.getTeam().getDisplayName());
 		
 		return false;
 	}

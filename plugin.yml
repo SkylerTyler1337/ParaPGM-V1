@@ -4,5 +4,6 @@ version: 0.2.6
 author: [ParaPenguin]
 website: http://teamloading.com/
 load: STARTUP
+commands:
   join:
     description: Join Command.

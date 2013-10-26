@@ -19,11 +19,11 @@ import org.dom4j.Element;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
-import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.filter.Filter;
 import me.parapenguin.overcast.scrimmage.map.kit.ItemKit;
 import me.parapenguin.overcast.scrimmage.map.kit.KitLoader;
+import me.parapenguin.overcast.scrimmage.map.objective.WoolObjective;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.map.region.RegionGroup;
@@ -118,17 +118,15 @@ public class Map {
 		this.boardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		
 		if(objectives) {
-			int i = 0;
+			int i = 1;
 			for(MapTeam team : teams) {
 				if(team.getObjectives() == null || team.getObjectives().size() == 0)
 					i = team.loadTeamObjectives(true, i);
 				else i = team.loadTeamObjectives(false, i);
 				if(teams.get(teams.size() - 1) != team) {
-					ServerLog.info("Loading Spaceset @" + i);
 					OfflinePlayer player = Scrimmage.getInstance().getServer().getOfflinePlayer(getSpaces(i));
 					getBoardObjective().getScore(player).setScore(i);
 					i++;
-					ServerLog.info("Loaded Spaceset @" + (i - 1));
 				}
 			}
 		}
@@ -139,7 +137,6 @@ public class Map {
 		
 		int i = 0;
 		while(i <= used) {
-			ServerLog.info("Added 1 space");
 			s += " ";
 			i++;
 		}
@@ -229,6 +226,7 @@ public class Map {
 			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
 					+ (System.currentTimeMillis() - start) + "ms!");
 			
+			kits = new ArrayList<ItemKit>();
 			for(Element kitsElement : MapLoader.getElements(root, "kits"))
 				for(Element kitElement : MapLoader.getElements(kitsElement, "kit"))
 					kits.add(new KitLoader(this, kitElement).load());
@@ -333,6 +331,27 @@ public class Map {
 			if(filter)
 		}
 		*/
+		
+		return null;
+	}
+	
+	public List<WoolObjective> getWools() {
+		List<WoolObjective> wools = new ArrayList<WoolObjective>();
+		
+		for(MapTeam team : getAllTeams())
+			wools.addAll(team.getWools());
+		
+		return wools;
+	}
+	
+	public List<WoolObjective> getWools(MapTeam team) {
+		return team.getWools();
+	}
+	
+	public WoolObjective getWool(Location location) {
+		for(MapTeam team : getTeams())
+			if(team.getWool(location) != null)
+				return team.getWool(location);
 		
 		return null;
 	}

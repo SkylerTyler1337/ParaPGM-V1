@@ -21,7 +21,9 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Wool;
 import org.bukkit.scoreboard.Team;
 import org.dom4j.Element;
 
@@ -138,7 +140,7 @@ public class MapTeam {
 					DyeColor dye = WoolObjective.getDye(wool.attributeValue("color"));
 					String display = WordUtils.capitalizeFully(wool.attributeValue("color") + " WOOL");
 					if(dye != null && place != null)
-						this.objectives.add(new WoolObjective(getMap(), display, place, dye));
+						this.objectives.add(new WoolObjective(getMap(), this, display, place, dye));
 				}
 			}
 			
@@ -291,7 +293,8 @@ public class MapTeam {
 			client.getPlayer().setCollidesWithEntities(true);
 			
 			// Load the kit here.
-			spawn.getKit().load(client);
+			if(spawn.getKit() != null)
+				spawn.getKit().load(client);
 		}
 		
 		if(this.team == null) ServerLog.info("Scoreboard Team for '" + name + "' is null");
@@ -302,6 +305,36 @@ public class MapTeam {
 	
 	public boolean isThisTeam(String check) {
 		return getColorName().toLowerCase().contains(check.toLowerCase());
+	}
+	
+	public List<WoolObjective> getWools() {
+		List<WoolObjective> wools = new ArrayList<WoolObjective>();
+		
+		if(getObjectives() == null)
+			return wools;
+		
+		for(TeamObjective obj : getObjectives())
+			if(obj instanceof WoolObjective)
+				wools.add((WoolObjective) obj);
+		
+		return wools;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public WoolObjective getWool(Block block) {
+		for(WoolObjective wool : getWools())
+			if(new Wool(block.getType(), block.getData()).getColor() == wool.getWool())
+				return wool;
+		
+		return null;
+	}
+	
+	public WoolObjective getWool(Location location) {
+		for(WoolObjective wool : getWools())
+			if(wool.isLocation(location))
+				return wool;
+		
+		return null;
 	}
 	
 	public static MapTeam getTeamByChatColor(List<MapTeam> teams, ChatColor color) {
