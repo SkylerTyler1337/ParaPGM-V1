@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
 
@@ -13,8 +14,10 @@ public class TeamObjective {
 	
 	@Getter String name;
 	@Getter MapTeam team;
-	@Getter @Setter boolean complete;
+	@Getter boolean complete;
 	@Getter int used;
+	
+	@Getter @Setter int touched;
 	
 	public TeamObjective(Map map, MapTeam owner, String name) {
 		this.name = name;
@@ -51,6 +54,20 @@ public class TeamObjective {
 		else if(this instanceof WoolObjective)
 			return ObjectiveType.DTM;
 		return ObjectiveType.NONE;
+	}
+	
+	public void addTouch() {
+		addTouch(1);
+	}
+	
+	public void addTouch(int amount) {
+		setTouched(getTouched() + amount);
+	}
+	
+	public void setComplete(boolean complete) {
+		this.complete = complete;
+		if(getTeam().getCompleted() == getTeam().getObjectives().size())
+			Scrimmage.getRotation().getSlot().getMatch().end(getTeam());
 	}
 	
 }

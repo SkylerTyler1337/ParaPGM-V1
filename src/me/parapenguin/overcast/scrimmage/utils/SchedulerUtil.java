@@ -11,15 +11,14 @@ public class SchedulerUtil {
 	private @Getter @Setter int id;
 	private @Getter BukkitTask task;
 	
-	public SchedulerUtil() {
-		
-	}
-	
 	public void runnable() {
 		
 	}
 	
 	public void repeatAsync(long interval, long delay) {
+		if(this.task != null)
+			this.task.cancel();
+		
 		this.task = Scrimmage.getInstance().getServer().getScheduler().runTaskTimerAsynchronously(Scrimmage.getInstance(), new Runnable() {
 			
 			@Override
@@ -31,6 +30,9 @@ public class SchedulerUtil {
 	}
 	
 	public void repeat(long interval, long delay) {
+		if(this.task != null)
+			this.task.cancel();
+		
 		this.task = Scrimmage.getInstance().getServer().getScheduler().runTaskTimer(Scrimmage.getInstance(), new Runnable() {
 			
 			@Override
@@ -42,6 +44,9 @@ public class SchedulerUtil {
 	}
 	
 	public void laterAsync(long delay) {
+		if(this.task != null)
+			this.task.cancel();
+		
 		this.task = Scrimmage.getInstance().getServer().getScheduler().runTaskLaterAsynchronously(Scrimmage.getInstance(), new Runnable() {
 			
 			@Override
@@ -53,6 +58,9 @@ public class SchedulerUtil {
 	}
 	
 	public void later(long delay) {
+		if(this.task != null)
+			this.task.cancel();
+		
 		this.task = Scrimmage.getInstance().getServer().getScheduler().runTaskLater(Scrimmage.getInstance(), new Runnable() {
 			
 			@Override
@@ -64,6 +72,9 @@ public class SchedulerUtil {
 	}
 	
 	public void nowAsync() {
+		if(this.task != null)
+			this.task.cancel();
+		
 		this.task = Scrimmage.getInstance().getServer().getScheduler().runTaskAsynchronously(Scrimmage.getInstance(), new Runnable() {
 			
 			@Override
@@ -75,6 +86,9 @@ public class SchedulerUtil {
 	}
 	
 	public void now() {
+		if(this.task != null)
+			this.task.cancel();
+		
 		this.task = Scrimmage.getInstance().getServer().getScheduler().runTask(Scrimmage.getInstance(), new Runnable() {
 			
 			@Override

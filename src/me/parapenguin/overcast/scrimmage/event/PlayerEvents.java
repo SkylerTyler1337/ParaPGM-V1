@@ -1,6 +1,7 @@
 package me.parapenguin.overcast.scrimmage.event;
 
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
 import me.parapenguin.overcast.scrimmage.map.MapTeamSpawn;
@@ -32,7 +33,7 @@ public class PlayerEvents implements Listener {
 		Client client = new Client(player);
 		
 		Client.getClients().add(client);
-		client.setTeam(Scrimmage.getRotation().getSlot().getMap().getObservers());
+		client.setTeam(Scrimmage.getRotation().getSlot().getMap().getObservers(), true);
 		
 		event.setJoinMessage(client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " joined the game.");
 	}
@@ -83,6 +84,9 @@ public class PlayerEvents implements Listener {
 		Client client = Client.getClient(event.getPlayer());
 		MapTeamSpawn spawn = client.getTeam().loadout(client, false);
 		event.setRespawnLocation(spawn.getSpawn());
+		if(!client.getTeam().isObserver())
+			spawn.getKit().load(client);
+		else client.getTeam().loadout(client, false);
 	}
 	
 	@EventHandler
@@ -102,6 +106,7 @@ public class PlayerEvents implements Listener {
 		}
 		
 		Scrimmage.broadcast(format, team);
+		ServerLog.info(format);
 	}
 	
 }

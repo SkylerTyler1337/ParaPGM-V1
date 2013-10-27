@@ -5,7 +5,6 @@ import java.util.List;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
-import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 
 public class Rotation {
@@ -40,15 +39,12 @@ public class Rotation {
 	
 	public void start() {
 		RotationSlot slot = rotation.get(0);
-		this.slot = slot; // derp, wrong way around.
-		if(slot == null)
-			Scrimmage.getInstance().getLogger().info("Slot #0 is null");
+		this.slot = slot;
 		
 		slot.load();
-		Map map = slot.getMap();
-		map.update(true);
 		
 		Scrimmage.setOpen(true);
+		slot.getMatch().start();
 	}
 	
 	public String getRotationString() {
@@ -73,6 +69,10 @@ public class Rotation {
 		rotation.addAll(aft);
 	}
 	
+	public RotationSlot getSlot(int slot) throws IndexOutOfBoundsException {
+		return getRotation().get(slot);
+	}
+	
 	public int getLocation(RotationSlot slot) {
 		int s = 0;
 		for(RotationSlot search : getRotation()) {
@@ -82,6 +82,16 @@ public class Rotation {
 		}
 		
 		return s;
+	}
+	
+	public RotationSlot getNext() {
+		int current = getLocation(getSlot());
+		
+		try {
+			return getSlot(current + 1);
+		} catch(IndexOutOfBoundsException ioobe) {
+			return null;
+		}
 	}
 	
 	public static boolean addMap(MapLoader loader) {

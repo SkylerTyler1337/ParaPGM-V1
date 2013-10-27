@@ -297,9 +297,6 @@ public class MapTeam {
 				spawn.getKit().load(client);
 		}
 		
-		if(this.team == null) ServerLog.info("Scoreboard Team for '" + name + "' is null");
-		this.team.addPlayer(client.getPlayer());
-		
 		return spawn;
 	}
 	
@@ -335,6 +332,25 @@ public class MapTeam {
 				return wool;
 		
 		return null;
+	}
+	
+	public int getCompleted() {
+		int complete = 0;
+		
+		for(TeamObjective objective : getObjectives())
+			if(objective.isComplete())
+				complete++;
+		
+		return complete;
+	}
+	
+	public int getTouches() {
+		int complete = 0;
+		
+		for(TeamObjective objective : getObjectives())
+			complete += objective.getTouched();
+		
+		return complete;
 	}
 	
 	public static MapTeam getTeamByChatColor(List<MapTeam> teams, ChatColor color) {

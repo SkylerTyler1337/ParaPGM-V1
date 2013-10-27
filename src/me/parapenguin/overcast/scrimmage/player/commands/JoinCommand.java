@@ -37,10 +37,7 @@ public class JoinCommand implements CommandExecutor {
 		}
 
 		client.setTeam(team);
-		team.loadout(client, true);
 		sender.sendMessage(ChatColor.GRAY + "You have joined the " + team.getColor() + team.getDisplayName() + ChatColor.GRAY + ".");
-		
-		sender.sendMessage(client.getTeam().getColor() + client.getTeam().getColor().name() + " + " + client.getTeam().getDisplayName());
 		
 		return false;
 	}

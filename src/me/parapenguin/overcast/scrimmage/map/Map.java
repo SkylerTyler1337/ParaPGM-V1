@@ -91,12 +91,13 @@ public class Map {
 		int lowest = teams.get(0).getPlayers().size();
 		
 		for(MapTeam team : getTeams())
-			if(lowest > team.getPlayers().size()) {
-				teams = new ArrayList<MapTeam>();
-				teams.add(team);
-				lowest = team.getPlayers().size();
-			} else if(lowest == team.getPlayers().size())
-				teams.add(team);
+			if(!teams.contains(team))
+				if(lowest > team.getPlayers().size()) {
+					teams = new ArrayList<MapTeam>();
+					teams.add(team);
+					lowest = team.getPlayers().size();
+				} else if(lowest == team.getPlayers().size())
+					teams.add(team);
 		
 		return teams.get(Scrimmage.random(0, teams.size() - 1));
 	}
@@ -354,6 +355,38 @@ public class Map {
 				return team.getWool(location);
 		
 		return null;
+	}
+	
+	public List<MapTeam> getWinners() {
+		List<MapTeam> teams = new ArrayList<MapTeam>();
+		teams.add(getTeams().get(0));
+		int highest = teams.get(0).getCompleted();
+		
+		for(MapTeam team : getTeams())
+			if(!teams.contains(team))
+				if(highest < team.getCompleted()) {
+					teams = new ArrayList<MapTeam>();
+					teams.add(team);
+					highest = team.getCompleted();
+				} else if(highest == team.getCompleted())
+					teams.add(team);
+		
+		if(teams.size() != 1) {
+			teams = new ArrayList<MapTeam>();
+			teams.add(getTeams().get(0));
+			highest = teams.get(0).getTouches();
+			
+			for(MapTeam team : getTeams())
+				if(!teams.contains(team))
+					if(highest < team.getTouches()) {
+						teams = new ArrayList<MapTeam>();
+						teams.add(team);
+						highest = team.getTouches();
+					} else if(highest == team.getTouches())
+						teams.add(team);
+		}
+		
+		return teams;
 	}
 	
 }

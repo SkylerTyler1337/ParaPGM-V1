@@ -21,7 +21,7 @@ public class FilterEvents implements Listener {
 		Player player = event.getPlayer();
 		Client client = Client.getClient(player);
 		
-		if(client.isObserver()) {
+		if(client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -37,7 +37,7 @@ public class FilterEvents implements Listener {
 		Player player = event.getPlayer();
 		Client client = Client.getClient(player);
 		
-		if(client.isObserver()) {
+		if(client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -53,7 +53,7 @@ public class FilterEvents implements Listener {
 		Player player = event.getPlayer();
 		Client client = Client.getClient(player);
 		
-		if(client.isObserver()) {
+		if(client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -69,7 +69,7 @@ public class FilterEvents implements Listener {
 		Player player = event.getPlayer();
 		Client client = Client.getClient(player);
 		
-		if(client.isObserver()) {
+		if(client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -90,7 +90,7 @@ public class FilterEvents implements Listener {
 		Player player = (Player) event.getWhoClicked();
 		Client client = Client.getClient(player);
 		
-		if(client.isObserver() && event.getInventory().getType() != InventoryType.PLAYER) {
+		if((client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) && event.getInventory().getType() != InventoryType.PLAYER) {
 			event.setCancelled(true);
 			return;
 		}
