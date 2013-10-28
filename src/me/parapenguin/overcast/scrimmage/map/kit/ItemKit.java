@@ -3,6 +3,7 @@ package me.parapenguin.overcast.scrimmage.map.kit;
 import java.util.List;
 
 import lombok.Getter;
+import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.player.Client;
 
 public class ItemKit {
@@ -23,8 +24,10 @@ public class ItemKit {
 			parent.load(client);
 		}
 		
-		for(ItemSlot slot : items)
+		for(ItemSlot slot : items) {
 			slot.give(client);
+			ServerLog.info("Set slot #" + slot.getSlot() + " for " + client.getPlayer().getName() + " containing '" + slot.getItem().getType() + "'!");
+		}
 	}
 	
 }

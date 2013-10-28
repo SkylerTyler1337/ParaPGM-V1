@@ -236,17 +236,13 @@ public class Map {
 					+ (System.currentTimeMillis() - start) + "ms!");
 			
 			kits = new ArrayList<ItemKit>();
-			List<Element> kitElements = new ArrayList<Element>();
 			for(Element kitsElement : MapLoader.getElements(root, "kits"))
 				for(Element kitElement : MapLoader.getElements(kitsElement, "kit"))
-					kitElements.add(kitElement);
+					kits.add(new KitLoader(this, kitElement).load());
 			for(Element kitsElement : MapLoader.getElements(root, "kits"))
 				for(Element kitsElement2 : MapLoader.getElements(kitsElement, "kits"))
 					for(Element kitElement : MapLoader.getElements(kitsElement2, "kit"))
-						kitElements.add(kitElement);
-			
-			for(Element kit : kitElements)
-				kits.add(new KitLoader(this, kit).load());
+						kits.add(new KitLoader(this, kitElement).load());
 
 			Scrimmage.getInstance().getLogger().info("Loaded the Kits for '" + this.name + "' taking "
 					+ (System.currentTimeMillis() - step) + "ms!");

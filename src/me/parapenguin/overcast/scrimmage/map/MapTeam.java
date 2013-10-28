@@ -138,7 +138,9 @@ public class MapTeam {
 				Element block = wool.element("block");
 				Location place = null;
 				try {
-					String[] xyz = block.getText().split(",");
+					String text = block.attributeValue("location");
+					if(text == null) text = block.getText();
+					String[] xyz = text.split(",");
 					double x = Double.parseDouble(xyz[0]);
 					double y = Double.parseDouble(xyz[1]);
 					double z = Double.parseDouble(xyz[2]);
@@ -200,39 +202,42 @@ public class MapTeam {
 		List<MapTeamSpawn> spawns = new ArrayList<MapTeamSpawn>();
 		List<Element> spawnElements = MapLoader.getElements(search, tag);
 		
-		List<Element> teamElements = new ArrayList<Element>();
-		
 		for(Element element : spawnElements)
-			if(isObserver() || (element.attributeValue("team") != null
-				&& getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase())))
-				teamElements.add(element);
+			if(isObserver() || (element.attributeValue("team") != null && getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase()))) {
+				Region region = new Region(map, element, RegionType.ALL);
+				
+				List<ConfiguredRegion> configured = region.getRegions();
+				for(ConfiguredRegion conf : configured)
+					spawns.add(new MapTeamSpawn(getMap(), conf, element.attributeValue("kit")));
+			}
 
 		if(!isObserver())
 			for(Element element : MapLoader.getElements(search, "spawns"))
-				if(element.attributeValue("team") != null
-					&& getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase())) {
+				if(element.attributeValue("team") != null && isThisTeam(element.attributeValue("team").toLowerCase())) {
 					search = element;
 					
 					spawnElements = MapLoader.getElements(element, tag);
-					for(Element element2 : spawnElements)
-						teamElements.add(element2);
-				} else if(element.attributeValue("team") != null && getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase()))
-						teamElements.add(element);
+					for(Element element2 : spawnElements) {
+						Region region = new Region(map, element2, RegionType.ALL);
+						
+						List<ConfiguredRegion> configured = region.getRegions();
+						for(ConfiguredRegion conf : configured)
+							spawns.add(new MapTeamSpawn(getMap(), conf, element2.attributeValue("kit")));
+					}
+				} else
+					for(Element element2 : MapLoader.getElements(element, "spawn"))
+						if(element2.attributeValue("team") != null && isThisTeam(element2.attributeValue("team").toLowerCase())) {
+							Region region = new Region(map, element2, RegionType.ALL);
+							
+							List<ConfiguredRegion> configured = region.getRegions();
+							for(ConfiguredRegion conf : configured)
+								spawns.add(new MapTeamSpawn(getMap(), conf, element2.attributeValue("kit")));
+						}
 		
 		/*
 		 * Now I have to make these spawns into their actual spawn value regions/points... * fun *
 		 * Dat class shift...
 		 */
-		
-		List<Element> loadableElements = new ArrayList<Element>();
-		for(Element element : teamElements)
-			loadableElements.addAll(MapLoader.getElements(element));
-		
-		Region regions = new Region(map, loadableElements, RegionType.ALL);
-		
-		List<ConfiguredRegion> configured = regions.getRegions();
-		for(ConfiguredRegion region : configured)
-			spawns.add(new MapTeamSpawn(getMap(), region, region.getElement().getParent().attributeValue("kit")));
 		
 		this.spawns = spawns;
 		
@@ -314,7 +319,11 @@ public class MapTeam {
 	}
 	
 	public boolean isThisTeam(String check) {
-		return getColorName().toLowerCase().contains(check.toLowerCase());
+		return contains(getColorName(), check) || contains(getDisplayName(), check) || contains(getName(), check);
+	}
+	
+	public boolean contains(String check, String contains) {
+		return check.toLowerCase().contains(contains.toLowerCase());
 	}
 	
 	public List<WoolObjective> getWools() {

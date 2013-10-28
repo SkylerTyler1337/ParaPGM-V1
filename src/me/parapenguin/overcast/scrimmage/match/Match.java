@@ -116,7 +116,7 @@ public class Match {
 			
 			String creators = "";
 			if(getMap().getAuthors().size() == 1)
-				creators += ChatColor.GOLD + getMap().getAuthors().get(0).getName();
+				creators += ChatColor.RED + getMap().getAuthors().get(0).getName();
 			else if(getMap().getAuthors().size() >= 2) {
 				/*
 				 * index 0 should prefix ""
