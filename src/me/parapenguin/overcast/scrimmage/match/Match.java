@@ -31,6 +31,7 @@ public class Match {
 
 	@Getter SchedulerUtil cyclingTask;
 	@Getter int cycling = 30;
+	@Getter @Setter boolean loaded = false;
 	@Getter @Setter boolean currentlyCycling = false;
 	
 	public Match(RotationSlot slot, int length) {
@@ -174,6 +175,23 @@ public class Match {
 		if(cycling == 0) {
 			cyclingTask.getTask().cancel();
 			setCurrentlyCycling(false);
+			
+			if(next == null) {
+				Scrimmage.getInstance().getServer().shutdown();
+				return true;
+			}
+
+			Scrimmage.getRotation().setSlot(next);
+			for(Client client : Client.getClients())
+				client.setTeam(next.getMap().getObservers(), true, true, true);
+			next.getMatch().start();
+			
+			return true;
+		}
+		
+		if(cycling == 5 && !loaded && next != null) {
+			setLoaded(true);
+			next.load();
 		}
 		
 		String p = "s";

@@ -99,11 +99,11 @@ public class Client {
 		*/
 		
 		if(Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
-			setTeam(team, true, false, false);
+			setTeam(team, true, true, true);
 			return;
 		}
 		
-		setTeam(team, false, true, true);
+		setTeam(team, false, true, false);
 	}
 	
 	public void setTeam(MapTeam team, boolean load, boolean clear, boolean teleport) {

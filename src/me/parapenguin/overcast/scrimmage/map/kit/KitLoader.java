@@ -48,10 +48,12 @@ public class KitLoader {
 		}
 		
 		String sparents = this.element.attributeValue("parents");
-		String[] values = sparents.split(" ");
-		for(String parent : values)
-			if(getMap().getKit(parent) != null)
-				parents.add(getMap().getKit(parent));
+		if(sparents != null) {
+			String[] values = sparents.split(" ");
+			for(String parent : values)
+				if(getMap().getKit(parent) != null)
+					parents.add(getMap().getKit(parent));
+		}
 		
 		return new ItemKit(name, slots, parents);
 	}

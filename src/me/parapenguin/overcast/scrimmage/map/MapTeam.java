@@ -32,6 +32,9 @@ public class MapTeam {
 	public static int DEFAULT_TEAM_CAP = 8;
 	
 	public static ChatColor getChatColorFromString(String string) {
+		if(string.equalsIgnoreCase("purple")) return ChatColor.DARK_PURPLE;
+		if(string.equalsIgnoreCase("cyan")) return ChatColor.DARK_AQUA;
+		
 		for(ChatColor color : ChatColor.values())
 			if(color.name().equalsIgnoreCase(string.replaceAll(" ", "_")))
 				return color;
@@ -89,7 +92,7 @@ public class MapTeam {
 	
 	public void setDisplayName(String name, boolean update) {
 		this.displayName = name;
-		if(update) getMap().reloadSidebar(false);
+		if(update) getMap().reloadSidebar(true);
 	}
 	
 	public void loadTeam() {
@@ -112,8 +115,8 @@ public class MapTeam {
 			Element root = getMap().getLoader().getDoc().getRootElement();
 			
 			// LOAD CTW OBJECTIVES HERE...
+			List<Element> wools = new ArrayList<Element>();
 			for(Element element : MapLoader.getElements(root, "wools")) {
-				List<Element> wools = new ArrayList<Element>();
 				if(element.attributeValue("team") != null && isThisTeam(element.attributeValue("team"))) {
 					wools.addAll(MapLoader.getElements(element, "wool"));
 					ServerLog.info("Found " + MapLoader.getElements(element, "wool").size() + " wools!");
@@ -121,27 +124,34 @@ public class MapTeam {
 					for(Element element2 : MapLoader.getElements(element, "wools"))
 						if(element.attributeValue("team") != null && isThisTeam(element.attributeValue("team")))
 							wools.add(element2);
-				
-				for(Element wool : wools) {
-					ServerLog.info("Found wool '" + wool.attributeValue("color") + "'!");
-					Element block = wool.element("block");
-					Location place = null;
-					try {
-						String[] xyz = block.getText().split(",");
-						double x = Double.parseDouble(xyz[0]);
-						double y = Double.parseDouble(xyz[1]);
-						double z = Double.parseDouble(xyz[2]);
-						
-						place = new Location(getSpawn().getSpawn().getWorld(), x, y, z);
-					} catch(Exception e) {
-						e.printStackTrace();
-					}
-					
-					DyeColor dye = WoolObjective.getDye(wool.attributeValue("color"));
-					String display = WordUtils.capitalizeFully(wool.attributeValue("color") + " WOOL");
-					if(dye != null && place != null)
-						this.objectives.add(new WoolObjective(getMap(), this, display, place, dye));
+			}
+
+			for(Element element : MapLoader.getElements(root.element("wools"), "wool")) {
+				if(element.attributeValue("team") != null && isThisTeam(element.attributeValue("team"))) {
+					wools.add(element);
+					ServerLog.info("Found 1 wool!");
 				}
+			}
+			
+			for(Element wool : wools) {
+				ServerLog.info("Found wool '" + wool.attributeValue("color") + "'!");
+				Element block = wool.element("block");
+				Location place = null;
+				try {
+					String[] xyz = block.getText().split(",");
+					double x = Double.parseDouble(xyz[0]);
+					double y = Double.parseDouble(xyz[1]);
+					double z = Double.parseDouble(xyz[2]);
+					
+					place = new Location(getSpawn().getSpawn().getWorld(), x, y, z);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+				
+				DyeColor dye = WoolObjective.getDye(wool.attributeValue("color"));
+				String display = WordUtils.capitalizeFully(wool.attributeValue("color") + " WOOL");
+				if(dye != null && place != null)
+					this.objectives.add(new WoolObjective(getMap(), this, display, place, dye));
 			}
 			
 			// LOAD DTM OBJECTIVES HERE...
@@ -203,10 +213,11 @@ public class MapTeam {
 					&& getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase())) {
 					search = element;
 					
-					spawnElements = MapLoader.getElements(search, tag);
+					spawnElements = MapLoader.getElements(element, tag);
 					for(Element element2 : spawnElements)
 						teamElements.add(element2);
-				}
+				} else if(element.attributeValue("team") != null && getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase()))
+						teamElements.add(element);
 		
 		/*
 		 * Now I have to make these spawns into their actual spawn value regions/points... * fun *

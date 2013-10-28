@@ -6,7 +6,10 @@ website: http://teamloading.com/
 load: STARTUP
 commands:
   join:
-    description: Join Command.
+    description: Join the match.
   setteam:
     aliases: [st]
-    description: Join Command.
+    description: Set the name of a team.
+  setnext:
+    aliases: [sn]
+    description: Set the next map.

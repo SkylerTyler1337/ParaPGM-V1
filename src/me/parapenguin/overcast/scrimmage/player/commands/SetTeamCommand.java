@@ -26,7 +26,7 @@ public class SetTeamCommand implements CommandExecutor {
 		
 		if(args.length < 2) {
 			sender.sendMessage(ChatColor.RED + "Invalid Arguments supplied!");
-			sender.sendMessage(ChatColor.RED + "/join [team]");
+			sender.sendMessage(ChatColor.RED + "/setteam <team> <new name>");
 			return false;
 		}
 		

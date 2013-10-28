@@ -26,6 +26,7 @@ import me.parapenguin.overcast.scrimmage.map.objective.ObjectiveEvents;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.player.commands.JoinCommand;
+import me.parapenguin.overcast.scrimmage.player.commands.SetNextCommand;
 import me.parapenguin.overcast.scrimmage.player.commands.SetTeamCommand;
 import me.parapenguin.overcast.scrimmage.rotation.Rotation;
 import me.parapenguin.overcast.scrimmage.tracker.GravityKillTracker;
@@ -99,6 +100,7 @@ public class Scrimmage extends JavaPlugin {
 		
 		registerCommand("join", new JoinCommand());
 		registerCommand("setteam", new SetTeamCommand());
+		registerCommand("setnext", new SetNextCommand());
 		enableTracker();
 	}
 

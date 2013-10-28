@@ -88,7 +88,7 @@ public class PlayerEvents implements Listener {
 		Client client = Client.getClient(event.getPlayer());
 		MapTeamSpawn spawn = client.getTeam().loadout(client, false, true);
 		event.setRespawnLocation(spawn.getSpawn());
-		if(!client.getTeam().isObserver())
+		if(!client.getTeam().isObserver() && spawn.getKit() != null)
 			spawn.getKit().load(client);
 		else client.getTeam().loadout(client, false, true);
 	}

@@ -125,6 +125,7 @@ public class Map {
 					i = team.loadTeamObjectives(true, i);
 				else i = team.loadTeamObjectives(false, i);
 				if(teams.get(teams.size() - 1) != team) {
+					i++;
 					OfflinePlayer player = Scrimmage.getInstance().getServer().getOfflinePlayer(getSpaces(i));
 					getBoardObjective().getScore(player).setScore(i);
 					i++;
@@ -151,6 +152,13 @@ public class Map {
 				return kit;
 		
 		return null;
+	}
+	
+	public void unload() {
+		String name = getWorld().getName();
+		Scrimmage.getInstance().getServer().unloadWorld(getWorld(), false);
+		
+		FileUtil.delete(new File(name));
 	}
 	
 	public void update() {
@@ -228,9 +236,17 @@ public class Map {
 					+ (System.currentTimeMillis() - start) + "ms!");
 			
 			kits = new ArrayList<ItemKit>();
+			List<Element> kitElements = new ArrayList<Element>();
 			for(Element kitsElement : MapLoader.getElements(root, "kits"))
 				for(Element kitElement : MapLoader.getElements(kitsElement, "kit"))
-					kits.add(new KitLoader(this, kitElement).load());
+					kitElements.add(kitElement);
+			for(Element kitsElement : MapLoader.getElements(root, "kits"))
+				for(Element kitsElement2 : MapLoader.getElements(kitsElement, "kits"))
+					for(Element kitElement : MapLoader.getElements(kitsElement2, "kit"))
+						kitElements.add(kitElement);
+			
+			for(Element kit : kitElements)
+				kits.add(new KitLoader(this, kit).load());
 
 			Scrimmage.getInstance().getLogger().info("Loaded the Kits for '" + this.name + "' taking "
 					+ (System.currentTimeMillis() - step) + "ms!");

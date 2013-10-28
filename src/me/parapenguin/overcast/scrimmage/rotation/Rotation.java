@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 
@@ -12,7 +13,7 @@ public class Rotation {
 	static @Getter List<MapLoader> loaded = new ArrayList<MapLoader>();
 	@Getter List<RotationSlot> rotation = new ArrayList<RotationSlot>();
 	
-	@Getter RotationSlot slot;
+	@Getter @Setter RotationSlot slot;
 	
 	public Rotation() {
 		List<MapLoader> maps = new ArrayList<MapLoader>();
@@ -61,12 +62,17 @@ public class Rotation {
 		int current = getLocation(slot);
 		
 		List<RotationSlot> pre = rotation.subList(0, current);
-		List<RotationSlot> aft = rotation.subList(current + 1, rotation.size() - 1);
+		List<RotationSlot> aft = new ArrayList<RotationSlot>();
+		try {
+			aft = rotation.subList(current + 1, rotation.size() - 1);
+		} catch(Exception e) {}
 		
 		List<RotationSlot> rotation = new ArrayList<RotationSlot>();
 		rotation.addAll(pre);
 		rotation.add(slot);
 		rotation.addAll(aft);
+		
+		this.rotation = rotation;
 	}
 	
 	public RotationSlot getSlot(int slot) throws IndexOutOfBoundsException {
@@ -98,9 +104,13 @@ public class Rotation {
 		return loaded.add(loader);
 	}
 	
+	public static MapLoader getMap(String name) {
+		return getMap(loaded, name);
+	}
+	
 	public static MapLoader getMap(List<MapLoader> loaded, String name) {
 		for(MapLoader loader : loaded)
-			if(loader.getName().startsWith(name))
+			if(loader.getName().toLowerCase().startsWith(name.toLowerCase()))
 				return loader;
 		
 		return null;
