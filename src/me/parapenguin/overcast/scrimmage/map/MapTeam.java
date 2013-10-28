@@ -205,10 +205,13 @@ public class MapTeam {
 		for(Element element : spawnElements)
 			if(isObserver() || (element.attributeValue("team") != null && getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase()))) {
 				Region region = new Region(map, element, RegionType.ALL);
+				String kit = element.attributeValue("kit");
 				
 				List<ConfiguredRegion> configured = region.getRegions();
-				for(ConfiguredRegion conf : configured)
-					spawns.add(new MapTeamSpawn(getMap(), conf, element.attributeValue("kit")));
+				for(ConfiguredRegion conf : configured) {
+					if(kit == null) kit = element.attributeValue("kit");
+					spawns.add(new MapTeamSpawn(getMap(), conf, kit));
+				}
 			}
 
 		if(!isObserver())
@@ -219,19 +222,25 @@ public class MapTeam {
 					spawnElements = MapLoader.getElements(element, tag);
 					for(Element element2 : spawnElements) {
 						Region region = new Region(map, element2, RegionType.ALL);
+						String kit = element.attributeValue("kit");
 						
 						List<ConfiguredRegion> configured = region.getRegions();
-						for(ConfiguredRegion conf : configured)
-							spawns.add(new MapTeamSpawn(getMap(), conf, element2.attributeValue("kit")));
+						for(ConfiguredRegion conf : configured) {
+							if(kit == null) kit = element2.attributeValue("kit");
+							spawns.add(new MapTeamSpawn(getMap(), conf, kit));
+						}
 					}
 				} else
 					for(Element element2 : MapLoader.getElements(element, "spawn"))
 						if(element2.attributeValue("team") != null && isThisTeam(element2.attributeValue("team").toLowerCase())) {
 							Region region = new Region(map, element2, RegionType.ALL);
+							String kit = element.attributeValue("kit");
 							
 							List<ConfiguredRegion> configured = region.getRegions();
-							for(ConfiguredRegion conf : configured)
-								spawns.add(new MapTeamSpawn(getMap(), conf, element2.attributeValue("kit")));
+							for(ConfiguredRegion conf : configured) {
+								if(kit == null) kit = element2.attributeValue("kit");
+								spawns.add(new MapTeamSpawn(getMap(), conf, kit));
+							}
 						}
 		
 		/*
