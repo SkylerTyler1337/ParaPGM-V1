@@ -85,7 +85,7 @@ public class Match {
 			
 			for(MapTeam team : getMap().getTeams())
 				for(Client client : team.getPlayers())
-					client.setTeam(team, true);
+					client.setTeam(team, true, true, true);
 			
 			return true;
 		}
@@ -101,8 +101,8 @@ public class Match {
 	
 	private boolean timing() {
 		setCurrentlyRunning(true);
-		if(timing >= length) {
-			end();
+		if(timing >= length || end(false)) {
+			end(true);
 			setCurrentlyRunning(false);
 			return true;
 		}
@@ -143,14 +143,16 @@ public class Match {
 		return false;
 	}
 	
-	public void end() {
+	public boolean end(boolean force) {
 		List<MapTeam> teams = getMap().getWinners();
 		MapTeam winner = null;
 		
 		if(teams.size() == 1)
 			winner = teams.get(0);
 		
+		if(!force) return false;
 		end(winner);
+		return true;
 	}
 	
 	public boolean end(MapTeam winner) {
@@ -160,6 +162,10 @@ public class Match {
 		
 		timingTask.getTask().cancel();
 		cyclingTask.repeatAsync(20, 20);
+		
+		for(MapTeam team : getMap().getTeams())
+			for(Client client : team.getPlayers())
+				client.setTeam(getMap().getObservers(), true, false, false);
 		return true;
 	}
 	

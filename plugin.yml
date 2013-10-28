@@ -7,3 +7,6 @@ load: STARTUP
 commands:
   join:
     description: Join Command.
+  setteam:
+    aliases: [st]
+    description: Join Command.

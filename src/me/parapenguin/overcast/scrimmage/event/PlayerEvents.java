@@ -33,7 +33,7 @@ public class PlayerEvents implements Listener {
 		Client client = new Client(player);
 		
 		Client.getClients().add(client);
-		client.setTeam(Scrimmage.getRotation().getSlot().getMap().getObservers(), true);
+		client.setTeam(Scrimmage.getRotation().getSlot().getMap().getObservers(), true, true, true);
 		
 		event.setJoinMessage(client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " joined the game.");
 	}
@@ -41,15 +41,19 @@ public class PlayerEvents implements Listener {
 	@EventHandler
 	public void onPlayerKick(PlayerKickEvent event) {
 		Client client = Client.getClient(event.getPlayer());
-		event.setLeaveMessage(client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " left the game.");
-		onPlayerExit(event.getPlayer());
+		try {
+			event.setLeaveMessage(client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " left the game.");
+			onPlayerExit(event.getPlayer());
+		} catch(NullPointerException e) {}
 	}
 	
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Client client = Client.getClient(event.getPlayer());
-		event.setQuitMessage(client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " left the game.");
-		onPlayerExit(event.getPlayer());
+		try {
+			event.setQuitMessage(client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " left the game.");
+			onPlayerExit(event.getPlayer());
+		} catch(NullPointerException e) {}
 	}
 	
 	public void onPlayerExit(Player player) {
@@ -82,11 +86,11 @@ public class PlayerEvents implements Listener {
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		Client client = Client.getClient(event.getPlayer());
-		MapTeamSpawn spawn = client.getTeam().loadout(client, false);
+		MapTeamSpawn spawn = client.getTeam().loadout(client, false, true);
 		event.setRespawnLocation(spawn.getSpawn());
 		if(!client.getTeam().isObserver())
 			spawn.getKit().load(client);
-		else client.getTeam().loadout(client, false);
+		else client.getTeam().loadout(client, false, true);
 	}
 	
 	@EventHandler
@@ -99,9 +103,9 @@ public class PlayerEvents implements Listener {
 		
 		MapTeam team = client.getTeam();
 		
-		String format = team.getColor() + "[Team] " + client.getPlayer().getName() + ChatColor.WHITE + ": " + message;
+		String format = team.getColor() + "[Team] " + client.getStars() + team.getColor() + client.getPlayer().getName() + ChatColor.WHITE + ": " + message;
 		if(!event.isTeam()) {
-			format = team.getColor() + client.getPlayer().getName() + ChatColor.WHITE + ": " + message;
+			format = client.getStars() + team.getColor() + client.getPlayer().getName() + ChatColor.WHITE + ": " + message;
 			team = null;
 		}
 		

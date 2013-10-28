@@ -9,6 +9,7 @@ import me.parapenguin.overcast.scrimmage.ServerLog;
 // import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
@@ -34,6 +35,62 @@ public class Client {
 		this.perms = player.addAttachment(Scrimmage.getInstance());
 	}
 	
+	public boolean isRanked() {
+		String[] devs = new String[]{"ParaPenguin"};
+		String[] refs = new String[]{"pmheys", "your_loved_one", "dcstarwars", "ShinyDialga45", "iEli2tyree011"};
+		
+		String op = ChatColor.RED + "*";
+		String dev = ChatColor.GOLD + "*";
+		String ref = ChatColor.DARK_AQUA + "*";
+		
+		String stars = "";
+		for(String string : devs)
+			if(string.equalsIgnoreCase(getPlayer().getName())) {
+				stars += dev;
+				break;
+			}
+		
+		for(String string : refs)
+			if(string.equalsIgnoreCase(getPlayer().getName())) {
+				stars += ref;
+				break;
+			}
+		
+		if(getPlayer().isOp())
+			stars += op;
+		
+		return stars.length() != 0;
+	}
+	
+	public String getStars() {
+		if(!isRanked()) return "";
+		
+		String[] devs = new String[]{"ParaPenguin"};
+		String[] refs = new String[]{"pmheys", "your_loved_one", "dcstarwars", "ShinyDialga45", "iEli2tyree011"};
+		
+		String op = ChatColor.RED + "*";
+		String dev = ChatColor.GOLD + "*";
+		String ref = ChatColor.DARK_AQUA + "*";
+		
+		String stars = "";
+		for(String string : devs)
+			if(string.equalsIgnoreCase(getPlayer().getName())) {
+				stars += dev;
+				break;
+			}
+		
+		for(String string : refs)
+			if(string.equalsIgnoreCase(getPlayer().getName())) {
+				stars += ref;
+				break;
+			}
+		
+		if(getPlayer().isOp())
+			stars += op;
+		
+		return stars;
+	}
+	
 	public void setTeam(MapTeam team) {
 		/*
 		ServerLog.info("Starting: " + Scrimmage.getRotation().getSlot().getMatch().isCurrentlyStarting());
@@ -42,20 +99,20 @@ public class Client {
 		*/
 		
 		if(Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
-			setTeam(team, true);
+			setTeam(team, true, false, false);
 			return;
 		}
 		
-		setTeam(team, false);
+		setTeam(team, false, true, true);
 	}
 	
-	public void setTeam(MapTeam team, boolean load) {
+	public void setTeam(MapTeam team, boolean load, boolean clear, boolean teleport) {
 		this.team = team;
 		player.setScoreboard(team.getMap().getBoard());
-		if(load) team.loadout(this, true);
+		if(load) team.loadout(this, teleport, clear);
 		
 		if(team.getTeam() == null) ServerLog.info("Scoreboard Team for '" + team.getName() + "' is null");
-		team.getTeam().addPlayer(getPlayer());
+		if(clear) team.getTeam().addPlayer(getPlayer());
 	}
 	
 	public boolean isObserver() {

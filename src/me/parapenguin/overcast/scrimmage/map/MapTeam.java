@@ -269,13 +269,14 @@ public class MapTeam {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public MapTeamSpawn loadout(Client client, boolean teleport) {
-		client.getPlayer().getInventory().clear();
-		client.getPlayer().getInventory().setHelmet(null);
-		client.getPlayer().getInventory().setChestplate(null);
-		client.getPlayer().getInventory().setLeggings(null);
-		client.getPlayer().getInventory().setBoots(null);
-		client.getPlayer().updateInventory();
+	public MapTeamSpawn loadout(Client client, boolean teleport, boolean clear) {
+		if(clear) {
+			client.getPlayer().getInventory().clear();
+			client.getPlayer().getInventory().setHelmet(null);
+			client.getPlayer().getInventory().setChestplate(null);
+			client.getPlayer().getInventory().setLeggings(null);
+			client.getPlayer().getInventory().setBoots(null);
+		}
 		
 		MapTeamSpawn spawn = getSpawn();
 		if(teleport) client.getPlayer().teleport(spawn.getSpawn());
@@ -296,7 +297,8 @@ public class MapTeam {
 			if(spawn.getKit() != null)
 				spawn.getKit().load(client);
 		}
-		
+
+		client.getPlayer().updateInventory();
 		return spawn;
 	}
 	
