@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.ServerLog;
+import me.parapenguin.overcast.scrimmage.map.Map;
 // import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
 
@@ -113,10 +114,34 @@ public class Client {
 		
 		if(team.getTeam() == null) ServerLog.info("Scoreboard Team for '" + team.getName() + "' is null");
 		if(clear) team.getTeam().addPlayer(getPlayer());
+		
+		updateVision();
 	}
 	
 	public boolean isObserver() {
 		return team.isObserver();
+	}
+	
+	public void updateVision() {
+		for(Client client : getClients()) {
+			Map map = client.getTeam().getMap();
+			List<Client> observers = map.getObservers().getPlayers();
+			List<Client> players = new ArrayList<Client>();
+			for(MapTeam team : map.getTeams())
+				players.addAll(team.getPlayers());
+			
+			if(getTeam().isObserver()) {
+				for(Client observer : observers)
+					client.getPlayer().showPlayer(observer.getPlayer());
+				for(Client player : players)
+					client.getPlayer().showPlayer(player.getPlayer());
+			} else {
+				for(Client observer : observers)
+					client.getPlayer().hidePlayer(observer.getPlayer());
+				for(Client player : players)
+					client.getPlayer().showPlayer(player.getPlayer());
+			}
+		}
 	}
 	
 }

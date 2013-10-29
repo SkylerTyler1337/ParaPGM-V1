@@ -5,7 +5,6 @@ import java.util.List;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
-import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.kit.ItemKit;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 
@@ -43,13 +42,9 @@ public class MapTeamSpawn {
 	}
 	
 	public ItemKit getKit() {
-		for(ItemKit kit : getMap().getKits()) {
-			ServerLog.info("Kit '" + kit.getName() + "' == '" + getKitName() + "' returns " + (kit.getName().equalsIgnoreCase(kitName)));
-			if(kit.getName().equalsIgnoreCase(kitName)) {
-				ServerLog.info("The kit '" + kit.getName() + "' matches for this team spawn! Awesome stuff Para...");
+		for(ItemKit kit : getMap().getKits())
+			if(kit.getName().equalsIgnoreCase(kitName))
 				return kit;
-			}
-		}
 		
 		return null;
 	}

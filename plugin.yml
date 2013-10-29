@@ -13,3 +13,6 @@ commands:
   setnext:
     aliases: [sn]
     description: Set the next map.
+  global:
+    aliases: [g]
+    description: Global chat.

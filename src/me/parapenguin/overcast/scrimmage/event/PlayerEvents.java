@@ -10,8 +10,10 @@ import me.parapenguin.overcast.scrimmage.player.PlayerChatEvent;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -66,12 +68,12 @@ public class PlayerEvents implements Listener {
 
 		ChatColor color = ChatColor.RED;
 		if(!Scrimmage.isOpen()) {
-			event.setMotd(color + " Â» " + ChatColor.AQUA + map.getName() + color + " Â« ");
+			event.setMotd(color + " È " + ChatColor.AQUA + map.getName() + color + " Ç ");
 			return;
 		}
 		
 		color = ChatColor.GRAY;
-		event.setMotd(color + " Â» " + ChatColor.AQUA + map.getName() + color + " Â« ");
+		event.setMotd(color + " È " + ChatColor.AQUA + map.getName() + color + " Ç ");
 	}
 	
 	@EventHandler
@@ -111,6 +113,29 @@ public class PlayerEvents implements Listener {
 		
 		Scrimmage.broadcast(format, team);
 		ServerLog.info(format);
+	}
+	
+	@EventHandler
+	public void onEntityDamageEvent(EntityDamageByEntityEvent event) {
+		if(event.getDamager() instanceof Player == false && event.getDamager() instanceof Projectile == false)
+			return;
+		
+		if(event.getEntity() instanceof Player == false)
+			return;
+		
+		Client damaged = Client.getClient((Player) event.getEntity());
+		Player attackerPlayer = null;
+		if(event.getDamager() instanceof Projectile) {
+			Projectile proj = (Projectile) event.getEntity();
+			if(proj.getShooter() instanceof Player == false)
+				return;
+			
+			attackerPlayer = (Player) proj.getShooter();
+		} else attackerPlayer = (Player) event.getDamager();
+		Client attacker = Client.getClient(attackerPlayer);
+		
+		if(attacker.getTeam() == damaged.getTeam() || attacker.getTeam().isObserver() || damaged.getTeam().isObserver())
+			event.setCancelled(true);
 	}
 	
 }

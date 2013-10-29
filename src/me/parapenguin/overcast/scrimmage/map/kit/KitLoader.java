@@ -41,7 +41,6 @@ public class KitLoader {
 				if(material == Material.AIR)
 					ServerLog.info("Failed to load an item because '" + element.getText() + "' does not exist (or the item was air)!");
 				else slots.add(new ItemSlot(slot, new ItemStack(material, ConversionUtil.convertStringToInteger(element.attributeValue("amount"), 1))));
-				ServerLog.info("Loaded '" + material + "' into the slot #" + slot + "!");
 			} catch(Exception e) {
 				ServerLog.info("Failed to load an item because it threw an exception");
 				e.printStackTrace();
