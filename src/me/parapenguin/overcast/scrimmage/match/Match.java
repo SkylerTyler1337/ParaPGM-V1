@@ -67,13 +67,28 @@ public class Match {
 		};
 		
 		map.update(true);
-		setCurrentlyStarting(false);
+		setCurrentlyStarting(true);
 		setCurrentlyRunning(false);
 		setCurrentlyCycling(false);
 	}
 	
 	public void start() {
+		try {
+			stop();
+		} catch(Exception e) {
+			// meh
+		}
+		
+		this.timing = 0;
+		this.cycling = 30;
+		this.starting = 30;
 		this.startingTask.repeat(20, 0);
+	}
+	
+	public void stop() throws NullPointerException {
+		if(this.startingTask.getTask() != null) this.startingTask.getTask().cancel();
+		if(this.cyclingTask.getTask() != null) this.cyclingTask.getTask().cancel();
+		if(this.timingTask.getTask() != null) this.timingTask.getTask().cancel();
 	}
 	
 	private boolean starting() {
@@ -102,7 +117,7 @@ public class Match {
 	
 	private boolean timing() {
 		setCurrentlyRunning(true);
-		if(timing >= length || end(false)) {
+		if((timing >= length && length != -1) || end(false)) {
 			end(true);
 			setCurrentlyRunning(false);
 			return true;
@@ -167,6 +182,9 @@ public class Match {
 		for(MapTeam team : getMap().getTeams())
 			for(Client client : team.getPlayers())
 				client.setTeam(getMap().getObservers(), true, false, false);
+		
+		setCurrentlyRunning(false);
+		setCurrentlyCycling(true);
 		return true;
 	}
 	

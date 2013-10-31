@@ -126,7 +126,7 @@ public class PlayerEvents implements Listener {
 		Client damaged = Client.getClient((Player) event.getEntity());
 		Player attackerPlayer = null;
 		if(event.getDamager() instanceof Projectile) {
-			Projectile proj = (Projectile) event.getEntity();
+			Projectile proj = (Projectile) event.getDamager();
 			if(proj.getShooter() instanceof Player == false)
 				return;
 			

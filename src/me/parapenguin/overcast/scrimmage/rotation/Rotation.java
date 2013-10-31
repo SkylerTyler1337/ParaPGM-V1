@@ -45,7 +45,6 @@ public class Rotation {
 		slot.load();
 		
 		Scrimmage.setOpen(true);
-		slot.getMatch().start();
 	}
 	
 	public String getRotationString() {
@@ -109,6 +108,10 @@ public class Rotation {
 	}
 	
 	public static MapLoader getMap(List<MapLoader> loaded, String name) {
+		for(MapLoader loader : loaded)
+			if(loader.getName().equalsIgnoreCase(name))
+				return loader;
+		
 		for(MapLoader loader : loaded)
 			if(loader.getName().toLowerCase().startsWith(name.toLowerCase()))
 				return loader;

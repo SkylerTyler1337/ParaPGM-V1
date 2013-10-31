@@ -100,6 +100,8 @@ public class Scrimmage extends JavaPlugin {
 		registerCommand("setteam", new SetTeamCommand());
 		registerCommand("setnext", new SetNextCommand());
 		registerCommand("global", new GlobalCommand());
+		registerCommand("start", new StartCommand());
+		registerCommand("end", new StopCommand());
 		enableTracker();
 	}
 

@@ -16,3 +16,8 @@ commands:
   global:
     aliases: [g]
     description: Global chat.
+  end:
+    aliases: [cancel]
+    description: Stop/End the game.
+  start:
+    description: Start the starting timer.

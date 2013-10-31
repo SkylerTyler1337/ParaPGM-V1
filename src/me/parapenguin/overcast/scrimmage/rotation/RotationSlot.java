@@ -22,7 +22,8 @@ public class RotationSlot {
 	}
 	
 	public Match load() {
-		return load(45*60);
+		// return load(45*60);
+		return load(-1);
 	}
 	
 }

@@ -13,6 +13,7 @@ import me.parapenguin.overcast.scrimmage.map.MapTeam;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.potion.PotionEffect;
 
 public class Client {
 	
@@ -109,13 +110,21 @@ public class Client {
 	
 	public void setTeam(MapTeam team, boolean load, boolean clear, boolean teleport) {
 		this.team = team;
+		
+		try {
+			updateVision();
+		} catch(NullPointerException e) {
+			// meh
+		}
+		
+		player.clearIgnorantEffects();
+		for(PotionEffect effect : player.getActivePotionEffects())
+			player.removePotionEffect(effect.getType());
 		player.setScoreboard(team.getMap().getBoard());
 		if(load) team.loadout(this, teleport, clear);
 		
 		if(team.getTeam() == null) ServerLog.info("Scoreboard Team for '" + team.getName() + "' is null");
 		if(clear) team.getTeam().addPlayer(getPlayer());
-		
-		updateVision();
 	}
 	
 	public boolean isObserver() {
@@ -130,16 +139,17 @@ public class Client {
 			for(MapTeam team : map.getTeams())
 				players.addAll(team.getPlayers());
 			
-			if(getTeam().isObserver()) {
+			if(Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
 				for(Client observer : observers)
-					client.getPlayer().showPlayer(observer.getPlayer());
+					for(Client update : Client.getClients())
+						observer.getPlayer().showPlayer(update.getPlayer());
 				for(Client player : players)
-					client.getPlayer().showPlayer(player.getPlayer());
+					for(Client update : observers)
+						player.getPlayer().hidePlayer(update.getPlayer());
 			} else {
-				for(Client observer : observers)
-					client.getPlayer().hidePlayer(observer.getPlayer());
-				for(Client player : players)
-					client.getPlayer().showPlayer(player.getPlayer());
+				for(Client observer : Client.getClients())
+					for(Client update : Client.getClients())
+						observer.getPlayer().showPlayer(update.getPlayer());
 			}
 		}
 	}

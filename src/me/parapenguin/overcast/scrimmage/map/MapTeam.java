@@ -203,7 +203,7 @@ public class MapTeam {
 		List<Element> spawnElements = MapLoader.getElements(search, tag);
 		
 		for(Element element : spawnElements)
-			if(isObserver() || (element.attributeValue("team") != null && getColorName().toLowerCase().contains(element.attributeValue("team").toLowerCase()))) {
+			if(isObserver() || (element.attributeValue("team") != null && isThisTeam(element.attributeValue("team")))) {
 				Region region = new Region(map, element, RegionType.ALL);
 				String kit = element.attributeValue("kit");
 				
@@ -216,7 +216,7 @@ public class MapTeam {
 
 		if(!isObserver())
 			for(Element element : MapLoader.getElements(search, "spawns"))
-				if(element.attributeValue("team") != null && isThisTeam(element.attributeValue("team").toLowerCase())) {
+				if(element.attributeValue("team") != null && isThisTeam(element.attributeValue("team"))) {
 					search = element;
 					
 					spawnElements = MapLoader.getElements(element, tag);
@@ -328,7 +328,9 @@ public class MapTeam {
 	}
 	
 	public boolean isThisTeam(String check) {
-		return contains(getColorName(), check) || contains(getDisplayName(), check) || contains(getName(), check);
+		return contains(getColorName(), check) || contains(getDisplayName(), check) ||
+				contains(getName(), check) || check.equalsIgnoreCase(getName()) ||
+				check.equalsIgnoreCase(getDisplayName()) || check.equalsIgnoreCase(getColorName());
 	}
 	
 	public boolean contains(String check, String contains) {
