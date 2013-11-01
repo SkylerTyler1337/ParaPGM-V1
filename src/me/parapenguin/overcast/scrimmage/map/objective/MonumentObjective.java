@@ -96,6 +96,7 @@ public class MonumentObjective extends TeamObjective {
 			Scrimmage.broadcast(message);
 		}
 		
+		setComplete(isDestroyed());
 		return true;
 	}
 	

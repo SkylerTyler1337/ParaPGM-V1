@@ -14,6 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class Client {
 	
@@ -111,11 +112,18 @@ public class Client {
 	public void setTeam(MapTeam team, boolean load, boolean clear, boolean teleport) {
 		this.team = team;
 		
-		try {
-			updateVision();
-		} catch(NullPointerException e) {
-			// meh
-		}
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				try {
+					updateVision();
+				} catch(NullPointerException e) {
+					// meh
+				}
+			}
+			
+		}.runTaskLaterAsynchronously(Scrimmage.getInstance(), 1);
 		
 		player.clearIgnorantEffects();
 		for(PotionEffect effect : player.getActivePotionEffects())
@@ -131,7 +139,7 @@ public class Client {
 		return team.isObserver();
 	}
 	
-	public void updateVision() {
+	public static void updateVision() {
 		for(Client client : getClients()) {
 			Map map = client.getTeam().getMap();
 			List<Client> observers = map.getObservers().getPlayers();

@@ -4,6 +4,7 @@ import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.player.Client;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -53,7 +54,7 @@ public class FilterEvents implements Listener {
 		Player player = event.getPlayer();
 		Client client = Client.getClient(player);
 		
-		if(client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
+		if((client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) && event.getClickedBlock().getType() != Material.CHEST) {
 			event.setCancelled(true);
 			return;
 		}

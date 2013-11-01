@@ -89,6 +89,10 @@ public class Match {
 		if(this.startingTask.getTask() != null) this.startingTask.getTask().cancel();
 		if(this.cyclingTask.getTask() != null) this.cyclingTask.getTask().cancel();
 		if(this.timingTask.getTask() != null) this.timingTask.getTask().cancel();
+		
+		setCurrentlyStarting(true);
+		setCurrentlyRunning(false);
+		setCurrentlyCycling(false);
 	}
 	
 	private boolean starting() {

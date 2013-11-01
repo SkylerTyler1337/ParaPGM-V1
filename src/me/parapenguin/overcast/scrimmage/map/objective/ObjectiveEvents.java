@@ -1,6 +1,7 @@
 package me.parapenguin.overcast.scrimmage.map.objective;
 
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.utils.FireworkUtil;
@@ -68,8 +69,6 @@ public class ObjectiveEvents implements Listener {
 		
 		wool.setComplete(true);
 		client.getTeam().getMap().reloadSidebar(true);
-		
-		
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
@@ -86,9 +85,11 @@ public class ObjectiveEvents implements Listener {
 		Map map = client.getTeam().getMap();
 		
 		MonumentObjective monument = map.getMonument(event.getBlock().getLocation());
+		ServerLog.info("Monument == null (" + (monument == null) + ")");
 		if(monument == null) return;
 		
 		if(monument.getTeam() != client.getTeam()) {
+			ServerLog.info("Team != Client Team (" + (monument.getTeam() != client.getTeam()) + ")");
 			event.setCancelled(true);
 			return;
 		}
