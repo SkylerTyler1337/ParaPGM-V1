@@ -1,6 +1,7 @@
 package me.parapenguin.overcast.scrimmage.map.objective;
 
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.utils.FireworkUtil;
 
@@ -17,7 +18,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 public class ObjectiveEvents implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onBlockPlace(BlockPlaceEvent event) {
+	public void onBlockPlaceForWool(BlockPlaceEvent event) {
 		Client client = Client.getClient(event.getPlayer());
 		/*
 		 * ServerLog.info("Placed Block: "
@@ -67,14 +68,32 @@ public class ObjectiveEvents implements Listener {
 		
 		wool.setComplete(true);
 		client.getTeam().getMap().reloadSidebar(true);
+		
+		
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onBlockBreak(BlockBreakEvent event) {
+	public void onBlockBreakForWool(BlockBreakEvent event) {
 		if(Scrimmage.getMap().getWool(event.getBlock().getLocation()) != null) {
 			event.setCancelled(true);
 			return;
 		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onBlockBreakForMonument(BlockBreakEvent event) {
+		Client client = Client.getClient(event.getPlayer());
+		Map map = client.getTeam().getMap();
+		
+		MonumentObjective monument = map.getMonument(event.getBlock().getLocation());
+		if(monument == null) return;
+		
+		if(monument.getTeam() != client.getTeam()) {
+			event.setCancelled(true);
+			return;
+		}
+		
+		monument.addBreak(event.getBlock().getLocation(), client);
 	}
 
 }

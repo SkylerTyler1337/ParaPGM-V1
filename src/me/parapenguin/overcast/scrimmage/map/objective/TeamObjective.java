@@ -66,6 +66,7 @@ public class TeamObjective {
 	
 	public void setComplete(boolean complete) {
 		this.complete = complete;
+		getTeam().getMap().reloadSidebar(true);
 		if(getTeam().getCompleted() == getTeam().getObjectives().size())
 			Scrimmage.getRotation().getSlot().getMatch().end(getTeam());
 	}

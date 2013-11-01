@@ -167,6 +167,9 @@ public class MapLoader {
 	public static List<Element> getElements(Element from) {
 		List<Element> elements = new ArrayList<Element>();
 		
+		if(from == null || from.elements() == null)
+			return elements;
+		
 		for(Object obj : from.elements())
 			if(obj instanceof Element)
 				elements.add((Element) obj);

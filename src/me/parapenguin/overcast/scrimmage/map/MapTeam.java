@@ -6,6 +6,8 @@ import java.util.List;
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.ServerLog;
+import me.parapenguin.overcast.scrimmage.map.objective.MonumentBlock;
+import me.parapenguin.overcast.scrimmage.map.objective.MonumentObjective;
 import me.parapenguin.overcast.scrimmage.map.objective.TeamObjective;
 import me.parapenguin.overcast.scrimmage.map.objective.WoolObjective;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
@@ -157,7 +159,42 @@ public class MapTeam {
 			}
 			
 			// LOAD DTM OBJECTIVES HERE...
+			List<Element> rootDestroyables = MapLoader.getElements(root, "destroyables");
 			
+			for(Element element : rootDestroyables) {
+				// This is looping through all the groups of Monuments
+				List<Material> materials = new ArrayList<Material>();
+				
+				String materialAttr = element.attributeValue("materials");
+				if(materialAttr != null) {
+					String[] materialStrings = new String[]{materialAttr};
+					if(materialAttr.contains(";")) materialStrings = materialAttr.split(";");
+					
+					for(String material : materialStrings)
+						if(ConversionUtil.convertStringToMaterial(material) != null)
+							materials.add(ConversionUtil.convertStringToMaterial(material));
+				}
+				
+				String name = element.attributeValue("name");
+				int completion = Integer.parseInt(element.attributeValue("completion").replaceAll("%", ""));
+
+				for(Element destroyable : MapLoader.getElements(element, "destroyable")) {
+					if(isThisTeam(destroyable.attributeValue("owner"))) {
+						List<Location> locations = new ArrayList<Location>();
+						List<MonumentBlock> blocks = new ArrayList<MonumentBlock>();
+						
+						Region region = new Region(map, element);
+						for(Location location : region.getLocations())
+							if(materials.size() == 0 || materials.contains(location.getBlock().getType()))
+								locations.add(location);
+						
+						for(Location location : locations)
+							blocks.add(new MonumentBlock(location));
+						
+						this.objectives.add(new MonumentObjective(getMap(), this, name, blocks, completion));
+					}
+				}
+			}
 		}
 
 		List<String> names = new ArrayList<String>();
@@ -201,6 +238,7 @@ public class MapTeam {
 		
 		List<MapTeamSpawn> spawns = new ArrayList<MapTeamSpawn>();
 		List<Element> spawnElements = MapLoader.getElements(search, tag);
+		
 		
 		for(Element element : spawnElements)
 			if(isObserver() || (element.attributeValue("team") != null && isThisTeam(element.attributeValue("team")))) {
@@ -363,6 +401,31 @@ public class MapTeam {
 		for(WoolObjective wool : getWools())
 			if(wool.isLocation(location))
 				return wool;
+		
+		return null;
+	}
+	
+	public List<MonumentObjective> getMonuments() {
+		List<MonumentObjective> monuments = new ArrayList<MonumentObjective>();
+		
+		if(getObjectives() == null)
+			return monuments;
+		
+		for(TeamObjective obj : getObjectives())
+			if(obj instanceof MonumentObjective)
+				monuments.add((MonumentObjective) obj);
+		
+		return monuments;
+	}
+	
+	public MonumentObjective getMonument(Block block) {
+		return getMonument(block.getLocation());
+	}
+	
+	public MonumentObjective getMonument(Location location) {
+		for(MonumentObjective monument : getMonuments())
+			if(monument.isLocation(location))
+				return monument;
 		
 		return null;
 	}

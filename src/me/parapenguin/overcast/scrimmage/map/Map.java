@@ -23,6 +23,7 @@ import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.filter.Filter;
 import me.parapenguin.overcast.scrimmage.map.kit.ItemKit;
 import me.parapenguin.overcast.scrimmage.map.kit.KitLoader;
+import me.parapenguin.overcast.scrimmage.map.objective.MonumentObjective;
 import me.parapenguin.overcast.scrimmage.map.objective.WoolObjective;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
@@ -365,6 +366,27 @@ public class Map {
 		for(MapTeam team : getTeams())
 			if(team.getWool(location) != null)
 				return team.getWool(location);
+		
+		return null;
+	}
+	
+	public List<MonumentObjective> getMonuments() {
+		List<MonumentObjective> wools = new ArrayList<MonumentObjective>();
+		
+		for(MapTeam team : getAllTeams())
+			wools.addAll(team.getMonuments());
+		
+		return wools;
+	}
+	
+	public List<MonumentObjective> getMonuments(MapTeam team) {
+		return team.getMonuments();
+	}
+	
+	public MonumentObjective getMonument(Location location) {
+		for(MapTeam team : getTeams())
+			if(team.getMonument(location) != null)
+				return team.getMonument(location);
 		
 		return null;
 	}
