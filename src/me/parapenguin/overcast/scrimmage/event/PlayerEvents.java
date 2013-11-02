@@ -68,12 +68,12 @@ public class PlayerEvents implements Listener {
 
 		ChatColor color = ChatColor.RED;
 		if(!Scrimmage.isOpen()) {
-			event.setMotd(color + " È " + ChatColor.AQUA + map.getName() + color + " Ç ");
+			event.setMotd(color + " Â» " + ChatColor.AQUA + map.getName() + color + " Â« ");
 			return;
 		}
 		
 		color = ChatColor.GRAY;
-		event.setMotd(color + " È " + ChatColor.AQUA + map.getName() + color + " Ç ");
+		event.setMotd(color + " Â» " + ChatColor.AQUA + map.getName() + color + " Â« ");
 	}
 	
 	@EventHandler

@@ -37,8 +37,11 @@ public class KitLoader {
 		
 		String[] types = new String[]{"item", "helmet", "chestplate", "leggings", "boots"};
 		for(String search : types)
-			for(Element element : MapLoader.getElements(this.element, search))
-				slots.add(compileItem(element, search));
+			for(Element element : MapLoader.getElements(this.element, search)) {
+				ItemSlot slot = compileItem(element, search);
+				if(slot != null)
+					slots.add(slot);
+			}
 		
 		String sparents = this.element.attributeValue("parents");
 		if(sparents != null) {
@@ -53,8 +56,18 @@ public class KitLoader {
 		 * <potion duration="5" amplifier="1">heal</potion>
 		 */
 		
-		for(Element element : MapLoader.getElements(this.element, search))
-			slots.add(compileItem(element, search));
+		for(Element element : MapLoader.getElements(this.element, "potion")) {
+			boolean ignore = true;
+			int duration = 0;
+			
+			try {
+				if(element.attributeValue("duration").equalsIgnoreCase("oo"))
+					duration = Integer.MAX_VALUE;
+				else duration = Integer.parseInt(element.attributeValue("duration"));
+			} catch(Exception e) {
+				ignore = true;
+			}
+		}
 		
 		if(effects.size() == 0)
 			return new ItemKit(name, slots, parents);
@@ -78,14 +91,6 @@ public class KitLoader {
 			Material material = ConversionUtil.convertStringToMaterial(element.getText());
 			ItemStack stack = new ItemStack(material, ConversionUtil.convertStringToInteger(element.attributeValue("amount"), 1));
 			
-			if(isLeather(material) && element.attributeValue("color") != null) {
-				int rgb = java.awt.Color.decode(element.attributeValue("color")).getRGB();
-				Color color = Color.fromRGB(rgb);
-				LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
-				meta.setColor(color);
-				stack.setItemMeta(meta);
-			}
-			
 			if(element.attributeValue("damage") != null)
 				try { stack.setDurability(Short.parseShort(element.attributeValue("damage"))); } catch(NumberFormatException e) { }
 			
@@ -101,14 +106,16 @@ public class KitLoader {
 				List<String> loreStrings = new ArrayList<String>();
 				
 				if(!lS.contains("|")) loreStrings.add(lS);
-				else {
+				else
 					for(String lore : lS.split("|"))
 						loreStrings.add(lore);
-				}
 				
-				String display = element.attributeValue("name").replaceAll("`", "§");
+				List<String> lore = new ArrayList<String>();
+				for(String loreItem : loreStrings)
+					lore.add(loreItem.replaceAll("`", "§"));
+				
 				ItemMeta meta = stack.getItemMeta();
-				meta.setDisplayName(display);
+				meta.setLore(lore);
 				stack.setItemMeta(meta);
 			}
 			
@@ -136,6 +143,16 @@ public class KitLoader {
 					Enchantment enchantment = ConversionUtil.convertStringToEnchantment(title);
 					if(enchantment != null) stack.addEnchantment(enchantment, level);
 				}
+			}
+			
+			if(isLeather(material) && element.attributeValue("color") != null) {
+				String colorString = element.attributeValue("color");
+				if(!colorString.startsWith("#")) colorString = "#" + colorString;
+				java.awt.Color awt = ConversionUtil.convertHexStringToColor(colorString);
+				Color color = Color.fromRGB(awt.getRed(), awt.getGreen(), awt.getBlue());
+				LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
+				meta.setColor(color);
+				stack.setItemMeta(meta);
 			}
 
 			if(material == Material.AIR)

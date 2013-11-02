@@ -1,5 +1,7 @@
 package me.parapenguin.overcast.scrimmage.utils;
 
+import java.awt.Color;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
@@ -27,11 +29,26 @@ public class ConversionUtil {
 	}
 	
 	public static Enchantment convertStringToEnchantment(String convert) {
-		return Enchantment.getByName(convert);
+		for(Enchantment option : Enchantment.values())
+			if(option.getName().replaceAll("_", " ").equalsIgnoreCase(convert) || option.getName().equalsIgnoreCase(convert))
+				return option;
+		
+		return null;
 	}
 	
 	public static PotionEffectType convertStringToPotionEffectType(String convert) {
-		return PotionEffectType.getByName(convert);
+		for(PotionEffectType option : PotionEffectType.values())
+			if(option.getName().replaceAll("_", " ").equalsIgnoreCase(convert) || option.getName().equalsIgnoreCase(convert))
+				return option;
+		
+		return null;
+	}
+	
+	public static Color convertHexStringToColor(String colorStr) {
+	    return new Color(
+	            Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
+	            Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
+	            Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
 	}
 	
 }

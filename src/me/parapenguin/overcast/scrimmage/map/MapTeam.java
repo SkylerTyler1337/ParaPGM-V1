@@ -359,15 +359,15 @@ public class MapTeam {
 		MapTeamSpawn spawn = getSpawn();
 		if(teleport) client.getPlayer().teleport(spawn.getSpawn());
 		
+		String[] perms = new String[]{"commandbook.teleport", "worldedit.navigation.thru.tool", "worldedit.navigation.jumpto.tool"};
+		
 		if(isObserver()) {
-			client.getPerms().setPermission("worldedit.navigation.thru.tool", true);
-			client.getPerms().setPermission("worldedit.navigation.jumpto.tool", true);
+			for(String perm : perms) client.getPerms().setPermission(perm, true);
 			client.getPlayer().setGameMode(GameMode.CREATIVE);
 			client.getPlayer().setCollidesWithEntities(false);
 			client.getPlayer().getInventory().setItem(0, new ItemStack(Material.COMPASS));
 		} else {
-			client.getPerms().unsetPermission("worldedit.navigation.thru.tool");
-			client.getPerms().unsetPermission("worldedit.navigation.jumpto.tool");
+			for(String perm : perms) client.getPerms().unsetPermission(perm);
 			client.getPlayer().setGameMode(GameMode.SURVIVAL);
 			client.getPlayer().setCollidesWithEntities(true);
 			

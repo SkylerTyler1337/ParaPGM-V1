@@ -9,6 +9,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -54,14 +55,13 @@ public class FilterEvents implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		Client client = Client.getClient(player);
-		
+
 		if(client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
 			event.setCancelled(true);
+			if(event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.CHEST && event.getAction() == Action.RIGHT_CLICK_BLOCK)
+				player.openInventory(((Chest) event.getClickedBlock().getState()).getBlockInventory());
 			return;
 		}
-		
-		if(event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.CHEST)
-			player.openInventory(((Chest) event.getClickedBlock()).getBlockInventory());
 		
 		if(!client.isObserver()) {
 			Map map = Scrimmage.getRotation().getSlot().getMap();
