@@ -151,9 +151,12 @@ public class Client {
 				for(Client observer : observers)
 					for(Client update : Client.getClients())
 						observer.getPlayer().showPlayer(update.getPlayer());
-				for(Client player : players)
+				for(Client player : players) {
 					for(Client update : observers)
 						player.getPlayer().hidePlayer(update.getPlayer());
+					for(Client update : players)
+						player.getPlayer().showPlayer(update.getPlayer());
+				}
 			} else {
 				for(Client observer : Client.getClients())
 					for(Client update : Client.getClients())

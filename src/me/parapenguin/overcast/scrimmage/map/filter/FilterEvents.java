@@ -54,7 +54,8 @@ public class FilterEvents implements Listener {
 		Player player = event.getPlayer();
 		Client client = Client.getClient(player);
 		
-		if((client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) && event.getClickedBlock().getType() != Material.CHEST) {
+		if((client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) &&
+				event.getClickedBlock() != null && event.getClickedBlock().getType() != Material.CHEST) {
 			event.setCancelled(true);
 			return;
 		}
