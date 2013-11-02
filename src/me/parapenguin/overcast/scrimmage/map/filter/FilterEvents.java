@@ -5,6 +5,7 @@ import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.player.Client;
 
 import org.bukkit.Material;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -54,11 +55,13 @@ public class FilterEvents implements Listener {
 		Player player = event.getPlayer();
 		Client client = Client.getClient(player);
 		
-		if((client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) &&
-				event.getClickedBlock() != null && event.getClickedBlock().getType() != Material.CHEST) {
+		if(client.isObserver() || !Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
 			event.setCancelled(true);
 			return;
 		}
+		
+		if(event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.CHEST)
+			player.openInventory(((Chest) event.getClickedBlock()).getBlockInventory());
 		
 		if(!client.isObserver()) {
 			Map map = Scrimmage.getRotation().getSlot().getMap();

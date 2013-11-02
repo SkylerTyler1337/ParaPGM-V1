@@ -179,11 +179,11 @@ public class MapTeam {
 				int completion = Integer.parseInt(element.attributeValue("completion").replaceAll("%", ""));
 
 				for(Element destroyable : MapLoader.getElements(element, "destroyable")) {
-					if(isThisTeam(destroyable.attributeValue("owner"))) {
+					if(!isThisTeam(destroyable.attributeValue("owner"))) {
 						List<Location> locations = new ArrayList<Location>();
 						List<MonumentBlock> blocks = new ArrayList<MonumentBlock>();
 						
-						Region region = new Region(map, element);
+						Region region = new Region(map, destroyable, RegionType.ALL);
 						for(Location location : region.getLocations())
 							if(materials.size() == 0 || materials.contains(location.getBlock().getType()))
 								locations.add(location);
@@ -192,6 +192,21 @@ public class MapTeam {
 							blocks.add(new MonumentBlock(location));
 						
 						this.objectives.add(new MonumentObjective(getMap(), this, name, blocks, completion));
+						
+						// ServerLog.info("Loaded '" + name + "' for '" + getDisplayName() + "' containing " + blocks.size() + " blocks!");
+						
+						/*
+						int i = 0;
+						for(MonumentBlock block : blocks) {
+							int x = block.getLocation().getBlockX();
+							int y = block.getLocation().getBlockY();
+							int z = block.getLocation().getBlockZ();
+							
+							ServerLog.info("[" + name + " | " + getDisplayName() + "] Block[" + i + "] Found at X[" + x + "], Y[" + y + "], Z[" + z + "]");
+							
+							i++;
+						}
+						*/
 					}
 				}
 			}
@@ -369,6 +384,10 @@ public class MapTeam {
 		return contains(getColorName(), check) || contains(getDisplayName(), check) ||
 				contains(getName(), check) || check.equalsIgnoreCase(getName()) ||
 				check.equalsIgnoreCase(getDisplayName()) || check.equalsIgnoreCase(getColorName());
+	}
+	
+	public boolean isThisTeam(MapTeam team) {
+		return isThisTeam(team.getColorName()) || isThisTeam(team.getDisplayName()) || isThisTeam(team.getName());
 	}
 	
 	public boolean contains(String check, String contains) {

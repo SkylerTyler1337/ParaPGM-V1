@@ -1,7 +1,6 @@
 package me.parapenguin.overcast.scrimmage.map.objective;
 
 import me.parapenguin.overcast.scrimmage.Scrimmage;
-import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.utils.FireworkUtil;
@@ -84,12 +83,35 @@ public class ObjectiveEvents implements Listener {
 		Client client = Client.getClient(event.getPlayer());
 		Map map = client.getTeam().getMap();
 		
+		/*
+		for(MonumentObjective monument : map.getMonuments()) {
+			try {
+				int x = monument.getBlocks().get(0).getLocation().getBlockX();
+				int y = monument.getBlocks().get(0).getLocation().getBlockY();
+				int z = monument.getBlocks().get(0).getLocation().getBlockZ();
+				ServerLog.info("Monument (" + monument.getBlocks().size() + " blocks starting at X:" + x + ", Y:" + y + ", Z:" + z + ")");
+			} catch(IndexOutOfBoundsException e) {
+				ServerLog.info("No Blocks found for Mounument ('" + monument.getName() + "')");
+			}
+		}
+		*/
+		
+		/*
+		if(map.getMonuments().size() == 0)
+			ServerLog.info("No monuments found...");
+		*/
+		
+		int x = event.getBlock().getLocation().getBlockX();
+		int y = event.getBlock().getLocation().getBlockY();
+		int z = event.getBlock().getLocation().getBlockZ();
+		//ServerLog.info("Player (X:" + x + ", Y:" + y + ", Z:" + z + ")");
+		
 		MonumentObjective monument = map.getMonument(event.getBlock().getLocation());
-		ServerLog.info("Monument == null (" + (monument == null) + ")");
+		//ServerLog.info("Monument == null (" + (monument == null) + ")");
 		if(monument == null) return;
 		
 		if(monument.getTeam() != client.getTeam()) {
-			ServerLog.info("Team != Client Team (" + (monument.getTeam() != client.getTeam()) + ")");
+			//ServerLog.info("Team == Client Team = " + (monument.getTeam() == client.getTeam()));
 			event.setCancelled(true);
 			return;
 		}

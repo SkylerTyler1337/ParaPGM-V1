@@ -133,6 +133,8 @@ public class Client {
 		
 		if(team.getTeam() == null) ServerLog.info("Scoreboard Team for '" + team.getName() + "' is null");
 		if(clear) team.getTeam().addPlayer(getPlayer());
+		
+		getPlayer().setDisplayName(getStars() + getTeam().getColor() + getPlayer().getName());
 	}
 	
 	public boolean isObserver() {
