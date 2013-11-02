@@ -53,6 +53,7 @@ public class Scrimmage extends JavaPlugin {
 		Region.MAX_BUILD_HEIGHT = 256;
 		
 		File libFolder = new File("/home/servers/scrim/libs/");
+		if(!libFolder.exists()) libFolder = getDataFolder().getParentFile().getParentFile().getParentFile().getParentFile();
 		files.add("dom4j.jar");
 		
 		for (String stringFile : files) {
