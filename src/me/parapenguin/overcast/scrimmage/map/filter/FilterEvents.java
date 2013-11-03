@@ -42,7 +42,7 @@ public class FilterEvents implements Listener {
 		
 		if(event.getNewState().getLocation().getBlockY() > map.getMaxbuildheight()) {
 			event.setCancelled(true);
-			client.getPlayer().sendMessage(ChatColor.RED + "You have reached the maximum build height!");
+			client.getPlayer().sendMessage(ChatColor.RED + "You have reached the maximum build height");
 			return;
 		}
 	}

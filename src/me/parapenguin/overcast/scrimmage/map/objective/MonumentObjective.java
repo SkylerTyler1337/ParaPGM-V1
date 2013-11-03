@@ -68,9 +68,10 @@ public class MonumentObjective extends TeamObjective {
 			});
 			
 			String destroyed = "";
-			if(calculations.size() == 1)
+			if(calculations.size() == 1) {
 				destroyed += calculations.get(0).getClient().getTeam().getColor() + calculations.get(0).getClient().getPlayer().getName();
-			else if(getMap().getAuthors().size() >= 2) {
+				destroyed += ChatColor.GRAY + " (" + calculations.get(0).getPercentage() + "%)";
+			} else if(getMap().getAuthors().size() >= 2) {
 				/*
 				 * index 0 should prefix ""
 				 * index 1 to (max index - 1) should prefix ", "
