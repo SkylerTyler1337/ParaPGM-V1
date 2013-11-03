@@ -28,8 +28,10 @@ public class JoinCommand implements CommandExecutor {
 			team = map.getLowest();
 		} else if(args.length == 1) {
 			team = map.getTeam(args[0]);
-			if(team == null)
+			if(team == null) {
 				sender.sendMessage(ChatColor.RED + "Could not find a team by that string!");
+				return false;
+			}
 		} else {
 			sender.sendMessage(ChatColor.RED + "Invalid Arguments supplied!");
 			sender.sendMessage(ChatColor.RED + "/join [team]");

@@ -38,12 +38,15 @@ public class FilterEvents implements Listener {
 	
 	public void onBlockChange(BlockChangeEvent event) {
 		Map map = event.getMap();
-		Client client = event.getClient();
 		
-		if(event.getNewState().getLocation().getBlockY() > map.getMaxbuildheight()) {
-			event.setCancelled(true);
-			client.getPlayer().sendMessage(ChatColor.RED + "You have reached the maximum build height");
-			return;
+		if(event.getClient() != null) {
+			Client client = event.getClient();
+			
+			if(event.getNewState().getLocation().getBlockY() > map.getMaxbuildheight()) {
+				event.setCancelled(true);
+				client.getPlayer().sendMessage(ChatColor.RED + "You have reached the maximum build height");
+				return;
+			}
 		}
 	}
 	

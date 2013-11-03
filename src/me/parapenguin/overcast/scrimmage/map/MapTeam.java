@@ -210,6 +210,45 @@ public class MapTeam {
 					}
 				}
 			}
+			
+			// LOAD DTC OBJECTIVES HERE...
+			/*
+			List<Element> rootCores = MapLoader.getElements(root, "destroyables");
+			
+			for(Element element : rootCores) {
+				List<Material> materials = new ArrayList<Material>();
+				
+				String materialAttr = element.attributeValue("materials");
+				if(materialAttr != null) {
+					String[] materialStrings = new String[]{materialAttr};
+					if(materialAttr.contains(";")) materialStrings = materialAttr.split(";");
+					
+					for(String material : materialStrings)
+						if(ConversionUtil.convertStringToMaterial(material) != null)
+							materials.add(ConversionUtil.convertStringToMaterial(material));
+				}
+				
+				String name = element.attributeValue("name");
+				int completion = Integer.parseInt(element.attributeValue("completion").replaceAll("%", ""));
+
+				for(Element destroyable : MapLoader.getElements(element, "destroyable")) {
+					if(!isThisTeam(destroyable.attributeValue("owner"))) {
+						List<Location> locations = new ArrayList<Location>();
+						List<MonumentBlock> blocks = new ArrayList<MonumentBlock>();
+						
+						Region region = new Region(map, destroyable, RegionType.ALL);
+						for(Location location : region.getLocations())
+							if(materials.size() == 0 || materials.contains(location.getBlock().getType()))
+								locations.add(location);
+						
+						for(Location location : locations)
+							blocks.add(new MonumentBlock(location));
+						
+						this.objectives.add(new MonumentObjective(getMap(), this, name, blocks, completion));
+					}
+				}
+			}
+			*/
 		}
 
 		List<String> names = new ArrayList<String>();

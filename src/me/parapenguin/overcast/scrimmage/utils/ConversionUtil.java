@@ -2,6 +2,8 @@ package me.parapenguin.overcast.scrimmage.utils;
 
 import java.awt.Color;
 
+import me.parapenguin.overcast.scrimmage.ServerLog;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
@@ -21,6 +23,8 @@ public class ConversionUtil {
 	}
 	
 	public static Material convertStringToMaterial(String convert) {
+		if(convert == null) return null;
+		
 		for(Material option : Material.values())
 			if(option.name().replaceAll("_", " ").equalsIgnoreCase(convert) || option.name().equalsIgnoreCase(convert))
 				return option;
@@ -29,6 +33,8 @@ public class ConversionUtil {
 	}
 	
 	public static Enchantment convertStringToEnchantment(String convert) {
+		if(convert == null) return null;
+		
 		for(Enchantment option : Enchantment.values())
 			if(option.getName().replaceAll("_", " ").equalsIgnoreCase(convert) || option.getName().equalsIgnoreCase(convert))
 				return option;
@@ -37,9 +43,12 @@ public class ConversionUtil {
 	}
 	
 	public static PotionEffectType convertStringToPotionEffectType(String convert) {
-		for(PotionEffectType option : PotionEffectType.values())
-			if(option.getName().replaceAll("_", " ").equalsIgnoreCase(convert) || option.getName().equalsIgnoreCase(convert))
+		if(convert == null) return null;
+		
+		for(PotionEffectType option : PotionEffectType.values()) {
+			if(option != null && option.getName() != null && (option.getName().replaceAll("_", " ").equalsIgnoreCase(convert) || option.getName().equalsIgnoreCase(convert)))
 				return option;
+		}
 		
 		return null;
 	}
