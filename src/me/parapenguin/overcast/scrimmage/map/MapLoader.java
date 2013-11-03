@@ -31,7 +31,7 @@ public class MapLoader {
 	@Getter List<MapTeam> teams;
 	@Getter MapTeam observers;
 	
-	@Getter int maxBuildHeight;
+	@Getter int maxbuildheight;
 	
 	@SuppressWarnings("unchecked")
 	private MapLoader(File file, Document doc) {
@@ -72,10 +72,10 @@ public class MapLoader {
 			}
 		}
 		
-		this.maxBuildHeight = Region.MAX_BUILD_HEIGHT;
+		this.maxbuildheight = Region.MAX_BUILD_HEIGHT;
 		if(root.element("maxbuildheight") != null && root.element("maxbuildheight").getText() != null) {
 			try {
-				this.maxBuildHeight = Integer.parseInt(root.element("maxbuildheight").getText());
+				this.maxbuildheight = Integer.parseInt(root.element("maxbuildheight").getText());
 			} catch(NumberFormatException e) {
 				Scrimmage.getInstance().getLogger().info("Failed to load max build height for '" + name + "'...");
 			}
@@ -88,7 +88,7 @@ public class MapLoader {
 	}
 	
 	public Map getMap(RotationSlot slot) {
-		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers);
+		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers, maxbuildheight);
 	}
 	
 	public static boolean isLoadable(File file) {

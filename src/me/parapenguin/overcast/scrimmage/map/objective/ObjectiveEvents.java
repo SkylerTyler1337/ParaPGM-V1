@@ -94,17 +94,15 @@ public class ObjectiveEvents implements Listener {
 				ServerLog.info("No Blocks found for Mounument ('" + monument.getName() + "')");
 			}
 		}
-		*/
 		
-		/*
 		if(map.getMonuments().size() == 0)
 			ServerLog.info("No monuments found...");
-		*/
 		
 		int x = event.getBlock().getLocation().getBlockX();
 		int y = event.getBlock().getLocation().getBlockY();
 		int z = event.getBlock().getLocation().getBlockZ();
-		//ServerLog.info("Player (X:" + x + ", Y:" + y + ", Z:" + z + ")");
+		ServerLog.info("Player (X:" + x + ", Y:" + y + ", Z:" + z + ")");
+		*/
 		
 		MonumentObjective monument = map.getMonument(event.getBlock().getLocation());
 		//ServerLog.info("Monument == null (" + (monument == null) + ")");

@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Color;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.dom4j.Element;
 
 import lombok.Getter;
@@ -57,16 +57,30 @@ public class KitLoader {
 		 */
 		
 		for(Element element : MapLoader.getElements(this.element, "potion")) {
-			boolean ignore = true;
+			PotionEffectType type = null;
 			int duration = 0;
+			int amplifier = 0;
 			
 			try {
 				if(element.attributeValue("duration").equalsIgnoreCase("oo"))
 					duration = Integer.MAX_VALUE;
 				else duration = Integer.parseInt(element.attributeValue("duration"));
 			} catch(Exception e) {
-				ignore = true;
+				duration = -1;
 			}
+			
+			try {
+				if(element.attributeValue("duration").equalsIgnoreCase("oo"))
+					duration = Integer.MAX_VALUE;
+				else duration = Integer.parseInt(element.attributeValue("duration"));
+			} catch(Exception e) {
+				// ignore, use default amplifier
+			}
+			
+			type = ConversionUtil.convertStringToPotionEffectType(element.getText());
+			
+			if(duration > 0 && type != null)
+				new PotionEffect(type, duration, amplifier);
 		}
 		
 		if(effects.size() == 0)

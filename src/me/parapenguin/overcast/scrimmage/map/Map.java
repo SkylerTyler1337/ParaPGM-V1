@@ -57,6 +57,7 @@ public class Map {
 	@Getter List<MapTeam> teams;
 	@Getter MapTeam observers;
 	
+	@Getter int maxbuildheight;
 	@Getter List<RegionGroup> regions;
 	@Getter List<Filter> filters;
 	
@@ -64,7 +65,7 @@ public class Map {
 	@Getter Objective boardObjective;
 	
 	public Map(MapLoader loader, RotationSlot slot, String name, String version, String objective, List<String> rules,
-			List<Contributor> authors, List<Contributor> contributors, List<MapTeam> teams, MapTeam observers) {
+			List<Contributor> authors, List<Contributor> contributors, List<MapTeam> teams, MapTeam observers, int maxbuildheight) {
 		this.loader = loader;
 		this.slot = slot;
 		this.name = name;
@@ -73,6 +74,7 @@ public class Map {
 		this.rules = rules;
 		this.authors = authors;
 		this.contributors = contributors;
+		this.maxbuildheight = maxbuildheight;
 		
 		this.board = Scrimmage.getInstance().getServer().getScoreboardManager().getNewScoreboard();
 		reloadSidebar(false);
