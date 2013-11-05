@@ -21,3 +21,5 @@ commands:
     description: Stop/End the game.
   start:
     description: Start the starting timer.
+  cycle:
+    description: Cycle to the next map.
