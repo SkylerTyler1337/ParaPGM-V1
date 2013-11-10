@@ -28,6 +28,8 @@ public class BeaconEvents implements Listener {
 	}
 	
 	@EventHandler
-	public void onPotionEffectChange()
+	public void onPotionEffectChange() {
+		
+	}
 	
 }

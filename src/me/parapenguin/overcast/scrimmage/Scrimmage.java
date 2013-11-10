@@ -45,14 +45,21 @@ public class Scrimmage extends JavaPlugin {
 	static @Getter String team;
 	static @Getter @Setter boolean open;
 	
+	private @Getter @Setter File rootDirectory;
+	
 	@Getter public static double MINIMUM_MOVEMENT = 0.125;
 	
 	public void onEnable() {
+		reloadConfig();
 		setOpen(false);
 		instance = this;
 		Region.MAX_BUILD_HEIGHT = 256;
 		
-		File libFolder = new File("/home/servers/scrim/libs/");
+		this.rootDirectory = getDataFolder().getParentFile().getParentFile();
+		if(getConfig().getString("maps") != null)
+			this.rootDirectory = new File(getConfig().getString("maps"));
+		
+		File libFolder = new File(getRootDirectory(), "libs");
 		if(!libFolder.exists()) libFolder = getDataFolder().getParentFile().getParentFile().getParentFile().getParentFile();
 		files.add("dom4j.jar");
 		
@@ -69,7 +76,6 @@ public class Scrimmage extends JavaPlugin {
 			}
 		}
 
-		reloadConfig();
 		loadJars();
 	}
 	
@@ -157,11 +163,11 @@ public class Scrimmage extends JavaPlugin {
 	}
 	
 	public static File getRootFolder() {
-		return new File("");
+		return instance.getRootDirectory();
 	}
 	
 	public static File getMapRoot() {
-		return new File("/home/servers/scrim/maps/");
+		return new File(instance.getRootDirectory(), "maps");
 	}
 	
 	public static void broadcast(String message) {
