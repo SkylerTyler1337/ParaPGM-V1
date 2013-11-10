@@ -55,7 +55,7 @@ public class Scrimmage extends JavaPlugin {
 		instance = this;
 		Region.MAX_BUILD_HEIGHT = 256;
 		
-		this.rootDirectory = new File(".");
+		this.rootDirectory = getServer().getWorldContainer();
 		if(getConfig().getString("maps") != null)
 			this.rootDirectory = new File(getConfig().getString("maps"));
 		
