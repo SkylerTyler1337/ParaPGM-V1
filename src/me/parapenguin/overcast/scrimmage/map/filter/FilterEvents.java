@@ -35,7 +35,6 @@ import org.bukkit.material.MaterialData;
 public class FilterEvents implements Listener {
 	
 	@EventHandler(priority = EventPriority.LOW)
-	
 	public void onBlockChange(BlockChangeEvent event) {
 		Map map = event.getMap();
 		
