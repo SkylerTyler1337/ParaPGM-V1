@@ -46,6 +46,7 @@ public class Scrimmage extends JavaPlugin {
 	static @Getter @Setter boolean open;
 	
 	private @Getter @Setter File rootDirectory;
+	private @Getter @Setter String mapDirectory;
 	
 	@Getter public static double MINIMUM_MOVEMENT = 0.125;
 	
@@ -57,7 +58,7 @@ public class Scrimmage extends JavaPlugin {
 		
 		this.rootDirectory = getServer().getWorldContainer();
 		if(getConfig().getString("maps") != null)
-			this.rootDirectory = new File(getConfig().getString("maps"));
+			this.mapDirectory = getConfig().getString("maps");
 		
 		File libFolder = new File(getRootDirectory(), "libs");
 		if(!libFolder.exists()) libFolder = getDataFolder().getParentFile().getParentFile().getParentFile().getParentFile();
@@ -167,7 +168,9 @@ public class Scrimmage extends JavaPlugin {
 	}
 	
 	public static File getMapRoot() {
-		return new File(instance.getRootDirectory(), "maps");
+		if(getInstance().getMapDirectory() != null)
+			return new File(getInstance().getMapDirectory());
+		else return new File(getRootFolder().getAbsolutePath() + "/maps/");
 	}
 	
 	public static void broadcast(String message) {
