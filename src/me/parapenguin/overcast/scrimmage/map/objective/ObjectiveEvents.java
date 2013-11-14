@@ -29,8 +29,9 @@ public class ObjectiveEvents implements Listener {
 			
 			if(event.getCause() instanceof BlockBreakEvent) {
 				for(CoreObjective core : cores)
-					if(core.isLocation(event.getNewState().getLocation()) && core.getTeam() != client.getTeam()) {
+					if(core.isLocation(event.getNewState().getLocation()) && core.getTeam() == client.getTeam()) {
 						event.setCancelled(true);
+						client.getPlayer().sendMessage(ChatColor.RED + "You can't break your own core!");
 						return;
 					}
 			}
