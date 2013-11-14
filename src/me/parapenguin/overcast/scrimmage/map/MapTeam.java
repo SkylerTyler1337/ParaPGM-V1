@@ -164,6 +164,68 @@ public class MapTeam {
 			List<Element> rootDestroyables = MapLoader.getElements(root, "destroyables");
 			
 			for(Element element : rootDestroyables) {
+				List<Element> destroyables = new ArrayList<Element>();
+				
+				List<Element> destroyableGroups = MapLoader.getElements(element, "destroyables");
+				for(Element destroyableGroup : destroyableGroups) {
+					destroyables.addAll(MapLoader.getElements(destroyableGroup, "destroyable"));
+					ServerLog.info("Found " + MapLoader.getElements(destroyableGroup, "destroyable").size() + " destroyables! (Search)");
+				}
+				
+				List<Element> coreGroup = MapLoader.getElements(element, "core");
+				for(Element core : coreGroup) {
+					destroyables.add(core);
+					ServerLog.info("Found a destroyable! (Search)");
+				}
+				
+				for(Element destroyable : destroyables) {
+					ServerLog.info("Found a destroyable! (Loop)");
+					
+					String name = "Core";
+					MapTeam team = this;
+					int completion = 0;
+					List<Material> materials = new ArrayList<Material>();
+					String materialNames = "";
+					
+					if(destroyable.attributeValue("owner") == null && destroyable.getParent().attributeValue("owner") == null) continue;
+					if(destroyable.attributeValue("owner") != null && !isThisTeam(destroyable.attributeValue("owner"))) continue;
+					if(destroyable.getParent().attributeValue("owner") != null && !isThisTeam(destroyable.getParent().attributeValue("owner"))) continue;
+					
+					if(destroyable.attributeValue("materials") == null && destroyable.getParent().attributeValue("materials") == null) continue;
+					if(destroyable.attributeValue("materials") != null) materialNames = destroyable.attributeValue("materials");
+					else if(destroyable.getParent().attributeValue("materials") != null) materialNames = destroyable.getParent().attributeValue("materials");
+					if(materialNames == null) continue;
+					
+					String[] materialStrings = new String[]{materialNames};
+					if(materialNames.contains(";")) materialStrings = materialNames.split(";");
+					
+					for(String material : materialStrings)
+						if(ConversionUtil.convertStringToMaterial(material) != null)
+							materials.add(ConversionUtil.convertStringToMaterial(material));
+					
+					if(destroyable.attributeValue("completion") == null && destroyable.getParent().attributeValue("completion") == null) completion = 100;
+					if(destroyable.attributeValue("completion") != null) completion = ConversionUtil.convertStringToInteger(destroyable.attributeValue("completion"));
+					else if(destroyable.getParent().attributeValue("completion") != null) completion = ConversionUtil.convertStringToInteger(destroyable.getParent().attributeValue("completion"));
+					
+					if(destroyable.attributeValue("name") != null) name = destroyable.attributeValue("name");
+					else if(destroyable.getParent().attributeValue("name") != null) name = destroyable.getParent().attributeValue("name");
+					
+					List<Location> locations = new ArrayList<Location>();
+					Region region = new Region(map, destroyable, RegionType.ALL);
+					for(Location location : region.getLocations())
+						if(materials.size() == 0 || materials.contains(location.getBlock().getType()))
+							locations.add(location);
+					
+					List<MonumentBlock> blocks = new ArrayList<MonumentBlock>();
+					for(Location location : locations)
+						blocks.add(new MonumentBlock(location));
+					
+					this.objectives.add(new MonumentObjective(map, team, name, blocks, completion));
+				}
+			}
+			
+			/*
+			for(Element element : rootDestroyables) {
 				// This is looping through all the groups of Monuments
 				List<Material> materials = new ArrayList<Material>();
 				
@@ -178,7 +240,12 @@ public class MapTeam {
 				}
 				
 				String name = element.attributeValue("name");
-				int completion = Integer.parseInt(element.attributeValue("completion").replaceAll("%", ""));
+				int completion = 100;
+				try {
+					completion = Integer.parseInt(element.attributeValue("completion").replaceAll("%", ""));
+				} catch(Exception e) {
+					// nevermind
+				}
 
 				for(Element destroyable : MapLoader.getElements(element, "destroyable")) {
 					if(!isThisTeam(destroyable.attributeValue("owner"))) {
@@ -197,7 +264,6 @@ public class MapTeam {
 						
 						// ServerLog.info("Loaded '" + name + "' for '" + getDisplayName() + "' containing " + blocks.size() + " blocks!");
 						
-						/*
 						int i = 0;
 						for(MonumentBlock block : blocks) {
 							int x = block.getLocation().getBlockX();
@@ -208,10 +274,10 @@ public class MapTeam {
 							
 							i++;
 						}
-						*/
 					}
 				}
 			}
+			*/
 			
 			// LOAD DTC OBJECTIVES HERE...
 			
@@ -291,31 +357,6 @@ public class MapTeam {
 					
 					CoreObjective coreObject = new CoreObjective(map, team, name, blocks, leak, stage);
 					this.objectives.add(coreObject);
-				}
-			}
-			
-			for(Element element : rootCores) {
-				Material material = ConversionUtil.convertStringToMaterial(element.attributeValue("material"));
-				
-				String name = element.attributeValue("name");
-				int leak = Integer.parseInt(element.attributeValue("leak"));
-
-				for(Element destroyable : MapLoader.getElements(element, "destroyable")) {
-					if(!isThisTeam(destroyable.attributeValue("team"))) {
-						List<Location> locations = new ArrayList<Location>();
-						
-						Region region = new Region(map, destroyable, RegionType.ALL);
-						for(Location location : region.getLocations())
-							if(material == location.getBlock().getType())
-								locations.add(location);
-						
-						CoreStage type = CoreStage.OTHER;
-						if(material == Material.OBSIDIAN) type = CoreStage.OBSIDIAN;
-						else if(material == Material.GOLD_BLOCK) type = CoreStage.GOLD;
-						else if(material == Material.GLASS) type = CoreStage.GLASS;
-						
-						this.objectives.add(new CoreObjective(map, this, name, locations, leak, type));
-					}
 				}
 			}
 		}
@@ -489,6 +530,8 @@ public class MapTeam {
 	}
 	
 	public boolean isThisTeam(String check) {
+		if(check == null) return false;
+		
 		return contains(getColorName(), check) || contains(getDisplayName(), check) ||
 				contains(getName(), check) || check.equalsIgnoreCase(getName()) ||
 				check.equalsIgnoreCase(getDisplayName()) || check.equalsIgnoreCase(getColorName());
@@ -499,6 +542,8 @@ public class MapTeam {
 	}
 	
 	public boolean contains(String check, String contains) {
+		if(contains == null) return false;
+		if(check == null) return false;
 		return check.toLowerCase().contains(contains.toLowerCase());
 	}
 	

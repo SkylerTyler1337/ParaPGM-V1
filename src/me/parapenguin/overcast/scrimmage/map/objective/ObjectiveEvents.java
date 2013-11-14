@@ -124,9 +124,12 @@ public class ObjectiveEvents implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onBlockBreakForMonument(BlockBreakEvent event) {
-		Client client = Client.getClient(event.getPlayer());
+	public void onBlockBreakForMonument(BlockChangeEvent event) {
+		Client client = event.getClient();
 		Map map = client.getTeam().getMap();
+		
+		if(event.getNewState().getType() != Material.AIR)
+			return;
 		
 		/*
 		for(MonumentObjective monument : map.getMonuments()) {
@@ -149,17 +152,21 @@ public class ObjectiveEvents implements Listener {
 		ServerLog.info("Player (X:" + x + ", Y:" + y + ", Z:" + z + ")");
 		*/
 		
-		MonumentObjective monument = map.getMonument(event.getBlock().getLocation());
+		MonumentObjective monument = map.getMonument(event.getNewState().getLocation());
 		//ServerLog.info("Monument == null (" + (monument == null) + ")");
 		if(monument == null) return;
 		
-		if(monument.getTeam() != client.getTeam()) {
-			//ServerLog.info("Team == Client Team = " + (monument.getTeam() == client.getTeam()));
-			event.setCancelled(true);
-			return;
+		try {
+			if(monument.getTeam() != client.getTeam()) {
+				//ServerLog.info("Team == Client Team = " + (monument.getTeam() == client.getTeam()));
+				event.setCancelled(true);
+				return;
+			}
+		} catch(NullPointerException e) {
+			// probably another cause for the TNT being destroyed, and the client is null...
 		}
 		
-		monument.addBreak(event.getBlock().getLocation(), client);
+		monument.addBreak(event.getNewState().getLocation(), client);
 	}
 
 }

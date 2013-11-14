@@ -2,8 +2,6 @@ package me.parapenguin.overcast.scrimmage.utils;
 
 import java.awt.Color;
 
-import me.parapenguin.overcast.scrimmage.ServerLog;
-
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;

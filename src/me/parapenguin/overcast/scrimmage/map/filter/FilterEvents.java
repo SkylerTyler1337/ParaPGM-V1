@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -152,10 +153,18 @@ public class FilterEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onEntityExplodeNormal(EntityExplodeEvent event) {
 		Map map = Scrimmage.getRotation().getSlot().getMap();
+		
+		Client client = null;
+		if(event.getEntity() instanceof TNTPrimed) {
+			TNTPrimed tnt = (TNTPrimed) event.getEntity();
+			if(tnt.getSource() instanceof Player)
+				client = Client.getClient((Player) tnt.getSource());
+		}
+		
 		for(Block block : event.blockList()) {
 			BlockState newState = block.getState();
 			newState.setData(new MaterialData(Material.AIR, (byte) 0));
-			BlockChangeEvent change = new BlockChangeEvent(event, map, null, block.getState(), newState);
+			BlockChangeEvent change = new BlockChangeEvent(event, map, client, block.getState(), newState);
 			Scrimmage.callEvent(change);
 		}
 	}
