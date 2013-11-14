@@ -77,7 +77,7 @@ public class Match {
 	}
 	
 	public void start(int time) {
-		if(time == 0)
+		if(time == -2)
 			time = 30;
 		
 		try {
