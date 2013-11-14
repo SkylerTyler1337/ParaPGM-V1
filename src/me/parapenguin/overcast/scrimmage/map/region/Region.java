@@ -28,8 +28,11 @@ public class Region {
 		elements.add(element);
 		
 		RegionType type = RegionType.getByElementName(element.getName());
-		if(type == null)
+		if(type == null) {
+			this.elements = new ArrayList<Element>();
+			this.regions = new ArrayList<ConfiguredRegion>();
 			return;
+		}
 		
 		Region region = new Region(map, elements, type);
 		this.elements = region.getElements();
