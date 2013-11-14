@@ -172,7 +172,7 @@ public class MapTeam {
 					ServerLog.info("Found " + MapLoader.getElements(destroyableGroup, "destroyable").size() + " destroyables! (Search)");
 				}
 				
-				List<Element> coreGroup = MapLoader.getElements(element, "core");
+				List<Element> coreGroup = MapLoader.getElements(element, "destroyable");
 				for(Element core : coreGroup) {
 					destroyables.add(core);
 					ServerLog.info("Found a destroyable! (Search)");

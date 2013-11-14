@@ -126,7 +126,7 @@ public class ObjectiveEvents implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockBreakForMonument(BlockChangeEvent event) {
 		Client client = event.getClient();
-		Map map = client.getTeam().getMap();
+		Map map = event.getMap();
 		
 		if(event.getNewState().getType() != Material.AIR)
 			return;
