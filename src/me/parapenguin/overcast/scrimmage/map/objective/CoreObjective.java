@@ -8,16 +8,19 @@ import me.parapenguin.overcast.scrimmage.map.MapTeam;
 import me.parapenguin.overcast.scrimmage.utils.RegionUtil;
 
 import org.bukkit.Location;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class CoreObjective extends TeamObjective {
 	
 	@Getter List<Location> blocks;
 	@Getter int leak;
+	@Getter CoreStage stage;
 	
-	public CoreObjective(Map map, MapTeam owner, String name, List<Location> blocks, int leak) {
+	public CoreObjective(Map map, MapTeam owner, String name, List<Location> blocks, int leak, CoreStage stage) {
 		super(map, owner, name);
 		this.blocks = blocks;
 		this.leak = leak;
+		this.stage = stage;
 	}
 	
 	public boolean isLeak(Location location) {
@@ -37,6 +40,24 @@ public class CoreObjective extends TeamObjective {
 		}
 		
 		return null;
+	}
+	
+	public void setStage(CoreStage newStage) {
+		if(newStage == CoreStage.OTHER)
+			return;
+		
+		this.stage = newStage;
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				for(Location location : blocks) {
+					location.getBlock().setType(stage.getMaterial());
+				}
+			}
+			
+		};
 	}
 	
 }

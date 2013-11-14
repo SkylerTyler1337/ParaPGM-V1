@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
@@ -170,8 +171,8 @@ public class RegionUtil {
 		return (x >= xMin && x <= xMax && y >= yMin && y <= yMax && z >= zMin && z <= zMax);
 	}
 
-	public static List<Block> contains(Location corner1, Location corner2){
-		List<Block> blocks = new ArrayList<Block>();
+	public static List<Location> contains(Location corner1, Location corner2) {
+		List<Location> blocks = new ArrayList<Location>();
 		
 		int xMin, xMax, yMin, yMax, zMin, zMax = 0;
 		xMin = Math.min(corner1.getBlockX(), corner2.getBlockX());
@@ -189,7 +190,7 @@ public class RegionUtil {
 			while (py <= yMax) {
 				int pz = zMin;
 				while (pz <= zMax) {
-					blocks.add(world.getBlockAt(new Location(world, px, py, pz, corner1.getYaw(), corner1.getPitch())));
+					blocks.add(new Location(world, px, py, pz, corner1.getYaw(), corner1.getPitch()));
 					pz++;
 				}
 				py++;
@@ -198,6 +199,24 @@ public class RegionUtil {
 		}
 		
 		return blocks;
+	}
+	
+	public static List<Location> contains(Location corner1, Location corner2, List<Material> materials) {
+		List<Location> blocks = new ArrayList<Location>();
+		
+		List<Location> possibles = contains(corner1, corner2);
+		for(Location possible : possibles)
+			if(materials.contains(possible.getBlock().getType()))
+				blocks.add(possible);
+		
+		return blocks;
+	}
+	
+	public static List<Location> contains(Location corner1, Location corner2, Material material) {
+		List<Material> materials = new ArrayList<Material>();
+		materials.add(material);
+		
+		return contains(corner1, corner2, materials);
 	}
 
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.objective.CoreObjective;
+import me.parapenguin.overcast.scrimmage.map.objective.CoreStage;
 import me.parapenguin.overcast.scrimmage.map.objective.MonumentBlock;
 import me.parapenguin.overcast.scrimmage.map.objective.MonumentObjective;
 import me.parapenguin.overcast.scrimmage.map.objective.TeamObjective;
@@ -213,43 +214,110 @@ public class MapTeam {
 			}
 			
 			// LOAD DTC OBJECTIVES HERE...
+			
 			/*
-			List<Element> rootCores = MapLoader.getElements(root, "destroyables");
+				<cores material="obsidian" leak="5">
+					<cores team="red">
+						<core name="Left Core">
+							<cuboid min="77,32,46" max="73,37,42"/>
+						</core>
+						<core name="Right Core">
+							<cuboid min="77,32,-46" max="73,37,-42"/>
+						</core>
+					</cores>
+					<cores team="blue">
+						<core name="Left Core">
+							<cuboid min="-77,32,-46" max="-73,37,-42"/>
+						</core>
+						<core name="Right Core">
+							<cuboid min="-77,32,46" max="-73,37,42"/>
+						</core>
+					</cores>
+				</cores>
+				
+				Example core list from "The 4th Law"
+			 */
+			List<Element> rootCores = MapLoader.getElements(root, "cores");
 			
 			for(Element element : rootCores) {
-				List<Material> materials = new ArrayList<Material>();
+				List<Element> cores = new ArrayList<Element>();
 				
-				String materialAttr = element.attributeValue("materials");
-				if(materialAttr != null) {
-					String[] materialStrings = new String[]{materialAttr};
-					if(materialAttr.contains(";")) materialStrings = materialAttr.split(";");
-					
-					for(String material : materialStrings)
-						if(ConversionUtil.convertStringToMaterial(material) != null)
-							materials.add(ConversionUtil.convertStringToMaterial(material));
+				List<Element> coreGroups = MapLoader.getElements(element, "cores");
+				for(Element coreGroup : coreGroups) {
+					cores.addAll(MapLoader.getElements(coreGroup, "core"));
+					ServerLog.info("Found " + MapLoader.getElements(coreGroup, "core").size() + " cores! (Search)");
 				}
 				
+				List<Element> coreGroup = MapLoader.getElements(element, "core");
+				for(Element core : coreGroup) {
+					cores.add(core);
+					ServerLog.info("Found a core! (Search)");
+				}
+				
+				for(Element core : cores) {
+					ServerLog.info("Found a core! (Loop)");
+					
+					String name = "Core";
+					MapTeam team = this;
+					int leak = 0;
+					Material material = Material.AIR;
+					
+					if(core.attributeValue("team") == null && core.getParent().attributeValue("team") == null) continue;
+					if(core.attributeValue("team") != null && !isThisTeam(core.attributeValue("team"))) continue;
+					if(core.getParent().attributeValue("team") != null && !isThisTeam(core.getParent().attributeValue("team"))) continue;
+					
+					if(core.attributeValue("material") == null && core.getParent().attributeValue("material") == null) continue;
+					if(core.attributeValue("material") != null) material = ConversionUtil.convertStringToMaterial(core.attributeValue("material"));
+					else if(core.getParent().attributeValue("material") != null) material = ConversionUtil.convertStringToMaterial(core.getParent().attributeValue("material"));
+					if(material == null) continue;
+					
+					if(core.attributeValue("leak") == null && core.getParent().attributeValue("leak") == null) continue;
+					if(core.attributeValue("leak") != null) leak = ConversionUtil.convertStringToInteger(core.attributeValue("leak"));
+					else if(core.getParent().attributeValue("leak") != null) leak = ConversionUtil.convertStringToInteger(core.getParent().attributeValue("leak"));
+					
+					if(core.attributeValue("name") != null) name = core.attributeValue("name");
+					else if(core.getParent().attributeValue("name") != null) name = core.getParent().attributeValue("name");
+					
+					List<Location> blocks = new ArrayList<Location>();
+					Region region = new Region(map, core, RegionType.ALL);
+					for(Location location : region.getLocations())
+						if(material == location.getBlock().getType())
+							blocks.add(location);
+					
+					CoreStage stage = CoreStage.OTHER;
+					if(material == Material.OBSIDIAN) stage = CoreStage.OBSIDIAN;
+					else if(material == Material.GOLD_BLOCK) stage = CoreStage.GOLD;
+					else if(material == Material.GLASS) stage = CoreStage.GLASS;
+					
+					CoreObjective coreObject = new CoreObjective(map, team, name, blocks, leak, stage);
+					this.objectives.add(coreObject);
+				}
+			}
+			
+			for(Element element : rootCores) {
+				Material material = ConversionUtil.convertStringToMaterial(element.attributeValue("material"));
+				
 				String name = element.attributeValue("name");
-				int completion = Integer.parseInt(element.attributeValue("completion").replaceAll("%", ""));
+				int leak = Integer.parseInt(element.attributeValue("leak"));
 
 				for(Element destroyable : MapLoader.getElements(element, "destroyable")) {
-					if(!isThisTeam(destroyable.attributeValue("owner"))) {
+					if(!isThisTeam(destroyable.attributeValue("team"))) {
 						List<Location> locations = new ArrayList<Location>();
-						List<MonumentBlock> blocks = new ArrayList<MonumentBlock>();
 						
 						Region region = new Region(map, destroyable, RegionType.ALL);
 						for(Location location : region.getLocations())
-							if(materials.size() == 0 || materials.contains(location.getBlock().getType()))
+							if(material == location.getBlock().getType())
 								locations.add(location);
 						
-						for(Location location : locations)
-							blocks.add(new MonumentBlock(location));
+						CoreStage type = CoreStage.OTHER;
+						if(material == Material.OBSIDIAN) type = CoreStage.OBSIDIAN;
+						else if(material == Material.GOLD_BLOCK) type = CoreStage.GOLD;
+						else if(material == Material.GLASS) type = CoreStage.GLASS;
 						
-						this.objectives.add(new MonumentObjective(getMap(), this, name, blocks, completion));
+						this.objectives.add(new CoreObjective(map, this, name, locations, leak, type));
 					}
 				}
 			}
-			*/
 		}
 
 		List<String> names = new ArrayList<String>();

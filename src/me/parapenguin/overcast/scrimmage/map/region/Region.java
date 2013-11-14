@@ -12,7 +12,6 @@ import me.parapenguin.overcast.scrimmage.map.MapLoader;
 import me.parapenguin.overcast.scrimmage.utils.RegionUtil;
 
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.dom4j.Element;
 
 public class Region {
@@ -248,12 +247,7 @@ public class Region {
 		if(!failed) {
 			Location minL = new Location(map.getWorld(), minX, minY, minZ, parseFloat(yaw), parseFloat(pitch));
 			Location maxL = new Location(map.getWorld(), maxX, maxY, maxZ, parseFloat(yaw), parseFloat(pitch));
-			List<Block> possibleBlocks = RegionUtil.contains(minL, maxL);
-			
-			List<Location> possibles = new ArrayList<Location>();
-			for(Block block : possibleBlocks)
-				possibles.add(block.getLocation());
-			
+			List<Location> possibles = RegionUtil.contains(minL, maxL);
 			locations.addAll(possibles);
 		}
 		
@@ -309,12 +303,7 @@ public class Region {
 		if(!failed) {
 			Location minL = new Location(map.getWorld(), minX, minY, minZ, parseFloat(yaw), parseFloat(pitch));
 			Location maxL = new Location(map.getWorld(), maxX, maxY, maxZ, parseFloat(yaw), parseFloat(pitch));
-			List<Block> possibleBlocks = RegionUtil.contains(minL, maxL);
-			
-			List<Location> possibles = new ArrayList<Location>();
-			for(Block block : possibleBlocks)
-				possibles.add(block.getLocation());
-			
+			List<Location> possibles = RegionUtil.contains(minL, maxL);
 			locations.addAll(possibles);
 		}
 		

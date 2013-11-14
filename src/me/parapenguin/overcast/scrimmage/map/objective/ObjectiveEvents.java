@@ -23,13 +23,13 @@ public class ObjectiveEvents implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onCoreBlockChange(BlockChangeEvent event) {
-		if(event.getClient() == null) {
+		if(event.getClient() != null) {
 			Client client = event.getClient();
 			List<CoreObjective> cores = event.getMap().getCores();
 			
 			if(event.getCause() instanceof BlockBreakEvent) {
 				for(CoreObjective core : cores)
-					if(core.isLocation(event.getNewState().getLocation()) && core.getTeam() == client.getTeam()) {
+					if(core.isLocation(event.getNewState().getLocation()) && core.getTeam() != client.getTeam()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -41,7 +41,16 @@ public class ObjectiveEvents implements Listener {
 			}
 		} else {
 			if(event.getNewState().getType() == Material.LAVA && event.getMap().getCoreLeak(event.getNewState().getLocation()) != null) {
-				// THE CORE LEAKED UMGGGG
+				CoreObjective core = event.getMap().getCoreLeak(event.getNewState().getLocation());
+				core.setComplete(true);
+				
+				event.getMap().reloadSidebar(true);
+				
+				String who = core.getTeam().getColor() + core.getTeam().getDisplayName() + "'s";
+				String leaked = ChatColor.DARK_AQUA + " " + core.getName();
+				String has = ChatColor.RED + " has leaked!";
+				String message = who + leaked + has;
+				Scrimmage.broadcast(message);
 			}
 		}
 	}
