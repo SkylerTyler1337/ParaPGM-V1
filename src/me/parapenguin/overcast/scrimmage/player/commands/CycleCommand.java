@@ -29,7 +29,7 @@ public class CycleCommand implements CommandExecutor {
 		
 		int time = 0;
 		if(args.length == 1)
-			if(ConversionUtil.convertStringToInteger(args[0], 0) > 5)
+			if(ConversionUtil.convertStringToInteger(args[0], 0) => 5)
 				time = ConversionUtil.convertStringToInteger(args[0], 0);
 			else {
 				sender.sendMessage(ChatColor.RED + "Please supply a valid time greater than 5");
