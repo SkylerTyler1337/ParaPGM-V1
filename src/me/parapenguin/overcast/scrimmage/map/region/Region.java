@@ -27,7 +27,11 @@ public class Region {
 		List<Element> elements = new ArrayList<Element>();
 		elements.add(element);
 		
-		Region region = new Region(map, elements, RegionType.getByElementName(element.getName()));
+		RegionType type = RegionType.getByElementName(element.getName());
+		if(type == null)
+			return;
+		
+		Region region = new Region(map, elements, type);
 		this.elements = region.getElements();
 		this.regions = region.getRegions();
 	}

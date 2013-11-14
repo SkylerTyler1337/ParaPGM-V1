@@ -1,5 +1,7 @@
 package me.parapenguin.overcast.scrimmage.map.filter;
 
+import java.util.List;
+
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.filter.events.BlockChangeEvent;
@@ -45,6 +47,13 @@ public class FilterEvents implements Listener {
 				event.setCancelled(true);
 				client.getPlayer().sendMessage(ChatColor.RED + "You have reached the maximum build height");
 				return;
+			}
+		}
+		
+		List<Filter> filters = map.getFilters(event.getOldState().getLocation());
+		for(Filter filter : filters) {
+			if(filter.getParents().contains(FilterType.DENY_PLAYERS) && filter.getAllowTeams().size() > 0) {
+				
 			}
 		}
 	}
