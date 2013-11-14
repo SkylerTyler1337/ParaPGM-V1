@@ -28,7 +28,7 @@ public class StartCommand implements CommandExecutor {
 		}
 		
 		Scrimmage.getRotation().getSlot().getMatch().start();
-		sender.sendMessage(ChatColor.RED + sender.getName() + ChatColor.DARK_PURPLE + " has started the countdown.");
+		Scrimmage.broadcast(ChatColor.RED + sender.getName() + ChatColor.DARK_PURPLE + " has started the countdown.");
 		
 		return true;
 	}

@@ -30,6 +30,7 @@ public class Filter {
 	
 	@Getter String name;
 	@Getter List<FilterType> parents;
+	@Getter String message;
 	
 	@Getter List<MapTeam> allowTeams; // teams must be initialised before these lists can be filled.
 	@Getter List<MapTeam> denyTeams;
@@ -61,6 +62,10 @@ public class Filter {
 		
 		if(FilterType.getBySplitAttribute(name) != null)
 			list.add(FilterType.getBySplitAttribute(name));
+	}
+	
+	public boolean hasMessage() {
+		return getMessage() != null;
 	}
 	
 	/*

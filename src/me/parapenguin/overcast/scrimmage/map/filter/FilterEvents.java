@@ -52,8 +52,13 @@ public class FilterEvents implements Listener {
 		
 		List<Filter> filters = map.getFilters(event.getOldState().getLocation());
 		for(Filter filter : filters) {
-			if(filter.getParents().contains(FilterType.DENY_PLAYERS) && filter.getAllowTeams().size() > 0) {
-				
+			if(event.getClient() != null) {
+				if(filter.getParents().contains(FilterType.DENY_PLAYERS))
+					if(filter.getAllowTeams().size() > 0) {
+						event.setCancelled(true);
+						if(filter.hasMessage())
+							event.getClient().getPlayer().sendMessage(ChatColor.RED + filter.getMessage());
+					}
 			}
 		}
 	}

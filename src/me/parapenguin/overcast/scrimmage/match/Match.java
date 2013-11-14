@@ -21,16 +21,16 @@ public class Match {
 	@Getter SchedulerUtil schedule;
 	
 	@Getter SchedulerUtil startingTask;
-	@Getter int starting = 30;
+	@Getter @Setter int starting = 30;
 	@Getter @Setter boolean currentlyStarting = false;
 
 	@Getter SchedulerUtil timingTask;
 	@Getter int timing = 0;
-	@Getter int length;
+	@Getter @Setter int length;
 	@Getter @Setter boolean currentlyRunning = false;
 
 	@Getter SchedulerUtil cyclingTask;
-	@Getter int cycling = 30;
+	@Getter @Setter int cycling = 30;
 	@Getter @Setter boolean loaded = false;
 	@Getter @Setter boolean currentlyCycling = false;
 	
@@ -73,6 +73,13 @@ public class Match {
 	}
 	
 	public void start() {
+		start(30);
+	}
+	
+	public void start(int time) {
+		if(time == 0)
+			time = 30;
+		
 		try {
 			stop();
 		} catch(Exception e) {
@@ -81,8 +88,28 @@ public class Match {
 		
 		this.timing = 0;
 		this.cycling = 30;
-		this.starting = 30;
+		this.starting = time;
 		this.startingTask.repeat(20, 0);
+	}
+	
+	public void cycle() {
+		cycle(30);
+	}
+	
+	public void cycle(int time) {
+		if(time == 0)
+			time = 30;
+		
+		try {
+			stop();
+		} catch(Exception e) {
+			// meh
+		}
+		
+		this.timing = 0;
+		this.cycling = time;
+		this.starting = 30;
+		this.cyclingTask.repeat(20, 0);
 	}
 	
 	public void stop() throws NullPointerException {

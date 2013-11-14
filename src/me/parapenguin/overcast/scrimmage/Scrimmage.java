@@ -109,6 +109,7 @@ public class Scrimmage extends JavaPlugin {
 		registerCommand("setnext", new SetNextCommand());
 		registerCommand("global", new GlobalCommand());
 		registerCommand("start", new StartCommand());
+		registerCommand("cycle", new CycleCommand());
 		registerCommand("end", new StopCommand());
 		enableTracker();
 	}
