@@ -7,6 +7,7 @@ import me.parapenguin.overcast.scrimmage.map.MapTeam;
 import me.parapenguin.overcast.scrimmage.map.MapTeamSpawn;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.player.PlayerChatEvent;
+import me.parapenguin.overcast.scrimmage.utils.Characters;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -73,7 +74,7 @@ public class PlayerEvents implements Listener {
 		}
 		
 		color = ChatColor.GRAY;
-		event.setMotd(color + " » " + ChatColor.AQUA + map.getName() + color + " « ");
+		event.setMotd(color + " " + Characters.raquo + " " + ChatColor.AQUA + map.getName() + color + " " + Characters.laquo + " ");
 	}
 	
 	@EventHandler
