@@ -9,8 +9,31 @@ import org.bukkit.block.Block;
 
 public class RegionUtil {
 	
-	public static Location closest(Location origin, List<Location> values) {
-		return null;
+	public static double closest(Location origin, List<Location> values) {
+		double closest = values.get(0).distance(origin);
+		
+		for(int i = 1; i < values.size(); i++) {
+			double length = values.get(i).distance(origin);
+			if(closest > length)
+				closest = length;
+		}
+		
+		return closest;
+	}
+	
+	public static Location closestLocation(Location origin, List<Location> values) {
+		Location value = values.get(0);
+		double closest = values.get(0).distance(origin);
+		
+		for(int i = 1; i < values.size(); i++) {
+			double length = values.get(i).distance(origin);
+			if(closest > length) {
+				closest = length;
+				value = values.get(i);
+			}
+		}
+		
+		return value;
 	}
 	
 	public static List<Block> circle(Block block, double r, double h, boolean hollow, boolean sphere) {

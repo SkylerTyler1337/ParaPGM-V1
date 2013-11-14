@@ -23,6 +23,7 @@ import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.filter.Filter;
 import me.parapenguin.overcast.scrimmage.map.kit.ItemKit;
 import me.parapenguin.overcast.scrimmage.map.kit.KitLoader;
+import me.parapenguin.overcast.scrimmage.map.objective.CoreObjective;
 import me.parapenguin.overcast.scrimmage.map.objective.MonumentObjective;
 import me.parapenguin.overcast.scrimmage.map.objective.WoolObjective;
 import me.parapenguin.overcast.scrimmage.map.region.ConfiguredRegion;
@@ -349,6 +350,39 @@ public class Map {
 		*/
 		
 		return found;
+	}
+	
+	public List<CoreObjective> getCores() {
+		List<CoreObjective> cores = new ArrayList<CoreObjective>();
+		
+		for(MapTeam team : getAllTeams())
+			cores.addAll(team.getCores());
+		
+		return cores;
+	}
+	
+	public List<CoreObjective> getCores(MapTeam team) {
+		return team.getCores();
+	}
+	
+	public CoreObjective getCore(Location location) {
+		for(MapTeam team : getTeams())
+			if(team.getCore(location) != null)
+				return team.getCore(location);
+		
+		return null;
+	}
+	
+	public CoreObjective getCoreLeak(Location location) {
+		for(MapTeam team : getTeams())
+			if(team.getCoreLeak(location) != null)
+				return team.getCoreLeak(location);
+		
+		return null;
+	}
+	
+	public boolean isCoreLeak(Location location) {
+		return getCoreLeak(location) != null;
 	}
 	
 	public List<WoolObjective> getWools() {

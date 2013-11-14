@@ -40,6 +40,11 @@ public class FilterEvents implements Listener {
 	public void onBlockChange(BlockChangeEvent event) {
 		Map map = event.getMap();
 		
+		if(!Scrimmage.getRotation().getSlot().getMatch().isCurrentlyRunning()) {
+			event.setCancelled(true);
+			return;
+		}
+		
 		if(event.getClient() != null) {
 			Client client = event.getClient();
 			

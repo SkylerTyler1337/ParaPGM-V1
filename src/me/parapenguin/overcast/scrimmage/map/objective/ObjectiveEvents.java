@@ -1,10 +1,14 @@
 package me.parapenguin.overcast.scrimmage.map.objective;
 
+import java.util.List;
+
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.Map;
+import me.parapenguin.overcast.scrimmage.map.filter.events.BlockChangeEvent;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.utils.FireworkUtil;
 
+import org.bukkit.ChatColor;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Builder;
 import org.bukkit.FireworkEffect.Type;
@@ -16,6 +20,31 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 public class ObjectiveEvents implements Listener {
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onCoreBlockChange(BlockChangeEvent event) {
+		if(event.getClient() == null) {
+			Client client = event.getClient();
+			List<CoreObjective> cores = event.getMap().getCores();
+			
+			if(event.getCause() instanceof BlockBreakEvent) {
+				for(CoreObjective core : cores)
+					if(core.isLocation(event.getNewState().getLocation()) && core.getTeam() == client.getTeam()) {
+						event.setCancelled(true);
+						return;
+					}
+			}
+			
+			if(event.getNewState().getType() == Material.LAVA) {
+				event.setCancelled(true);
+				return;
+			}
+		} else {
+			if(event.getNewState().getType() == Material.LAVA && event.getMap().getCoreLeak(event.getNewState().getLocation()) != null) {
+				// THE CORE LEAKED UMGGGG
+			}
+		}
+	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockPlaceForWool(BlockPlaceEvent event) {
@@ -68,6 +97,12 @@ public class ObjectiveEvents implements Listener {
 		
 		wool.setComplete(true);
 		client.getTeam().getMap().reloadSidebar(true);
+		
+		String who = client.getTeam().getColor() + client.getPlayer().getName();
+		String placed = ChatColor.WHITE + " placed the " + wool.getColor() + wool.getName().toUpperCase();
+		String team = ChatColor.WHITE + " for " + client.getTeam().getColor() + client.getTeam().getDisplayName();
+		String message = who + placed + team;
+		Scrimmage.broadcast(message);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)

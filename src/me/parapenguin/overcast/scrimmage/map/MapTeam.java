@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.ServerLog;
+import me.parapenguin.overcast.scrimmage.map.objective.CoreObjective;
 import me.parapenguin.overcast.scrimmage.map.objective.MonumentBlock;
 import me.parapenguin.overcast.scrimmage.map.objective.MonumentObjective;
 import me.parapenguin.overcast.scrimmage.map.objective.TeamObjective;
@@ -431,6 +432,39 @@ public class MapTeam {
 	
 	public boolean contains(String check, String contains) {
 		return check.toLowerCase().contains(contains.toLowerCase());
+	}
+	
+	public List<CoreObjective> getCores() {
+		List<CoreObjective> cores = new ArrayList<CoreObjective>();
+		
+		if(getObjectives() == null)
+			return cores;
+		
+		for(TeamObjective obj : getObjectives())
+			if(obj instanceof CoreObjective)
+				cores.add((CoreObjective) obj);
+		
+		return cores;
+	}
+	
+	public CoreObjective getCore(Block block) {
+		return getCore(block.getLocation());
+	}
+	
+	public CoreObjective getCore(Location location) {
+		for(CoreObjective core : getCores())
+			if(core.isLocation(location))
+				return core;
+		
+		return null;
+	}
+	
+	public CoreObjective getCoreLeak(Location location) {
+		for(CoreObjective core : getCores())
+			if(core.isLeak(location))
+				return core;
+		
+		return null;
 	}
 	
 	public List<WoolObjective> getWools() {
