@@ -340,15 +340,15 @@ public class Map {
 	}
 	
 	public List<Filter> getFilters(Location loc) {
-		/*
 		List<Filter> found = new ArrayList<Filter>();
-		
+
+		/*
 		for(Filter filter : filters) {
 			if(filter)
 		}
 		*/
 		
-		return null;
+		return found;
 	}
 	
 	public List<WoolObjective> getWools() {
