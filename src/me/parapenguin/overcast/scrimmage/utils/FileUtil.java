@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileUtil {
+	
 	public static List<File> getFiles(File folder) {
 		if (!folder.exists())
 			folder.mkdirs();
@@ -33,6 +34,11 @@ public class FileUtil {
 			}
 		}
 		dir.delete();
+	}
+	
+	public static void move(File from, File to) throws IOException {
+		copyFolder(from, to);
+		delete(from);
 	}
 	
 	public static void copy(InputStream in, File file) {
@@ -119,4 +125,5 @@ public class FileUtil {
 			}
 		}
 	}
+	
 }

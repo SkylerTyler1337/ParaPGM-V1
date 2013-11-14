@@ -9,6 +9,10 @@ import org.bukkit.block.Block;
 
 public class RegionUtil {
 	
+	public static Location closest(Location origin, List<Location> values) {
+		return null;
+	}
+	
 	public static List<Block> circle(Block block, double r, double h, boolean hollow, boolean sphere) {
 		List<Location> locs = circle(true, block.getLocation(), r, h, hollow, sphere);
 		List<Block> blocks = new ArrayList<Block>();

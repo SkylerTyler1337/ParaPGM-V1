@@ -30,7 +30,9 @@ import me.parapenguin.overcast.scrimmage.rotation.Rotation;
 import me.parapenguin.overcast.scrimmage.tracker.GravityKillTracker;
 import me.parapenguin.overcast.scrimmage.tracker.PlayerBlockChecker;
 import me.parapenguin.overcast.scrimmage.tracker.TickTimer;
+import me.parapenguin.overcast.scrimmage.utils.FileUtil;
 import me.parapenguin.overcast.scrimmage.utils.JarUtils;
+import me.parapenguin.overcast.scrimmage.utils.ZipUtil;
 
 public class Scrimmage extends JavaPlugin {
 	
@@ -78,6 +80,30 @@ public class Scrimmage extends JavaPlugin {
 		}
 
 		loadJars();
+		
+		/*
+		 * Auto un-zipper, this should be helpful instead of killing my internet :)
+		 */
+		
+		File[] maps = getMapRoot().listFiles();
+		File zips = new File(getMapRoot().getAbsolutePath() + "/zips/");
+		
+		for(File file : maps) {
+			if(!file.getName().toLowerCase().contains(".zip"))
+				continue;
+			
+			if(!zips.isDirectory())
+				FileUtil.delete(zips);
+			if(!zips.exists())
+				zips.mkdirs();
+			
+			ZipUtil.unZip(file, getMapRoot());
+			try {
+				FileUtil.move(file, new File(zips.getAbsolutePath() + "/" + file.getName()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void startup() {
