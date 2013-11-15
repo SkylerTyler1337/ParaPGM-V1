@@ -14,10 +14,13 @@ Todo List
 
 [PRE] Compiling your own version of ParaPGM
 -------------------------------------------
-First things first, you're going to need to import the following jars into your Eclipse project!
+First things first, you're going to need to download and **install** [Lombok] [6] onto Eclipse, this is so that the methods work. Make sure you restart Eclipse after install *cough* *cough*
+
+Next, you're going to need to import the following jars into your Eclipse project!
 - [SportBukkit Server] [1]
 - [dom4j Library] [2]
 - [SportBukkit API] [5]
+- [Lombok] [6]
 
 After that, export the plugin and you're ready to roll! Just add it to your plugins folder, and follow the setup process below.
 
@@ -44,3 +47,4 @@ You can see the format of the repository [here] [4] or [here] [3]. Those steps a
 [3]: https://maps.oc.tc/ "Overcast Maps"
 [4]: http://scrimmage1.teamloading.com/ "Scrimmage Maps"
 [5]: http://scrimmage1.teamloading.com/bukkit.jar "SportBukkit API"
+[6]: http://projectlombok.org "Project Lombok"
