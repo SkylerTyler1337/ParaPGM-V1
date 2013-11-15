@@ -26,8 +26,7 @@ After that, export the plugin and you're ready to roll! Just add it to your plug
 
 1. Getting and Setting up SportBukkit
 -------------------------------------
-First of all, this plugin **requires** SportBukkit! So before going any further, go compile it.
-You can find a version of **SportBukkit** that my servers use, located at [CraftBukkit] [1]
+First of all, this plugin **requires** SportBukkit! So before going any further, if you don't have it, you'll need to compile or you can find a version of **SportBukkit** that my servers use, located at [CraftBukkit] [1]
 
 If you don't know what **SportBukkit** is, then you're pretty silly and you need to place it as though it was your CraftBukkit/Spigot jar.
 
