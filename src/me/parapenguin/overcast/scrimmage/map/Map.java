@@ -67,8 +67,11 @@ public class Map {
 	@Getter Scoreboard board;
 	@Getter Objective boardObjective;
 	
+	@Getter int timeLimit;
+	@Getter int scoreLimit;
+	
 	public Map(MapLoader loader, RotationSlot slot, String name, String version, String objective, List<String> rules,
-			List<Contributor> authors, List<Contributor> contributors, List<MapTeam> teams, MapTeam observers, int maxbuildheight, SidebarType sidebar) {
+			List<Contributor> authors, List<Contributor> contributors, List<MapTeam> teams, MapTeam observers, int maxbuildheight, SidebarType sidebar, int timeLimit, int scoreLimit) {
 		this.loader = loader;
 		this.slot = slot;
 		this.name = name;
@@ -77,11 +80,14 @@ public class Map {
 		this.rules = rules;
 		this.authors = authors;
 		this.contributors = contributors;
+		this.teams = teams;
+		this.observers = observers;
 		this.maxbuildheight = maxbuildheight;
 		this.sidebar = sidebar;
+		this.timeLimit = timeLimit;
+		this.scoreLimit = scoreLimit;
 		
 		this.board = Scrimmage.getInstance().getServer().getScoreboardManager().getNewScoreboard();
-		reloadSidebar(false, null);
 	}
 	
 	public List<MapTeam> getAllTeams() {
@@ -453,6 +459,23 @@ public class Map {
 	
 	public List<MapTeam> getWinners() {
 		List<MapTeam> teams = new ArrayList<MapTeam>();
+		
+		if(sidebar == SidebarType.SCORE) {
+			teams.add(getTeams().get(0));
+			int highest = teams.get(0).getScore();
+			
+			for(MapTeam team : getTeams())
+				if(!teams.contains(team))
+					if(highest < team.getScore()) {
+						teams = new ArrayList<MapTeam>();
+						teams.add(team);
+						highest = team.getScore();
+					} else if(highest == team.getScore())
+						teams.add(team);
+			
+			return teams;
+		}
+		
 		teams.add(getTeams().get(0));
 		int highest = teams.get(0).getCompleted();
 		

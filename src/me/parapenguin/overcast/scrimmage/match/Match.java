@@ -1,5 +1,6 @@
 package me.parapenguin.overcast.scrimmage.match;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -9,8 +10,11 @@ import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
+import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
+import me.parapenguin.overcast.scrimmage.map.extras.SidebarType;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
+import me.parapenguin.overcast.scrimmage.utils.ConversionUtil;
 import me.parapenguin.overcast.scrimmage.utils.SchedulerUtil;
 
 public class Match {
@@ -148,45 +152,46 @@ public class Match {
 	
 	private boolean timing() {
 		setCurrentlyRunning(true);
-		if((timing >= length && length != -1) || end(false)) {
+		if((timing >= length && length != -1) || end(false) || (getMap().getTimeLimit() > 0 && getMap().getTimeLimit() <= timing)) {
 			end(true);
 			setCurrentlyRunning(false);
 			return true;
 		}
 		
-		timing++;
-		
 		if(timing % (5*60) == 0) {
 			String playing = ChatColor.DARK_PURPLE + "Currently playing " + ChatColor.GOLD + getMap().getName();
 			String by = ChatColor.DARK_PURPLE + " by ";
 			
-			String creators = "";
-			if(getMap().getAuthors().size() == 1)
-				creators += ChatColor.RED + getMap().getAuthors().get(0).getName();
-			else if(getMap().getAuthors().size() >= 2) {
-				/*
-				 * index 0 should prefix ""
-				 * index 1 to (max index - 1) should prefix ", "
-				 * index max index should prefix " and "
-				 */
-				
-				int index = 0;
-				while(index < getMap().getAuthors().size()) {
-					if(index > 0) {
-						creators += ChatColor.DARK_PURPLE;
-						if(index == (getMap().getAuthors().size() -1))
-							creators += " and ";
-						else creators += ", ";
-					}
-					
-					creators += ChatColor.RED + getMap().getAuthors().get(index).getName();
-					index++;
-				}
-			}
-			
-			String broadcast = playing + by + creators + ChatColor.DARK_PURPLE + ".";
+			List<String> authors = new ArrayList<String>();
+			for(Contributor author : getMap().getAuthors())
+				authors.add(ChatColor.RED + author.getName());
+			String creators = ConversionUtil.commaList(authors, ChatColor.DARK_PURPLE);
+			String broadcast = playing + by + creators;
 			Scrimmage.broadcast(broadcast);
 		}
+		
+		boolean timer = false;
+		if(getMap().getSidebar() != SidebarType.SCORE) return false;
+		else if(timing % 60 == 0) timer = true;
+		else if(getMap().getTimeLimit() > 0) {
+			if(getMap().getTimeLimit() - timing <= 60) {
+				if(getMap().getTimeLimit() - timing % 15 == 0) timer = true;
+				else if(getMap().getTimeLimit() - timing < 5) timer = true;
+			}
+		}
+		
+		if(timer) {
+			String score = ChatColor.AQUA + "Score: ";
+			for(MapTeam team : getMap().getTeams())
+				score += team.getColor() + "" + team.getScore() + " ";
+			
+			if(getMap().getTimeLimit() > 0)
+				score += ChatColor.RED + ConversionUtil.formatTime(getMap().getTimeLimit() - getTiming());
+			Scrimmage.broadcast(score);
+		}
+		
+		timing++;
+		
 		return false;
 	}
 	
@@ -202,11 +207,28 @@ public class Match {
 		return true;
 	}
 	
-	public boolean end(MapTeam winner) {
-		Scrimmage.broadcast(ChatColor.GOLD + "" + ChatColor.BOLD + "Game Over!");
-		if(winner != null)
-			Scrimmage.broadcast(winner.getColor() + winner.getDisplayName() + " wins!");
+	public boolean end(List<MapTeam> winners) {
+		end();
+		if(winners.size() > 0) {
+			List<String> teams = new ArrayList<String>();
+			for(MapTeam team : winners)
+				teams.add(team.getColor() + team.getDisplayName());
+			
+			String text = ConversionUtil.commaList(teams, ChatColor.GRAY) + " wins!";
+			Scrimmage.broadcast(text);
+		}
 		
+		return true;
+	}
+	
+	public boolean end(MapTeam winner) {
+		List<MapTeam> winners = new ArrayList<MapTeam>();
+		if(winner != null) winners.add(winner);
+		return end(winners);
+	}
+	
+	private void end() {
+		Scrimmage.broadcast(ChatColor.GOLD + "" + ChatColor.BOLD + "Game Over!");
 		timingTask.getTask().cancel();
 		cyclingTask.repeatAsync(20, 20);
 		
@@ -216,7 +238,6 @@ public class Match {
 		
 		setCurrentlyRunning(false);
 		setCurrentlyCycling(true);
-		return true;
 	}
 	
 	private boolean cycling(RotationSlot next) {

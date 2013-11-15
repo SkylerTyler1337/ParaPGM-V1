@@ -29,7 +29,11 @@ public class ObjectiveEvents implements Listener {
 		Client died = Client.getClient(event.getKilled());
 		
 		if(killer == null) died.getTeam().addScore(-1);
-		else killer.getTeam().addScore(1);
+		else {
+			killer.getTeam().addScore(1);
+			if(event.getMap().getSidebar() == SidebarType.SCORE && killer.getTeam().getScore() >= event.getMap().getScoreLimit() && event.getMap().getScoreLimit() > 0)
+				Scrimmage.getRotation().getSlot().getMatch().end(killer.getTeam());
+		}
 		
 		event.getMap().reloadSidebar(false, SidebarType.SCORE);
 	}

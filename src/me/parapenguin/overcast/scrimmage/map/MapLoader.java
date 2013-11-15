@@ -15,6 +15,7 @@ import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.extras.SidebarType;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
+import me.parapenguin.overcast.scrimmage.utils.ConversionUtil;
 
 public class MapLoader {
 	
@@ -34,6 +35,9 @@ public class MapLoader {
 	
 	@Getter int maxbuildheight;
 	@Getter SidebarType sidebar;
+	
+	@Getter int score = -1;
+	@Getter int time = -1;
 	
 	@SuppressWarnings("unchecked")
 	private MapLoader(File file, Document doc) {
@@ -84,6 +88,29 @@ public class MapLoader {
 		}
 		
 		this.sidebar = SidebarType.OBJECTIVES;
+		/*
+			Check if a match is TDM
+			
+			<score>
+				<!-- Time till the match ends in seconds -->    
+				<time>600</time>
+				
+				<!-- Game ends when a team reaches this score, defaults to -1 i.e. no limit. -->
+				<limit>-1</limit>
+			</score>
+		 */
+		
+		Element score = root.element("score");
+		if(score != null) {
+			Element limit = score.element("limit");
+			Element time = score.element("time");
+			
+			if(limit != null || time != null) {
+				if(limit != null) this.score = ConversionUtil.convertStringToInteger(limit.getText(), -1);
+				if(time != null) this.time = ConversionUtil.convertStringToInteger(time.getText(), -1);
+				this.sidebar = SidebarType.SCORE;
+			}
+		}
 		
 		// this.filters = filters;
 		
@@ -92,7 +119,7 @@ public class MapLoader {
 	}
 	
 	public Map getMap(RotationSlot slot) {
-		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers, maxbuildheight, sidebar);
+		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers, maxbuildheight, sidebar, time, score);
 	}
 	
 	public static boolean isLoadable(File file) {
