@@ -46,4 +46,4 @@ You can see the format of the repository [here] [4] or [here] [3]. Those steps a
 [3]: https://maps.oc.tc/ "Overcast Maps"
 [4]: http://scrimmage1.teamloading.com/ "Scrimmage Maps"
 [5]: http://scrimmage1.teamloading.com/bukkit.jar "SportBukkit API"
-[6]: http://projectlombok.org "Project Lombok"
+[6]: http://projectlombok.org/ "Project Lombok"
