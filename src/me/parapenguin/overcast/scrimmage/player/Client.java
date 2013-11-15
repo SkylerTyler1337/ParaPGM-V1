@@ -70,10 +70,12 @@ public class Client {
 		
 		String[] devs = new String[]{"ParaPenguin"};
 		String[] refs = new String[]{"pmheys", "your_loved_one", "dcstarwars", "ShinyDialga45", "iEli2tyree011"};
-		
+		String[] subdevs = new String[]{"nixter1029"};
+
 		String op = ChatColor.RED + "*";
 		String dev = ChatColor.GOLD + "*";
 		String ref = ChatColor.DARK_AQUA + "*";
+		String subdev = ChatColor.DARK_PURPLE + "*";
 		
 		String stars = "";
 		for(String string : devs)
@@ -85,6 +87,12 @@ public class Client {
 		for(String string : refs)
 			if(string.equalsIgnoreCase(getPlayer().getName())) {
 				stars += ref;
+				break;
+			}
+		
+		for(String string : subdevs)
+			if(string.equalsIgnoreCase(getPlayer().getName())) {
+				stars += subdev;
 				break;
 			}
 		
