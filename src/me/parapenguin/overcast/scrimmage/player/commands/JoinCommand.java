@@ -29,7 +29,7 @@ public class JoinCommand implements CommandExecutor {
 		} else if(args.length == 1) {
 			team = map.getTeam(args[0]);
 			if(team == null) {
-				sender.sendMessage(ChatColor.RED + "Could not find a team by that string!");
+				sender.sendMessage(ChatColor.RED + "No teams matched query.");
 				return false;
 			}
 		} else {
