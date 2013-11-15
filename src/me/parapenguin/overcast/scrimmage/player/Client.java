@@ -68,14 +68,14 @@ public class Client {
 	public String getStars() {
 		if(!isRanked()) return "";
 		
-		String[] devs = new String[]{"ParaPenguin"};
+		String[] devs = new String[]{"ParaPenguin", "Haribo98"};
 		String[] refs = new String[]{"pmheys", "your_loved_one", "dcstarwars", "ShinyDialga45", "iEli2tyree011"};
 		String[] subdevs = new String[]{};
 
 		String op = ChatColor.RED + "*";
-		String dev = ChatColor.GOLD + "*";
+		String dev = ChatColor.DARK_PURPLE + "*";
 		String ref = ChatColor.DARK_AQUA + "*";
-		String subdev = ChatColor.DARK_PURPLE + "*";
+		String subdev = ChatColor.YELLOW + "*";
 		
 		String stars = "";
 		for(String string : devs)
