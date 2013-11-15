@@ -3,6 +3,15 @@ Overcast-Scrimmage
 
 Private Overcast Scrimmage plugin utilising the OCN XML system!
 
+Todo List
+---------
+- [ ] XML Parsing of Filters
+- [ ] Filters that actually have connected events
+- [ ] Add Blitz support
+- [ ] Add the Rage module
+- [ ] Update to the new version of Overcast Tracker
+- [ ] Add support for Gear maps
+
 1. Getting and Setting up SportBukkit
 -------------------------------------
 First of all, this plugin **requires** SportBukkit! So before going any further, go compile it.
