@@ -7,6 +7,7 @@ import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
+import me.parapenguin.overcast.scrimmage.map.extras.SidebarType;
 
 public class TeamObjective {
 	
@@ -66,7 +67,7 @@ public class TeamObjective {
 	
 	public void setComplete(boolean complete) {
 		this.complete = complete;
-		getTeam().getMap().reloadSidebar(true);
+		getTeam().getMap().reloadSidebar(true, SidebarType.OBJECTIVES);
 		if(getTeam().getCompleted() == getTeam().getObjectives().size())
 			Scrimmage.getRotation().getSlot().getMatch().end(getTeam());
 	}

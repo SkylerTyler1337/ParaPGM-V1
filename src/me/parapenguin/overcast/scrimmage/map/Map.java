@@ -20,6 +20,7 @@ import org.dom4j.Element;
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
+import me.parapenguin.overcast.scrimmage.map.extras.SidebarType;
 import me.parapenguin.overcast.scrimmage.map.filter.Filter;
 import me.parapenguin.overcast.scrimmage.map.kit.ItemKit;
 import me.parapenguin.overcast.scrimmage.map.kit.KitLoader;
@@ -62,11 +63,12 @@ public class Map {
 	@Getter List<RegionGroup> regions;
 	@Getter List<Filter> filters;
 	
+	@Getter SidebarType sidebar = SidebarType.OBJECTIVES;
 	@Getter Scoreboard board;
 	@Getter Objective boardObjective;
 	
 	public Map(MapLoader loader, RotationSlot slot, String name, String version, String objective, List<String> rules,
-			List<Contributor> authors, List<Contributor> contributors, List<MapTeam> teams, MapTeam observers, int maxbuildheight) {
+			List<Contributor> authors, List<Contributor> contributors, List<MapTeam> teams, MapTeam observers, int maxbuildheight, SidebarType sidebar) {
 		this.loader = loader;
 		this.slot = slot;
 		this.name = name;
@@ -76,9 +78,10 @@ public class Map {
 		this.authors = authors;
 		this.contributors = contributors;
 		this.maxbuildheight = maxbuildheight;
+		this.sidebar = sidebar;
 		
 		this.board = Scrimmage.getInstance().getServer().getScoreboardManager().getNewScoreboard();
-		reloadSidebar(false);
+		reloadSidebar(false, null);
 	}
 	
 	public List<MapTeam> getAllTeams() {
@@ -114,26 +117,47 @@ public class Map {
 		return null;
 	}
 	
-	public void reloadSidebar(boolean objectives) {
-		if(boardObjective != null)
-			this.boardObjective.unregister();
-		
-		this.boardObjective = board.registerNewObjective("Objectives", "dummy");
-		this.boardObjective.setDisplayName(ChatColor.GOLD + "Objectives");
-		this.boardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-		
-		if(objectives) {
-			int i = 1;
-			for(MapTeam team : teams) {
-				if(team.getObjectives() == null || team.getObjectives().size() == 0)
-					i = team.loadTeamObjectives(true, i);
-				else i = team.loadTeamObjectives(false, i);
-				if(teams.get(teams.size() - 1) != team) {
-					i++;
-					OfflinePlayer player = Scrimmage.getInstance().getServer().getOfflinePlayer(getSpaces(i));
-					getBoardObjective().getScore(player).setScore(i);
-					i++;
+	public void reloadSidebar(boolean objectives, SidebarType sidebar) {
+		if(getSidebar() == SidebarType.OBJECTIVES && (sidebar == SidebarType.OBJECTIVES || sidebar == null)) {
+			if(boardObjective != null)
+				this.boardObjective.unregister();
+			
+			this.boardObjective = board.registerNewObjective("Objectives", "dummy");
+			this.boardObjective.setDisplayName(ChatColor.GOLD + "Objectives");
+			this.boardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+			
+			if(objectives) {
+				int i = 1;
+				for(MapTeam team : teams) {
+					if(team.getObjectives() == null || team.getObjectives().size() == 0)
+						i = team.loadTeamObjectives(true, i);
+					else i = team.loadTeamObjectives(false, i);
+					if(teams.get(teams.size() - 1) != team) {
+						i++;
+						OfflinePlayer player = Scrimmage.getInstance().getServer().getOfflinePlayer(getSpaces(i));
+						getBoardObjective().getScore(player).setScore(i);
+						i++;
+					}
 				}
+			}
+		} else if(getSidebar() == SidebarType.SCORE && (sidebar == SidebarType.SCORE || sidebar == null)) {
+			if(objectives) {
+				if(boardObjective != null)
+					this.boardObjective.unregister();
+				
+				this.boardObjective = board.registerNewObjective("Score", "dummy");
+				this.boardObjective.setDisplayName(ChatColor.GOLD + "Score");
+				this.boardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+				
+				for(MapTeam team : getTeams()) {
+					OfflinePlayer player = Scrimmage.getInstance().getServer().getOfflinePlayer(team.getColor() + team.getDisplayName());
+					this.boardObjective.getScore(player).setScore(1);
+				}
+			}
+			
+			for(MapTeam team : getTeams()) {
+				OfflinePlayer player = Scrimmage.getInstance().getServer().getOfflinePlayer(team.getColor() + team.getDisplayName());
+				this.boardObjective.getScore(player).setScore(team.getScore());
 			}
 		}
 	}
@@ -277,7 +301,7 @@ public class Map {
 			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
 					+ (System.currentTimeMillis() - start) + "ms!");
 			
-			reloadSidebar(true);
+			reloadSidebar(true, null);
 
 			Scrimmage.getInstance().getLogger().info("Loaded the Objectives for '" + this.name + "' taking "
 					+ (System.currentTimeMillis() - step) + "ms!");

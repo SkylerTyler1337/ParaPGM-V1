@@ -238,7 +238,7 @@ public class Match {
 			return true;
 		}
 		
-		if(cycling == 5 && !loaded && next != null) {
+		if(cycling <= 5 && !loaded && next != null) {
 			setLoaded(true);
 			next.load();
 		}

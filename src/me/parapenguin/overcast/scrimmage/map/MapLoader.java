@@ -12,6 +12,7 @@ import org.dom4j.io.SAXReader;
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
+import me.parapenguin.overcast.scrimmage.map.extras.SidebarType;
 import me.parapenguin.overcast.scrimmage.map.region.Region;
 import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
 
@@ -32,6 +33,7 @@ public class MapLoader {
 	@Getter MapTeam observers;
 	
 	@Getter int maxbuildheight;
+	@Getter SidebarType sidebar;
 	
 	@SuppressWarnings("unchecked")
 	private MapLoader(File file, Document doc) {
@@ -81,6 +83,8 @@ public class MapLoader {
 			}
 		}
 		
+		this.sidebar = SidebarType.OBJECTIVES;
+		
 		// this.filters = filters;
 		
 		long finish = System.currentTimeMillis();
@@ -88,7 +92,7 @@ public class MapLoader {
 	}
 	
 	public Map getMap(RotationSlot slot) {
-		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers, maxbuildheight);
+		return new Map(this, slot, name, version, objective, rules, authors, contributors, teams, observers, maxbuildheight, sidebar);
 	}
 	
 	public static boolean isLoadable(File file) {

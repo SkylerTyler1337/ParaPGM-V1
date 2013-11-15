@@ -4,7 +4,9 @@ import java.util.List;
 
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.map.Map;
+import me.parapenguin.overcast.scrimmage.map.extras.SidebarType;
 import me.parapenguin.overcast.scrimmage.map.filter.events.BlockChangeEvent;
+import me.parapenguin.overcast.scrimmage.match.events.PlayerDiedEvent;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.utils.FireworkUtil;
 
@@ -22,7 +24,21 @@ import org.bukkit.event.block.BlockPlaceEvent;
 public class ObjectiveEvents implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGH)
+	public void onPlayerDiedEvent(PlayerDiedEvent event) {
+		Client killer = Client.getClient(event.getKiller());
+		Client died = Client.getClient(event.getKilled());
+		
+		if(killer == null) died.getTeam().addScore(-1);
+		else killer.getTeam().addScore(1);
+		
+		event.getMap().reloadSidebar(false, SidebarType.SCORE);
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onCoreBlockChange(BlockChangeEvent event) {
+		if(event.getNewState().getWorld() != event.getMap().getWorld())
+			return;
+		
 		if(event.getClient() != null) {
 			Client client = event.getClient();
 			List<CoreObjective> cores = event.getMap().getCores();
@@ -45,7 +61,7 @@ public class ObjectiveEvents implements Listener {
 				CoreObjective core = event.getMap().getCoreLeak(event.getNewState().getLocation());
 				core.setComplete(true);
 				
-				event.getMap().reloadSidebar(true);
+				event.getMap().reloadSidebar(true, SidebarType.OBJECTIVES);
 				
 				String who = core.getTeam().getColor() + core.getTeam().getDisplayName() + "'s";
 				String leaked = ChatColor.DARK_AQUA + " " + core.getName();
@@ -106,7 +122,7 @@ public class ObjectiveEvents implements Listener {
 		}
 		
 		wool.setComplete(true);
-		client.getTeam().getMap().reloadSidebar(true);
+		client.getTeam().getMap().reloadSidebar(true, SidebarType.OBJECTIVES);
 		
 		String who = client.getTeam().getColor() + client.getPlayer().getName();
 		String placed = ChatColor.WHITE + " placed the " + wool.getColor() + wool.getName().toUpperCase();

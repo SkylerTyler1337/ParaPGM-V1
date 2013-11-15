@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
 import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.objective.CoreObjective;
@@ -52,6 +53,7 @@ public class MapTeam {
 	@Getter String name;
 	@Getter ChatColor color;
 	@Getter int cap;
+	@Getter @Setter int score = 0;
 	
 	@Getter String displayName;
 	@Getter List<MapTeamSpawn> spawns;
@@ -90,13 +92,17 @@ public class MapTeam {
 		this(map, name, getChatColorFromString(color), cap);
 	}
 	
+	public void addScore(int amount) {
+		setScore(getScore() + amount);
+	}
+	
 	public void setDisplayName() {
 		setDisplayName(name, false);
 	}
 	
 	public void setDisplayName(String name, boolean update) {
 		this.displayName = name;
-		if(update) getMap().reloadSidebar(true);
+		if(update) getMap().reloadSidebar(true, null);
 	}
 	
 	public void loadTeam() {
