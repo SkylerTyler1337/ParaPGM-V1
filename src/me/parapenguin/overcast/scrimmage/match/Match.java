@@ -170,24 +170,25 @@ public class Match {
 			Scrimmage.broadcast(broadcast);
 		}
 		
-		boolean timer = false;
-		if(getMap().getSidebar() != SidebarType.SCORE) return false;
-		else if(timing % 60 == 0) timer = true;
-		else if(getMap().getTimeLimit() > 0) {
-			if(getMap().getTimeLimit() - timing <= 60) {
-				if(getMap().getTimeLimit() - timing % 15 == 0) timer = true;
-				else if(getMap().getTimeLimit() - timing < 5) timer = true;
+		if(getMap().getSidebar() == SidebarType.SCORE) {
+			boolean timer = false;
+			if(timing % 60 == 0) timer = true;
+			else if(getMap().getTimeLimit() > 0) {
+				if(getMap().getTimeLimit() - timing <= 60) {
+					if(getMap().getTimeLimit() - timing % 15 == 0) timer = true;
+					else if(getMap().getTimeLimit() - timing < 5) timer = true;
+				}
 			}
-		}
-		
-		if(timer) {
-			String score = ChatColor.AQUA + "Score: ";
-			for(MapTeam team : getMap().getTeams())
-				score += team.getColor() + "" + team.getScore() + " ";
 			
-			if(getMap().getTimeLimit() > 0)
-				score += ChatColor.RED + ConversionUtil.formatTime(getMap().getTimeLimit() - getTiming());
-			Scrimmage.broadcast(score);
+			if(timer) {
+				String score = ChatColor.AQUA + "Score: ";
+				for(MapTeam team : getMap().getTeams())
+					score += team.getColor() + "" + team.getScore() + " ";
+				
+				if(getMap().getTimeLimit() > 0)
+					score += ChatColor.RED + ConversionUtil.formatTime(getMap().getTimeLimit() - getTiming());
+				Scrimmage.broadcast(score);
+			}
 		}
 		
 		timing++;
