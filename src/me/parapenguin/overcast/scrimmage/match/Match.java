@@ -12,6 +12,7 @@ import me.parapenguin.overcast.scrimmage.map.Map;
 import me.parapenguin.overcast.scrimmage.map.MapTeam;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.extras.SidebarType;
+import me.parapenguin.overcast.scrimmage.map.objective.CoreObjective;
 import me.parapenguin.overcast.scrimmage.player.Client;
 import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
 import me.parapenguin.overcast.scrimmage.utils.ConversionUtil;
@@ -168,6 +169,11 @@ public class Match {
 			String creators = ConversionUtil.commaList(authors, ChatColor.DARK_PURPLE);
 			String broadcast = playing + by + creators;
 			Scrimmage.broadcast(broadcast);
+		}
+		
+		for(CoreObjective core : getMap().getCores()) {
+			if(core.getStage().getNext() != null && core.getStage().getNext().getTime() == timing)
+				core.setStage(core.getStage().getNext());
 		}
 		
 		if(getMap().getSidebar() == SidebarType.SCORE) {

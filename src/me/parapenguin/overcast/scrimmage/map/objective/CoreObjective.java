@@ -24,7 +24,8 @@ public class CoreObjective extends TeamObjective {
 	}
 	
 	public boolean isLeak(Location location) {
-		return RegionUtil.closest(location, blocks) >= leak;
+		double closest = RegionUtil.closest(location, blocks);
+		return closest >= leak && closest <= leak + 4;
 	}
 	
 	public boolean isLocation(Location location) {
@@ -43,6 +44,7 @@ public class CoreObjective extends TeamObjective {
 	}
 	
 	public void setStage(CoreStage newStage) {
+		final CoreStage oldStage = this.stage;
 		if(newStage == CoreStage.OTHER)
 			return;
 		
@@ -52,9 +54,9 @@ public class CoreObjective extends TeamObjective {
 			
 			@Override
 			public void run() {
-				for(Location location : blocks) {
-					location.getBlock().setType(stage.getMaterial());
-				}
+				for(Location location : blocks)
+					if(location.getBlock().getType() == oldStage.getMaterial())
+						location.getBlock().setType(stage.getMaterial());
 			}
 			
 		};

@@ -331,7 +331,7 @@ public class MapTeam {
 					
 					String name = "Core";
 					MapTeam team = this;
-					int leak = 0;
+					int leak = 8;
 					Material material = Material.AIR;
 					
 					if(core.attributeValue("team") == null && core.getParent().attributeValue("team") == null) continue;
@@ -343,7 +343,6 @@ public class MapTeam {
 					else if(core.getParent().attributeValue("material") != null) material = ConversionUtil.convertStringToMaterial(core.getParent().attributeValue("material"));
 					if(material == null) continue;
 					
-					if(core.attributeValue("leak") == null && core.getParent().attributeValue("leak") == null) continue;
 					if(core.attributeValue("leak") != null) leak = ConversionUtil.convertStringToInteger(core.attributeValue("leak"));
 					else if(core.getParent().attributeValue("leak") != null) leak = ConversionUtil.convertStringToInteger(core.getParent().attributeValue("leak"));
 					
