@@ -38,14 +38,14 @@ public class PlayerEvents implements Listener {
 		Client.getClients().add(client);
 		client.setTeam(Scrimmage.getRotation().getSlot().getMap().getObservers(), true, true, true);
 		
-		event.setJoinMessage(client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " joined the game.");
+		event.setJoinMessage(client.getStars() + client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " joined the game.");
 	}
 	
 	@EventHandler
 	public void onPlayerKick(PlayerKickEvent event) {
 		Client client = Client.getClient(event.getPlayer());
 		try {
-			event.setLeaveMessage(client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " left the game.");
+			event.setLeaveMessage(client.getStars() + client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " left the game.");
 			onPlayerExit(event.getPlayer());
 		} catch(NullPointerException e) {}
 	}
@@ -54,7 +54,7 @@ public class PlayerEvents implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Client client = Client.getClient(event.getPlayer());
 		try {
-			event.setQuitMessage(client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " left the game.");
+			event.setQuitMessage(client.getStars() + client.getTeam().getColor() + event.getPlayer().getName() + ChatColor.YELLOW + " left the game.");
 			onPlayerExit(event.getPlayer());
 		} catch(NullPointerException e) {}
 	}
