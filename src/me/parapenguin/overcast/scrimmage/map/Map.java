@@ -321,9 +321,18 @@ public class Map {
 			step = System.currentTimeMillis();
 			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
 					+ (System.currentTimeMillis() - start) + "ms!");
+			
+			/*
+			 * Start parsing those filters, shall we?
+			 */
+			
+			filters = new ArrayList<Filter>();
+			Element filters = root.element("filters");
+			if(filters != null) {
+				
+			}
 
 			regions = new ArrayList<RegionGroup>();
-			
 			Element regions = root.element("regions");
 			if(regions != null) {
 				Region shapes = new Region(this, regions, RegionType.ALL);

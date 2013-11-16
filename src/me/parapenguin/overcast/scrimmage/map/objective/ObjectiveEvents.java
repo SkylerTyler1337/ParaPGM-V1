@@ -8,6 +8,7 @@ import me.parapenguin.overcast.scrimmage.map.extras.SidebarType;
 import me.parapenguin.overcast.scrimmage.map.filter.events.BlockChangeEvent;
 import me.parapenguin.overcast.scrimmage.match.events.PlayerDiedEvent;
 import me.parapenguin.overcast.scrimmage.player.Client;
+import me.parapenguin.overcast.scrimmage.utils.ConversionUtil;
 import me.parapenguin.overcast.scrimmage.utils.FireworkUtil;
 
 import org.bukkit.ChatColor;
@@ -125,14 +126,14 @@ public class ObjectiveEvents implements Listener {
 			e.printStackTrace();
 		}
 		
-		wool.setComplete(true);
-		client.getTeam().getMap().reloadSidebar(true, SidebarType.OBJECTIVES);
-		
 		String who = client.getTeam().getColor() + client.getPlayer().getName();
-		String placed = ChatColor.WHITE + " placed the " + wool.getColor() + wool.getName().toUpperCase();
+		String placed = ChatColor.WHITE + " placed the " +  + wool.getName().toUpperCase();
 		String team = ChatColor.WHITE + " for " + client.getTeam().getColor() + client.getTeam().getDisplayName();
 		String message = who + placed + team;
 		Scrimmage.broadcast(message);
+		
+		wool.setComplete(true);
+		client.getTeam().getMap().reloadSidebar(true, SidebarType.OBJECTIVES);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)

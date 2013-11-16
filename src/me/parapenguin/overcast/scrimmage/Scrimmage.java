@@ -2,18 +2,13 @@ package me.parapenguin.overcast.scrimmage;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -30,16 +25,14 @@ import me.parapenguin.overcast.scrimmage.rotation.Rotation;
 import me.parapenguin.overcast.scrimmage.tracker.GravityKillTracker;
 import me.parapenguin.overcast.scrimmage.tracker.PlayerBlockChecker;
 import me.parapenguin.overcast.scrimmage.tracker.TickTimer;
+import me.parapenguin.overcast.scrimmage.utils.ClassPathUtil;
 import me.parapenguin.overcast.scrimmage.utils.FileUtil;
-import me.parapenguin.overcast.scrimmage.utils.JarUtils;
 import me.parapenguin.overcast.scrimmage.utils.ZipUtil;
 
 public class Scrimmage extends JavaPlugin {
 	
 	static @Getter Scrimmage instance;
 	static @Getter @Setter Rotation rotation;
-	@Getter List<File> libs = new ArrayList<File>();
-	@Getter List<String> files = new ArrayList<String>();
 
 	private TickTimer tickTimer;
 	@Getter public GravityKillTracker gkt;
@@ -62,25 +55,25 @@ public class Scrimmage extends JavaPlugin {
 		if(getConfig().getString("maps") != null)
 			this.mapDirectory = getConfig().getString("maps");
 		
-		files = new ArrayList<String>();
+		List<String> files = new ArrayList<String>();
 		File libFolder = new File(getRootDirectory(), "libs");
 		if(!libFolder.exists()) libFolder = getDataFolder().getParentFile().getParentFile().getParentFile().getParentFile();
 		files.add("dom4j.jar");
 		
-		for (String stringFile : files) {
-
-			if (libFolder.exists() && libFolder.isDirectory()) {
-				libs.add(new File(libFolder.getAbsolutePath() + "/" + stringFile));
-			} else if (!libFolder.exists()) {
-				libFolder.mkdir();
-				libs.add(new File(libFolder.getAbsolutePath() + "/" + stringFile));
-			} else {
-				getLogger().warning("/" + libFolder.getParentFile().getName() + "/" + libFolder.getName() + " already exists and isn't a directory.");
-				Bukkit.getServer().getPluginManager().disablePlugin(this);
-			}
+		ClassPathUtil.load(libFolder);
+		if(!ClassPathUtil.addJars(files)) {
+			ServerLog.severe("Failed to load all of the required libraries - Server shutting down!");
+			getServer().shutdown();
+			return;
 		}
 
-		loadJars();
+		if(!ClassPathUtil.loadJars()) {
+			ServerLog.severe("Failed to add all of the required libraries to the class path - Server shutting down!");
+			getServer().shutdown();
+			return;
+		}
+		
+		startup();
 		
 		/*
 		 * Auto un-zipper, this should be helpful instead of killing my internet :)
@@ -148,43 +141,6 @@ public class Scrimmage extends JavaPlugin {
 		gkt = new GravityKillTracker(tickTimer, new PlayerBlockChecker());
 		getServer().getPluginManager().registerEvents(gkt, this);
 		getServer().getPluginManager().registerEvents(tickTimer, this);
-	}
-	
-	public void loadJars() {
-		/*
-		 * That awkward moment when you forget to upload the jar file... hahah!
-		 */
-		
-		new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				for (File lib : libs) {
-					try {
-						addClassPath(JarUtils.getJarUrl(lib));
-						getLogger().info("'" + lib.getName() + "' has been loaded!");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				
-				startup();
-			}
-			
-		}.runTask(instance);
-	}
-	
-	public void addClassPath(final URL url) throws IOException {
-		final URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-		final Class<URLClassLoader> sysclass = URLClassLoader.class;
-		try {
-			final Method method = sysclass.getDeclaredMethod("addURL", new Class[] { URL.class });
-			method.setAccessible(true);
-			method.invoke(sysloader, new Object[] { url });
-		} catch (final Throwable t) {
-			t.printStackTrace();
-			throw new IOException("Error adding " + url + " to system classloader");
-		}
 	}
 	
 	public static int random(int min, int max) {
