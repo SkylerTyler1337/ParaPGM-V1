@@ -41,6 +41,8 @@ Before you can go any further, you must make sure that your Maps repository cont
 
 You can see the format of the repository [here] [4] or [here] [3]. Those steps are pretty easy and no modifications should be needed to setup your server, as the map.xml is read just like PGM would!
 
+The maps repository should be a folder named 'maps' in the root of the server folder. (This is the same location as the server jar.)
+
 [1]: http://scrimmage1.teamloading.com/craftbukkit.jar "SportBukkit"
 [2]: http://scrimmage1.teamloading.com/dom4j.jar "dom4j"
 [3]: https://maps.oc.tc/ "Overcast Maps"
