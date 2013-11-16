@@ -62,6 +62,7 @@ public class Scrimmage extends JavaPlugin {
 		if(getConfig().getString("maps") != null)
 			this.mapDirectory = getConfig().getString("maps");
 		
+		files = new ArrayList<String>();
 		File libFolder = new File(getRootDirectory(), "libs");
 		if(!libFolder.exists()) libFolder = getDataFolder().getParentFile().getParentFile().getParentFile().getParentFile();
 		files.add("dom4j.jar");

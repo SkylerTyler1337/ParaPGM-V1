@@ -19,6 +19,7 @@ import org.dom4j.Element;
 
 import lombok.Getter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.extras.Contributor;
 import me.parapenguin.overcast.scrimmage.map.extras.SidebarType;
 import me.parapenguin.overcast.scrimmage.map.filter.Filter;
@@ -33,6 +34,7 @@ import me.parapenguin.overcast.scrimmage.map.region.RegionGroup;
 import me.parapenguin.overcast.scrimmage.map.region.RegionGroupType;
 import me.parapenguin.overcast.scrimmage.map.region.RegionType;
 import me.parapenguin.overcast.scrimmage.rotation.RotationSlot;
+import me.parapenguin.overcast.scrimmage.utils.ConversionUtil;
 import me.parapenguin.overcast.scrimmage.utils.FileUtil;
 
 public class Map {
@@ -56,7 +58,7 @@ public class Map {
 	@Getter List<Contributor> authors;
 	@Getter List<Contributor> contributors;
 	@Getter List<ItemKit> kits;
-	@Getter List<MapTeam> teams;
+	@Getter List<MapTeam> teams = new ArrayList<MapTeam>();
 	@Getter MapTeam observers;
 	
 	@Getter int maxbuildheight;
@@ -80,14 +82,15 @@ public class Map {
 		this.rules = rules;
 		this.authors = authors;
 		this.contributors = contributors;
-		this.teams = teams;
-		this.observers = observers;
+		if(teams != null) this.teams = teams;
+		if(observers != null) this.observers = observers;
 		this.maxbuildheight = maxbuildheight;
 		this.sidebar = sidebar;
 		this.timeLimit = timeLimit;
 		this.scoreLimit = scoreLimit;
 		
 		this.board = Scrimmage.getInstance().getServer().getScoreboardManager().getNewScoreboard();
+		reloadSidebar(true, null);
 	}
 	
 	public List<MapTeam> getAllTeams() {
@@ -262,7 +265,11 @@ public class Map {
 							+ teamName + "' due to having an invalid color supplied!");
 				else teams.add(team);
 			}
-
+			
+			List<String> values = new ArrayList<String>();
+			for(MapTeam team : teams) values.add(team.getName());
+			ServerLog.info("Loaded " + teams.size() + " teams (" + ConversionUtil.commaList(values) + ")");
+			
 			Scrimmage.getInstance().getLogger().info("Loaded the Teams for '" + this.name + "' taking "
 					+ (System.currentTimeMillis() - step) + "ms!");
 			step = System.currentTimeMillis();

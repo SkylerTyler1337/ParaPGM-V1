@@ -3,6 +3,7 @@ package me.parapenguin.overcast.scrimmage.match;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.ChatColor;
 
 import lombok.Getter;
@@ -172,8 +173,12 @@ public class Match {
 		}
 		
 		for(CoreObjective core : getMap().getCores()) {
-			if(core.getStage().getNext() != null && core.getStage().getNext().getTime() == timing)
+			if(core.getStage().getNext() != null && core.getStage().getNext().getTime() == timing) {
+				String prefix = ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "> > > ";
+				String suffix = ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " < < <";
+				Scrimmage.broadcast(prefix + ChatColor.RED + WordUtils.capitalizeFully(core.getStage().name() + " Core Mode") + suffix);
 				core.setStage(core.getStage().getNext());
+			}
 		}
 		
 		if(getMap().getSidebar() == SidebarType.SCORE) {
