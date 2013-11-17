@@ -1,7 +1,7 @@
 ParaPGM
 =======
 
-Private Overcast Scrimmage plugin utilising the OCN XML system!
+ParaPenguin's public version of PGM utilising the OCN XML system!
 
 If you have a new feature that you think should be part of this plugin, submit a PR and I'll most likely add it within 7 days.
 
