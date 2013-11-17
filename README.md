@@ -14,21 +14,20 @@ Todo List
 - [ ] Update to the new version of Overcast Tracker
 - [ ] Add support for Gear maps
 
-[PRE] Compiling your own version of ParaPGM
+Compiling your own version of ParaPGM
 -------------------------------------------
-First things first, you're going to need to download and **install** [Lombok] [6] onto Eclipse, this is so that the methods work. Make sure you restart Eclipse after install *cough* *cough*
+First things first, you're going to need to download and **install** [Lombok] [5] onto Eclipse, this is so that the methods work. Make sure you restart Eclipse after install *cough* *cough*
 
 Next, you're going to need to import the following jars into your Eclipse project!
-- [SportBukkit Server] [1]
+- [SportBukkit Server & API] [1] (_you need both files_)
 - [dom4j Library] [2]
-- [SportBukkit API] [5]
-- [Lombok] [6]
+- [Lombok] [5]
 
 After that, export the plugin and you're ready to roll! Just add it to your plugins folder, and follow the setup process below.
 
 1. Getting and Setting up SportBukkit
 -------------------------------------
-First of all, this plugin **requires** SportBukkit! So before going any further, if you don't have it, you'll need to compile or you can find a version of **SportBukkit** that my servers use, located at [CraftBukkit] [1]
+First of all, this plugin **requires** SportBukkit! So before going any further, if you don't have it, you'll need to compile or you can find a version of **SportBukkit** that my servers use, located [here] [1] (you need `sportbukkit`, not `sportbukkit-api`)
 
 If you don't know what **SportBukkit** is, then you're pretty silly and you need to place it as though it was your CraftBukkit/Spigot jar.
 
@@ -45,9 +44,8 @@ You can see the format of the repository [here] [4] or [here] [3]. Those steps a
 
 The maps repository should be a folder named 'maps' in the root of the server folder. (This is the same location as the server jar.)
 
-[1]: http://scrimmage1.teamloading.com/craftbukkit.jar "SportBukkit"
+[1]: http://ci.maxsa.li/job/SportBukkit/ "SportBukkit"
 [2]: http://scrimmage1.teamloading.com/dom4j.jar "dom4j"
 [3]: https://maps.oc.tc/ "Overcast Maps"
 [4]: http://scrimmage1.teamloading.com/ "Scrimmage Maps"
-[5]: http://scrimmage1.teamloading.com/bukkit.jar "SportBukkit API"
-[6]: http://projectlombok.org/ "Project Lombok"
+[5]: http://projectlombok.org/ "Project Lombok"
