@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.parapenguin.overcast.scrimmage.map.extras.projectile.ModifyBowProjectileModule;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -289,9 +290,11 @@ public class Map {
 					+ (System.currentTimeMillis() - step) + "ms!");
 			step = System.currentTimeMillis();
 			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
-					+ (System.currentTimeMillis() - start) + "ms!");
-			
-			for(MapTeam team : teams)
+                    + (System.currentTimeMillis() - start) + "ms!");
+
+            ModifyBowProjectileModule.parse(loader.getDoc());
+
+            for(MapTeam team : teams)
 				team.load(root.element("spawns"), -1);
 			
 			observers = new MapTeam(this, "Observers", ChatColor.AQUA, -1);
@@ -309,7 +312,7 @@ public class Map {
 			observers.loadTeam();
 
 			Scrimmage.getInstance().getLogger().info("Loaded the Scoreboard Teams for '" + this.name + "' taking "
-					+ (System.currentTimeMillis() - step) + "ms!");
+                    + (System.currentTimeMillis() - step) + "ms!");
 			step = System.currentTimeMillis();
 			Scrimmage.getInstance().getLogger().info("Total load time for '" + this.name + "' is currently "
 					+ (System.currentTimeMillis() - start) + "ms!");

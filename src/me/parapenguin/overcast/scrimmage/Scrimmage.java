@@ -192,5 +192,10 @@ public class Scrimmage extends JavaPlugin {
 	public static Map getMap() {
 		return Scrimmage.getRotation().getSlot().getMap();
 	}
-	
+
+    public void registerEvents(Listener listener) {
+        getServer().getPluginManager().registerEvents(listener, this);
+    }
 }
+
+

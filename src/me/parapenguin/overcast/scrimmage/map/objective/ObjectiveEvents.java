@@ -127,7 +127,7 @@ public class ObjectiveEvents implements Listener {
 		}
 		
 		String who = client.getTeam().getColor() + client.getPlayer().getName();
-		String placed = ChatColor.WHITE + " placed the " +  + wool.getName().toUpperCase();
+		String placed = ChatColor.WHITE + " placed the " + wool.getName().toUpperCase();
 		String team = ChatColor.WHITE + " for " + client.getTeam().getColor() + client.getTeam().getDisplayName();
 		String message = who + placed + team;
 		Scrimmage.broadcast(message);
