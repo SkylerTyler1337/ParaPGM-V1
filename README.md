@@ -44,7 +44,7 @@ You can see the format of the repository [here] [4] or [here] [3]. Those steps a
 
 The maps repository should be a folder named 'maps' in the root of the server folder. (This is the same location as the server jar.)
 
-[1]: http://ci.maxsa.li/job/SportBukkit/ "SportBukkit"
+[1]: http://ci.maxsa.li/job/SportBukkit/lastBuild/ "SportBukkit"
 [2]: http://scrimmage1.teamloading.com/dom4j.jar "dom4j"
 [3]: https://maps.oc.tc/ "Overcast Maps"
 [4]: http://scrimmage1.teamloading.com/ "Scrimmage Maps"
