@@ -45,7 +45,7 @@ public class Client {
 	public String getStars() {
 		String[] devs = new String[]{"ParaPenguin", "Haribo98"};
 		String[] refs = new String[]{"pmheys", "your_loved_one", "dcstarwars", "ShinyDialga45", "iEli2tyree011"};
-		String[] subdevs = new String[]{};
+		String[] subdevs = new String[]{"ShinyDialga45", "bookofnathan"};
 
 		String op = ChatColor.RED + "*";
 		String dev = ChatColor.DARK_PURPLE + "*";
