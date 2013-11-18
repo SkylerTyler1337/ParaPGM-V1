@@ -13,6 +13,7 @@ Todo List
 - [ ] Add the Rage module
 - [ ] Update to the new version of Overcast Tracker
 - [ ] Add support for Gear maps
+- [ ] Item Remove / Item Repair
 
 Compiling your own version of ParaPGM
 -------------------------------------------
