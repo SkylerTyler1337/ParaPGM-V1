@@ -44,16 +44,8 @@ public class SetNextCommand implements CommandExecutor {
 		}
 		
 		Rotation rot = Scrimmage.getRotation();
-		RotationSlot after = rot.getNext();
-		
+
 		rot.setNext(new RotationSlot(found));
-		
-		RotationSlot current = rot.getSlot();
-		if(current.getMatch().isLoaded()) {
-			after.getMap().unload();
-			rot.getNext().load();
-			after.getMatch().setLoaded(true);
-		}
 		
 		sender.sendMessage(ChatColor.RED + sender.getName() + ChatColor.DARK_PURPLE + " set the next map to " + ChatColor.GOLD + found.getName() + ChatColor.DARK_PURPLE + "!");
 		

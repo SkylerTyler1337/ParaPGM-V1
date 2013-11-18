@@ -6,15 +6,19 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import me.parapenguin.overcast.scrimmage.Scrimmage;
+import me.parapenguin.overcast.scrimmage.ServerLog;
 import me.parapenguin.overcast.scrimmage.map.MapLoader;
 
 public class Rotation {
 	
 	static @Getter List<MapLoader> loaded = new ArrayList<MapLoader>();
 	@Getter List<RotationSlot> rotation = new ArrayList<RotationSlot>();
-	
+    int current;
+    @Getter @Setter RotationSlot nextmapinrot;
+    @Getter @Setter RotationSlot nextmap;
 	@Getter @Setter RotationSlot slot;
-	
+	boolean didsetnext;
+
 	public Rotation() {
 		List<MapLoader> maps = new ArrayList<MapLoader>();
 		List<RotationSlot> slots = new ArrayList<RotationSlot>();
@@ -58,20 +62,10 @@ public class Rotation {
 	}
 	
 	public void setNext(RotationSlot slot) {
-		int current = getLocation(slot);
-		
-		List<RotationSlot> pre = rotation.subList(0, current);
-		List<RotationSlot> aft = new ArrayList<RotationSlot>();
-		try {
-			aft = rotation.subList(current + 1, rotation.size() - 1);
-		} catch(Exception e) {}
-		
-		List<RotationSlot> rotation = new ArrayList<RotationSlot>();
-		rotation.addAll(pre);
-		rotation.add(slot);
-		rotation.addAll(aft);
-		
-		this.rotation = rotation;
+        didsetnext = true;
+        this.nextmap = slot;
+        current = getLocation(getSlot());
+        nextmapinrot = getSlot(current + 1);
 	}
 	
 	public RotationSlot getSlot(int slot) throws IndexOutOfBoundsException {
@@ -90,15 +84,32 @@ public class Rotation {
 	}
 	
 	public RotationSlot getNext() {
-		int current = getLocation(getSlot());
-		
-		try {
-			return getSlot(current + 1);
-		} catch(IndexOutOfBoundsException ioobe) {
-			return null;
-		}
+		if (this.nextmap != null) {
+            RotationSlot next = this.nextmap;
+            return next;
+        }
+        else if (this.nextmapinrot != null) {
+            RotationSlot next = this.nextmapinrot;
+            return next;
+        } else {
+            try {
+                return getSlot(getLocation(getSlot()) + 1);
+            } catch (IndexOutOfBoundsException ioob) {
+                return null;
+            }
+        }
 	}
-	
+
+    public void cyclingFinished () {
+        if (didsetnext && nextmap != null) {
+            nextmap = null;
+            didsetnext = false;
+        }
+        else if (!didsetnext && nextmapinrot != null) {
+            nextmapinrot = null;
+        }
+    }
+
 	public static boolean addMap(MapLoader loader) {
 		return loaded.add(loader);
 	}

@@ -3,6 +3,7 @@ package me.parapenguin.overcast.scrimmage.match;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.parapenguin.overcast.scrimmage.rotation.Rotation;
 import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.ChatColor;
 
@@ -103,8 +104,9 @@ public class Match {
 	}
 	
 	public void cycle(int time) {
-		if(time == 0)
+		if(time == 0) {
 			time = 30;
+        }
 		
 		try {
 			stop();
@@ -267,7 +269,8 @@ public class Match {
 			for(Client client : Client.getClients())
 				client.setTeam(next.getMap().getObservers(), true, true, true);
 			next.getMatch().start();
-			
+            Rotation rot = Scrimmage.getRotation();
+            rot.cyclingFinished();
 			return true;
 		}
 		
@@ -279,9 +282,10 @@ public class Match {
 		String p = "s";
 		if(cycling == 1) p = "";
 		if(cycling % 5 == 0 || cycling <= 5) {
-			if(next != null)
+			if(next != null) {
 				Scrimmage.broadcast(ChatColor.DARK_AQUA + "Cycling to " + ChatColor.AQUA + next.getLoader().getName() + ChatColor.DARK_AQUA
 						+ " in " + ChatColor.DARK_RED + cycling + ChatColor.DARK_AQUA + " second" + p + "!");
+            }
 			else Scrimmage.broadcast(ChatColor.AQUA + "Server restarting in " + ChatColor.DARK_RED + cycling + ChatColor.AQUA + " second" + p + "!");
 		}
 		
