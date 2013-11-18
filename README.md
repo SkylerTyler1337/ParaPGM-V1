@@ -14,6 +14,7 @@ Todo List
 - [ ] Update to the new version of Overcast Tracker
 - [ ] Add support for Gear maps
 - [ ] Item Remove / Item Repair
+- [x] Fix /sn (Set Next)
 
 Compiling your own version of ParaPGM
 -------------------------------------------
