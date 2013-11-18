@@ -39,8 +39,8 @@ public class SetNextCommand implements CommandExecutor {
 		
 		MapLoader found = Rotation.getMap(name);
 		if(found == null) {
-			sender.sendMessage(ChatColor.GRAY + "We could not find a map by the name '" + ChatColor.GOLD + name + ChatColor.GRAY + "'.");
-			sender.sendMessage(ChatColor.GRAY + "To see a list of valid maps, use the repo at github.com/ParaPenguin/ParaPGM-Maps '" + ChatColor.GOLD + name + ChatColor.GRAY + "'.");
+			sender.sendMessage(ChatColor.GRAY + "We could not find a map by the name '" + ChatColor.GOLD + name + ChatColor.GRAY + "'");
+			sender.sendMessage(ChatColor.GRAY + "To see a list of valid maps, use the repo at github.com/ParaPenguin/ParaPGM-Maps");
 			return false;
 		}
 		
