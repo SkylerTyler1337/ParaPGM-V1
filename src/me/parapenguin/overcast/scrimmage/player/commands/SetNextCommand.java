@@ -41,6 +41,7 @@ public class SetNextCommand implements CommandExecutor {
 		if(found == null) {
 			sender.sendMessage(ChatColor.GRAY + "We could not find a map by the name '" + ChatColor.GOLD + name + ChatColor.GRAY + "'.");
 			return false;
+			sender.sendMessage(ChatColor.GRAY + "To see a list of valid maps, use the repo at github.com/ParaPenguin/ParaPGM-Maps";
 		}
 		
 		Rotation rot = Scrimmage.getRotation();
