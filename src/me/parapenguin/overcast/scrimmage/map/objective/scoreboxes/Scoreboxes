@@ -1,0 +1,4 @@
+Package me.parapenguin.overcast.scrimmage.map.objective.scoreboxes;
+
+   Public class Scoreboxes extends JavaPlugin{
+
